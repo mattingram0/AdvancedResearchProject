@@ -38,8 +38,6 @@ df.plot(kind='line',x='name',y='num_children',ax=ax)
 df.plot(kind='line',x='name',y='num_pets', ax=ax)
 plt.clf()
 
-
-
 # Convenience method that plots all columns against the index
 # column, with labels.
 df.plot()
