@@ -45,3 +45,6 @@ df.plot()
 # Show the plot -
 plt.show()
 
+# Note - when plotting using Pandas and Matplotlib, keep the data and the
+# plotting separate - use pandas for the data, and matplotlib for the plotting
+

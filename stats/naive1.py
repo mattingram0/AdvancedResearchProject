@@ -1,2 +1,2 @@
 def forecast(data):
-    return data['total load actual'].shift(1)
+    data['naive1'] = data['total load actual'].shift(1)

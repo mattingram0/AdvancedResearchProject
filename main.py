@@ -1,17 +1,16 @@
 import pandas as pd
-from pandas.plotting import register_matplotlib_converters, \
-    autocorrelation_plot
-from statsmodels.graphics.tsaplots import plot_pacf, plot_acf
+from pandas.plotting import register_matplotlib_converters
+
+from statsmodels.tsa.stattools import adfuller
+from statsmodels.tsa.holtwinters import SimpleExpSmoothing, Holt
 import matplotlib.pyplot as plt
-import matplotlib.style
-from stats import helpers
-from stats import naive1, naiveS
+from stats import ses
 
 
 def load_data(filename):
-    return pd.read_csv(filename, parse_dates=["time"], usecols=["time",
-                                                                "total load "
-                                                                "actual"])
+    return pd.read_csv(filename, parse_dates=["time"],
+                       usecols=["time", "total load actual"],
+                       infer_datetime_format=True)
 
 
 def main():
@@ -19,56 +18,47 @@ def main():
     data = load_data("/Users/matt/Projects/AdvancedResearchProject/data/spain/"
                      "energy_dataset.csv")
     data.set_index('time', inplace=True)
-    data = data.head(336)  # Using diff variable caused the weird errors
     data.interpolate(inplace=True)  # Interpolate missing values
 
-    # Naive Forecast, and Simple Moving Average
-    week1_naive1 = naive1.forecast(data.iloc[0:168])
-    week2_naive1 = naive1.forecast(data.iloc[168:])
-    week1_naiveS = naiveS.forecast(data.iloc[0:168])
-    week2_naiveS = naiveS.forecast(data.iloc[168:])
-    week1_sma = helpers.sma(data.iloc[0:168], 24)
-    week2_sma = helpers.sma(data.iloc[168:], 24)
+    # Perform an Augmented Dickey-Fuller Test for stationarity
+    # test_stationarity(data)
 
-    # Create a figure with 6 (2 x 3) subplots, increase size and resolution,
-    # add titles and rotate x-axis labels
-    fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(12.8, 9.6), dpi=250)
-    fig.canvas.set_window_title("Visualisation and Autocorrelation")
-    axes[0, 0].set_title("Week 1")
-    axes[0, 1].set_title("Week 2")
-    plt.xticks(rotation=45)
+    # Plots the data at different frequencies
+    # helpers.resample_plots(data)
 
-    # Plot week 1 data, forecast, and autocorrelation
-    data.iloc[0:168].plot(ax=axes[0, 0])
-    # week1_naive1.plot(ax=axes[0, 0])
-    week1_naiveS.plot(ax=axes[0, 0])
-    # week1_sma.plot(ax=axes[0, 0])
-    autocorrelation_plot(data.iloc[0:168], ax=axes[1, 0])
+    # Plot the ACF of the first two weeks to assess stationarity
+    # helpers.acf_plots(data)
 
-    # Plot week 2 data, forecast and autocorrelation
-    data.iloc[168:].plot(ax=axes[0, 1])
-    # week2_naive1.plot(ax=axes[0, 1])
-    week2_naiveS.plot(ax=axes[0, 1])
-    # week2_sma.plot(ax=axes[0, 1])
-    autocorrelation_plot(data.iloc[168:], ax=axes[1, 1])
+    # Simple Exponential Smoothing Forecast
+    # ses.forecast(data)
 
-    # Plot the ACF and PACF
-    plot_acf(data.iloc[0:168], ax=axes[0, 2], alpha=0.1, lags=50)
-    plot_acf(data.iloc[168:], ax=axes[1, 2], alpha=0.1, lags=50)
+    #
 
-    # Show the plot
-    plt.show()
+
+def test_stationarity(data):
+    result = adfuller(data["total load actual"].iloc[0:1344],
+                            autolag='AIC')
+    print("Test Statistic = {:.3f}".format(result[0]))  # The error is a bug
+    print("P-value = {:.3f}".format(result[1]))
+    print("Critical values :")
+    for k, v in result[4].items():
+        print(
+            "\t{}: {:.4f} (The data is {}stationary with {}% "
+            "confidence)".format(
+                k, v, "not " if v < result[0] else "", 100 - int(k[:-1])))
 
 
 if __name__ == "main":
-    matplotlib.style.use('seaborn-deep')
+    # matplotlib.style.use('seaborn-deep')
     register_matplotlib_converters()
     # pd.options.mode.chained_assignment = None TURN OFF CHAINED ASSIGNMENTS
     # WARNING - possibly use in the future if I run into that message again
     main()
 
 # Entry point when using PyCharm - REMOVE
-matplotlib.style.use('seaborn-deep')
+# matplotlib.style.use('seaborn-deep')
 register_matplotlib_converters()
+pd.options.mode.chained_assignment = None
+plt.style.use('Solarize_Light2')
 main()
 
