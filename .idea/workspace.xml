@@ -2,14 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="564df88f-763d-43a5-ba2e-b5cd80214a9e" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/stats/ses.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/matt.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/matt.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stats/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/stats/helpers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stats/naive1.py" beforeDir="false" afterPath="$PROJECT_DIR$/stats/naive1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stats/naiveS.py" beforeDir="false" afterPath="$PROJECT_DIR$/stats/naiveS.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tutorials/plotting.py" beforeDir="false" afterPath="$PROJECT_DIR$/tutorials/plotting.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stats/naive2.py" beforeDir="false" afterPath="$PROJECT_DIR$/stats/naive2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stats/ses.py" beforeDir="false" afterPath="$PROJECT_DIR$/stats/ses.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -32,36 +30,15 @@
     <select />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+    <leaf>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="229">
-              <caret line="34" column="6" selection-start-line="34" selection-start-column="6" selection-end-line="34" selection-end-column="6" />
+            <state relative-caret-position="128">
+              <caret line="65" lean-forward="true" selection-start-line="65" selection-end-line="66" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/stats/ses.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-162">
-              <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
-              <folding>
-                <element signature="e#0#58#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/holtwinters.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="50">
-              <caret line="789" column="8" selection-start-line="789" selection-start-column="8" selection-end-line="789" selection-end-column="8" />
             </state>
           </provider>
         </entry>
@@ -69,11 +46,60 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/stats/helpers.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1605">
-              <caret line="107" column="4" selection-start-line="107" selection-start-column="4" selection-end-line="107" selection-end-column="33" />
+            <state relative-caret-position="177">
+              <caret line="103" column="20" selection-start-line="103" selection-start-column="20" selection-end-line="103" selection-end-column="20" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/seasonal.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="183">
+              <caret line="52" column="4" selection-start-line="52" selection-start-column="4" selection-end-line="52" selection-end-column="4" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/stats/ses.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="345">
+              <caret line="65" lean-forward="true" selection-start-line="65" selection-end-line="65" />
+              <folding>
+                <element signature="e#0#58#0" expanded="true" />
+                <element signature="e#228#1833#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/stats/naive1.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="45">
+              <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/stats/naiveS.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="15">
+              <caret line="1" column="56" selection-start-line="1" selection-start-column="56" selection-end-line="1" selection-end-column="56" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/stats/naive2.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="30">
+              <caret line="2" column="47" selection-start-line="2" selection-start-column="47" selection-end-line="2" selection-end-column="47" />
             </state>
           </provider>
         </entry>
@@ -94,8 +120,9 @@
       <find>week2_forecast</find>
       <find>title</find>
       <find>set_title</find>
-      <find>legend</find>
       <find>legends</find>
+      <find>t</find>
+      <find>legend</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -111,16 +138,17 @@
         <option value="$PROJECT_DIR$/stats/pandas.py" />
         <option value="$PROJECT_DIR$/stats/basics.py" />
         <option value="$PROJECT_DIR$/stats/pandasBasics.py" />
-        <option value="$PROJECT_DIR$/stats/naive2.py" />
         <option value="$PROJECT_DIR$/stats/sma.py" />
         <option value="$PROJECT_DIR$/tutorials/pandas2.py" />
         <option value="$PROJECT_DIR$/tutorials/numpy1.py" />
         <option value="$PROJECT_DIR$/tutorials/scipy1.py" />
         <option value="$PROJECT_DIR$/tutorials/plotting.py" />
         <option value="$PROJECT_DIR$/stats/naiveS.py" />
-        <option value="$PROJECT_DIR$/stats/naive1.py" />
-        <option value="$PROJECT_DIR$/stats/helpers.py" />
+        <option value="$APPLICATION_CONFIG_DIR$/pycharm.vmoptions" />
         <option value="$PROJECT_DIR$/stats/ses.py" />
+        <option value="$PROJECT_DIR$/stats/naive1.py" />
+        <option value="$PROJECT_DIR$/stats/naive2.py" />
+        <option value="$PROJECT_DIR$/stats/helpers.py" />
         <option value="$PROJECT_DIR$/main.py" />
       </list>
     </option>
@@ -135,7 +163,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -148,10 +175,16 @@
               <item name="AdvancedResearchProject" type="462c0819:PsiDirectoryNode" />
               <item name="stats" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="AdvancedResearchProject" type="b2602c69:ProjectViewProjectNode" />
+              <item name="AdvancedResearchProject" type="462c0819:PsiDirectoryNode" />
+              <item name="tutorials" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -311,7 +344,8 @@
       <updated>1573150147721</updated>
       <workItem from="1573150149943" duration="24328000" />
       <workItem from="1573232602412" duration="32768000" />
-      <workItem from="1573642445141" duration="24641000" />
+      <workItem from="1573642445141" duration="25431000" />
+      <workItem from="1573815772139" duration="10830000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit. Git setup.">
       <created>1573219288446</created>
@@ -362,21 +396,28 @@
       <option name="project" value="LOCAL" />
       <updated>1573642811684</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Added resampling techniques, and Simple Exponential Smoothing">
+      <created>1573815071085</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1573815071085</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="81737000" />
+    <option name="totallyTimeSpent" value="93357000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="720" height="900" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.29351032" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2920354" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.29646018" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32920793" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32920793" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
@@ -387,11 +428,11 @@
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.5007153" side_tool="true" weight="0.38366336" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.32920793" />
-      <window_info active="true" anchor="bottom" id="Python Console" order="12" sideWeight="0.49928468" visible="true" weight="0.28836635" />
+      <window_info anchor="bottom" id="Python Console" order="12" sideWeight="0.49928468" visible="true" weight="0.34034654" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" x="204" y="22" width="719" height="878" id="SciView" order="3" sideWeight="0.49893844" type="WINDOWED" visible="true" weight="0.81473535" />
+      <window_info anchor="right" x="0" y="22" width="1440" height="878" id="SciView" order="3" sideWeight="0.49893844" type="WINDOWED" visible="true" weight="0.7182891" />
       <window_info anchor="right" id="Database" order="4" weight="0.3297568" />
       <window_info anchor="right" x="0" y="0" width="310" height="700" id="Documentation" order="5" sideWeight="0.50106156" side_tool="true" weight="0.9406295" />
     </layout>
@@ -481,7 +522,8 @@
     <MESSAGE value="More learning - pandas and plotting." />
     <MESSAGE value="More learning - scipy." />
     <MESSAGE value="Added naive seasonal forecast method, and autocorrelation plots to identify seasonality." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added naive seasonal forecast method, and autocorrelation plots to identify seasonality." />
+    <MESSAGE value="Added resampling techniques, and Simple Exponential Smoothing" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added resampling techniques, and Simple Exponential Smoothing" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/AdvancedResearchProject$Pandas.coverage" NAME="Pandas Coverage Results" MODIFIED="1573231911049" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/stats" />
@@ -554,34 +596,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stats/naive1.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="4" selection-start-column="4" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stats/naiveS.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" column="56" selection-start-line="1" selection-start-column="56" selection-end-line="1" selection-end-column="56" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stats/naive2.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/pandas/plotting/_misc.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
           <caret line="601" selection-start-line="601" selection-end-line="601" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/matplotlib/pyplot.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="199">
-          <caret line="405" column="4" selection-start-line="405" selection-start-column="4" selection-end-line="405" selection-end-column="4" />
         </state>
       </provider>
     </entry>
@@ -613,27 +631,66 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/holtwinters.py">
+    <entry file="file://$APPLICATION_CONFIG_DIR$/pycharm.vmoptions">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="50">
-          <caret line="789" column="8" selection-start-line="789" selection-start-column="8" selection-end-line="789" selection-end-column="8" />
+        <state relative-caret-position="90">
+          <caret line="6" column="21" lean-forward="true" selection-start-line="6" selection-start-column="21" selection-end-line="6" selection-end-column="21" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stats/ses.py">
+    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/tests/results/results_arima.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-162">
-          <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
-          <folding>
-            <element signature="e#0#58#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="-69">
+          <caret line="27" column="16" selection-start-line="27" selection-start-column="16" selection-end-line="27" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/holtwinters.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-244">
+          <caret line="230" column="6" selection-start-line="230" selection-start-column="6" selection-end-line="230" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stats/naiveS.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="56" selection-start-line="1" selection-start-column="56" selection-end-line="1" selection-end-column="56" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/matplotlib/pyplot.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="172">
+          <caret line="405" column="4" selection-start-line="405" selection-start-column="4" selection-end-line="405" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stats/naive1.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stats/naive2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="47" selection-start-line="2" selection-start-column="47" selection-end-line="2" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/seasonal.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="183">
+          <caret line="52" column="4" selection-start-line="52" selection-start-column="4" selection-end-line="52" selection-end-column="4" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/stats/helpers.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1605">
-          <caret line="107" column="4" selection-start-line="107" selection-start-column="4" selection-end-line="107" selection-end-column="33" />
+        <state relative-caret-position="177">
+          <caret line="103" column="20" selection-start-line="103" selection-start-column="20" selection-end-line="103" selection-end-column="20" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
@@ -642,10 +699,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="229">
-          <caret line="34" column="6" selection-start-line="34" selection-start-column="6" selection-end-line="34" selection-end-column="6" />
+        <state relative-caret-position="128">
+          <caret line="65" lean-forward="true" selection-start-line="65" selection-end-line="66" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stats/ses.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="65" lean-forward="true" selection-start-line="65" selection-end-line="65" />
+          <folding>
+            <element signature="e#0#58#0" expanded="true" />
+            <element signature="e#228#1833#0" />
           </folding>
         </state>
       </provider>

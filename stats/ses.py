@@ -5,6 +5,21 @@ import numpy as np
 
 
 def forecast(data):
+    data.index = pd.to_datetime(data.index, utc=True)
+
+    # Train on the first 6 days to predict the 7th day
+    train = data.iloc[0:144]
+    test = data.iloc[144:]
+
+    model = SimpleExpSmoothing(np.asarray(train['adjusted']))
+    model._index = pd.to_datetime(train.index)
+
+    fit = model.fit(optimized=True)
+    pred = fit.forecast(23)
+    data['ses'] = list(fit.fittedvalues) + list(pred)
+
+
+def forecast_plots(data):
     fig = plt.figure(figsize=(12.8, 9.6), dpi=250)
     ax = fig.add_subplot(1, 1, 1)
 
@@ -44,8 +59,7 @@ def forecast(data):
     ax.plot(test.index, test['total load actual'], color="grey", marker="o",
             label="Test Data")
 
-    # Add title and show legend
+    # Add legend and show plot
     ax.legend(loc="best")
-
     plt.show()
 

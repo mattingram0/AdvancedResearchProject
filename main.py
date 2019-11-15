@@ -1,10 +1,8 @@
 import pandas as pd
 from pandas.plotting import register_matplotlib_converters
-
-from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.holtwinters import SimpleExpSmoothing, Holt
 import matplotlib.pyplot as plt
-from stats import ses
+from stats import ses, helpers, naive1, naive2, naiveS
 
 
 def load_data(filename):
@@ -20,32 +18,51 @@ def main():
     data.set_index('time', inplace=True)
     data.interpolate(inplace=True)  # Interpolate missing values
 
-    # Perform an Augmented Dickey-Fuller Test for stationarity
-    # test_stationarity(data)
-
-    # Plots the data at different frequencies
+    # Plots the data at different frequencies to get a feel for the data
     # helpers.resample_plots(data)
 
-    # Plot the ACF of the first two weeks to assess stationarity
+    # Plot Time Series Decomposition to get an idea of the seasonality
+    # helpers.decompose_plots(data, "additive")
+    # helpers.decompose_plots(data, "multiplicative")
+
+    # Plot the ACF of the first two weeks to further assess seasonality
     # helpers.acf_plots(data)
 
-    # Simple Exponential Smoothing Forecast
-    # ses.forecast(data)
+    # Statistical test for stationarity
+    # helpers.test_stationarity(data)
 
-    #
+    data = data[:168]  # Use only the first week of data
 
+    # Naive 1, Naive S use the original data
+    naive1.forecast(data)
+    naiveS.forecast(data)
 
-def test_stationarity(data):
-    result = adfuller(data["total load actual"].iloc[0:1344],
-                            autolag='AIC')
-    print("Test Statistic = {:.3f}".format(result[0]))  # The error is a bug
-    print("P-value = {:.3f}".format(result[1]))
-    print("Critical values :")
-    for k, v in result[4].items():
-        print(
-            "\t{}: {:.4f} (The data is {}stationary with {}% "
-            "confidence)".format(
-                k, v, "not " if v < result[0] else "", 100 - int(k[:-1])))
+    # All other statistical forecasts use the seasonally adjusted data
+    helpers.seasonally_adjust(data, "additive")
+    naive2.forecast(data)
+    ses.forecast(data)
+
+    # Plot the non-seasonally adjusted forecasts
+    fig = plt.figure(figsize=(12.8, 9.6), dpi=250)
+    ax = fig.add_subplot(1, 1, 1)
+    ax.plot(data.index[0:144], data['total load actual'][0:144],
+            label="Training Data")
+    ax.plot(data.index[144:], data['total load actual'][144:], label="Test "
+                                                                     "Data")
+    ax.plot(data.index, data['naive1'], label="Naive1",)
+    ax.plot(data.index[144:], data['naiveS'][144:], label="NaiveS")
+    ax.legend(loc="best")
+    plt.show()
+
+    # Plot the seasonally-adjusted forecasts
+    fig = plt.figure(figsize=(12.8, 9.6), dpi=250)
+    ax = fig.add_subplot(1, 1, 1)
+    ax.plot(data.index[0:144], data['adjusted'][0:144], label="Training Data")
+    ax.plot(data.index[144:], data['adjusted'][144:], label="Test Data")
+    ax.plot(data.index[144:], data['naive2'][144:], label="Naive2")
+    ax.plot(data.index, data['ses'], label="SES")
+    ax.legend(loc="best")
+    plt.show()
 
 
 if __name__ == "main":
