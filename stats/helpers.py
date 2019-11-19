@@ -1,6 +1,5 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from stats import naive1, naive2, naiveS
 from statsmodels.graphics.tsaplots import plot_pacf, plot_acf
 from pandas.plotting import autocorrelation_plot
 from statsmodels.tsa.stattools import adfuller
@@ -140,9 +139,10 @@ def decompose_plots(data, model):
     plt.show()
 
 
-def seasonally_adjust(data, model):
+def seasonally_adjust(data, train_days, test_days, model):
     data.index = pd.to_datetime(data.index, utc=True)
-    decomp = seasonal_decompose(data['total load actual'][0:168],
+    decomp = seasonal_decompose(data['total load actual'][0:(train_days +
+                                                             test_days) * 24],
                                 model=model, freq=24)
     data['adjusted'] = decomp.observed - decomp.seasonal if model == \
                                                             "additive" else \

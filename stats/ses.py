@@ -1,22 +1,25 @@
 from statsmodels.tsa.holtwinters import SimpleExpSmoothing
+from sklearn.metrics import mean_squared_error
+from math import sqrt
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
 
-def forecast(data):
-    data.index = pd.to_datetime(data.index, utc=True)
-
+def forecast(data, train_days, test_days):
     # Train on the first 6 days to predict the 7th day
-    train = data.iloc[0:144]
-    test = data.iloc[144:]
+    train = data.iloc[0:train_days * 24]
 
+    # Create the SES Model
     model = SimpleExpSmoothing(np.asarray(train['adjusted']))
     model._index = pd.to_datetime(train.index)
 
-    fit = model.fit(optimized=True)
-    pred = fit.forecast(23)
+    # Fit the model, and forecast
+    fit = model.fit()
+    pred = fit.forecast((test_days * 24) - 1)
     data['ses'] = list(fit.fittedvalues) + list(pred)
+
+    # print("SES: Optimal Alpha:", str(fit.params['smoothing_level'])[:3])
 
 
 def forecast_plots(data):
