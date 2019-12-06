@@ -1,0 +1,13 @@
+import pmdarima as pm
+
+def forecast(data, train_hours, test_hours):
+    model = pm.auto_arima(data['total load actual'][:(train_hours)],
+                          start_p=0, start_q=0, max_p=2, max_q=2,
+                          m=24, start_P=0, start_Q=0, max_Q=2, max_P=2,
+                          max_d=2, max_D=2, trace=True, suppress_warnings=True,
+                          stepwise=True)
+    model.fit(data['total load actual'][:train_hours])
+    data['auto sarima'] = 0
+    data['auto sarima'][train_hours:] = model.predict(n_periods=test_hours)
+
+    print(model.summary())

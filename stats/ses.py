@@ -1,25 +1,34 @@
-from statsmodels.tsa.holtwinters import SimpleExpSmoothing
-from sklearn.metrics import mean_squared_error
-from math import sqrt
 import matplotlib.pyplot as plt
-import pandas as pd
 import numpy as np
+import pandas as pd
+from statsmodels.tsa.holtwinters import SimpleExpSmoothing
 
 
-def forecast(data, train_days, test_days):
+def forecast(data, train_hours, test_hours):
     # Train on the first 6 days to predict the 7th day
-    train = data.iloc[0:train_days * 24]
+    # In SES, Holt, etc that rely on the double-differenced data, we cannot
+    # use the first 25 values.
+    train = data.iloc[25:train_hours]
 
     # Create the SES Model
-    model = SimpleExpSmoothing(np.asarray(train['adjusted']))
-    model._index = pd.to_datetime(train.index)
+    model = SimpleExpSmoothing(np.asarray(train['seasonally differenced']))
+    # model._index = pd.to_datetime(train.index)
 
     # Fit the model, and forecast
     fit = model.fit()
-    pred = fit.forecast((test_days * 24) - 1)
-    data['ses'] = list(fit.fittedvalues) + list(pred)
+    pred = fit.forecast(test_hours)
+    data['ses'] = 0
+    data['ses'][25:] = list(fit.fittedvalues) + list(pred)
 
     # print("SES: Optimal Alpha:", str(fit.params['smoothing_level'])[:3])
+
+
+def undifference(data, train_hours, test_hours):
+    start_value = [data['total load actual'][train_hours] for i in range(
+        test_hours)]
+    cum_forecast = np.cumsum(data['ses'][train_hours:])
+    data['ses undiff'] = 0
+    data['ses undiff'][train_hours:] = start_value + cum_forecast
 
 
 def forecast_plots(data):

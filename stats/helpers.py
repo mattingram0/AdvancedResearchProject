@@ -1,5 +1,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+from math import sqrt
+from scipy import signal
 from statsmodels.graphics.tsaplots import plot_pacf, plot_acf
 from pandas.plotting import autocorrelation_plot
 from statsmodels.tsa.stattools import adfuller
@@ -74,7 +77,6 @@ def acf_plots(data):
     for ax in axes.flat:
         plt.setp(ax.get_xticklabels(), rotation=45)
 
-
     # Plot week 1 data and autocorrelation
     axes[0, 0].plot(data.iloc[0:168].index,
                     data.iloc[0:168]["total load actual"],
@@ -99,17 +101,119 @@ def acf_plots(data):
     plt.show()
 
 
+def differenced_plots(data, train_hours, test_hours):
+    # Adjust and Difference Data
+    adjust(data, train_hours, test_hours, "additive")
+    difference(data)
+    seasonally_difference(data)
+    double_difference(data)
+
+    # Create the subplots
+    fig = plt.figure(figsize=(20, 14), dpi=250)
+    gs = fig.add_gridspec(3, 5)
+    ax1 = fig.add_subplot(gs[0, :])
+    ax2 = fig.add_subplot(gs[1, 0])
+    ax3 = fig.add_subplot(gs[2, 0])
+    ax4 = fig.add_subplot(gs[1, 1])
+    ax5 = fig.add_subplot(gs[2, 1])
+    ax6 = fig.add_subplot(gs[1, 2])
+    ax7 = fig.add_subplot(gs[2, 2])
+    ax8 = fig.add_subplot(gs[1, 3])
+    ax9 = fig.add_subplot(gs[2, 3])
+    ax10 = fig.add_subplot(gs[1, 4])
+    ax11 = fig.add_subplot(gs[2, 4])
+
+    # Plot the time series data
+    ax1.plot(data.index, data['total load actual'], label="Actual")
+    ax1.plot(data.index, data['adjusted'], label="Adjusted")
+    ax1.plot(data.index, data['differenced'], label="Differenced")
+    ax1.plot(data.index, data['seasonally differenced'], label="Seasonally "
+                                                               "Differenced")
+    ax1.plot(data.index, data['double differenced'], label="Seasonally and "
+                                                           "Non-Seasonally "
+                                                           "Differenced")
+
+    # Plot the ACFs and PACFs
+    plot_acf(data[24:]["total load actual"], ax=ax2, alpha=0.05, lags=50)
+    plot_pacf(data[24:]["total load actual"], ax=ax3, alpha=0.05, lags=50)
+    plot_acf(data[12:-12]["adjusted"], ax=ax4, alpha=0.05, lags=50)
+    plot_pacf(data[12:-12]["adjusted"], ax=ax5, alpha=0.05, lags=50)
+    plot_acf(data[1:]["differenced"], ax=ax6, alpha=0.05, lags=50)
+    plot_pacf(data[1:]["differenced"], ax=ax7, alpha=0.05, lags=50)
+    plot_acf(data[24:]["seasonally differenced"], ax=ax8, alpha=0.05, lags=50)
+    plot_pacf(data[24:]["seasonally differenced"], ax=ax9, alpha=0.05, lags=50)
+    plot_acf(data[25:]["double differenced"], ax=ax10, alpha=0.05, lags=50)
+    plot_pacf(data[25:]["double differenced"], ax=ax11, alpha=0.05, lags=50)
+
+    ax2.set_title("ACF for Actual Data")
+    ax3.set_title("PACF for Actual Data")
+    ax4.set_title("ACF for Adjusted Data")
+    ax5.set_title("PACF for Adjusted Data")
+    ax6.set_title("ACF for Differenced Data")
+    ax7.set_title("PACF for Differenced Data")
+    ax8.set_title("ACF for Seasonally Differenced Data")
+    ax9.set_title("PACF for Seasonally Differenced Data")
+    ax10.set_title("ACF for Double Differenced Data")
+    ax11.set_title("PACF for Double Differenced Data")
+
+    # Calculate the standard deviations of the differenced data
+    print("Standard Deviation (Actual Data):",
+          np.std(data[24:]["total load actual"]))
+    print("Standard Deviation (Adjusted Data):",
+          np.std(data[24:]["adjusted"]))
+    print("Standard Deviation (Non-Seasonally Differenced Data):",
+          np.std(data[24:]["differenced"]))
+    print("Standard Deviation (Seasonally Differenced Data):",
+          np.std(data[24:]["seasonally differenced"]))
+    print("Standard Deviation (Seasonally & Non-Seasonally Differenced Data):",
+          np.std(data[25:]["double differenced"]))
+
+    ax1.legend(loc="best")
+    plt.show()
+
+
+# TODO - finish this, doesn't work
+def power_spectrum_plot(data):
+    f, pxx_spec = signal.periodogram(data['total load actual'], fs=len(
+        data['total load actual']), scaling='density')
+    plt.figure()
+    plt.semilogy(f[:50], np.sqrt(pxx_spec)[:50])
+    plt.title('Power Spectrum (Welch\'s Method)')
+    plt.show()
+
+
+# Must have double differenced the data first before calling this function
 def test_stationarity(data):
-    result = adfuller(data["total load actual"].iloc[0:1344],
-                            autolag='AIC')
-    print("Test Statistic = {:.3f}".format(result[0]))  # The error is a bug
-    print("P-value = {:.3f}".format(result[1]))
-    print("Critical values :")
-    for k, v in result[4].items():
+    result_original = adfuller(data["total load actual"], autolag='AIC')
+    result_differenced = adfuller(data["seasonally differenced"][25:],
+                                  autolag='AIC')
+    print("Original Data")
+    print("Test Statistic = {:.3f}".format(result_original[0]))  # The error
+    # is a bug
+    print("P-value = {:.3f}".format(result_original[1]))
+    print("Critical values: ")
+    for k, v in result_original[4].items():
         print(
             "\t{}: {:.4f} (The data is {}stationary with {}% "
             "confidence)".format(
-                k, v, "not " if v < result[0] else "", 100 - int(k[:-1])))
+                k, v, "not " if v < result_original[0] else "", 100 - int(k[
+                                                                          :-1])))
+
+    print("\nSeasonally Differenced Data")
+    print("Test Statistic = {:.3f}".format(result_differenced[0]))  # The error
+    # is a bug
+    print("P-value = {:.3f}".format(result_differenced[1]))
+    print("Critical values: ")
+    for k, v in result_differenced[4].items():
+        print(
+            "\t{}: {:.4f} (The data is {}stationary with {}% "
+            "confidence)".format(
+                k, v, "not " if v < result_differenced[0] else "",
+                100 - int(k[
+                          :-1])))
+
+def decompose(data, model):
+    return seasonal_decompose(data['total load actual'],model=model, freq=24)
 
 
 def decompose_plots(data, model):
@@ -125,25 +229,74 @@ def decompose_plots(data, model):
     axes[1].plot(decomp.trend)
     axes[2].plot(decomp.seasonal)
     axes[3].plot(decomp.resid)
-    axes[4].plot(decomp.observed - decomp.seasonal if model == "additive"
-                 else decomp.observed / decomp.seasonal)
+    axes[4].plot(decomp.observed - decomp.seasonal - decomp.trend if model ==
+                                                                     "additive"
+                 else (decomp.observed / decomp.seasonal) - decomp.trend)
 
     # Add titles
     axes[0].set_title("Observed Data")
     axes[1].set_title("Trend Component")
     axes[2].set_title("Seasonal Component")
     axes[3].set_title("Residual Component")
-    axes[4].set_title("Seasonally Adjusted Data")
+    axes[4].set_title("Seasonally and Trend Adjusted Data")
 
     # Show the figure
     plt.show()
 
 
-def seasonally_adjust(data, train_days, test_days, model):
+def adjust(data, train_hours, test_hours, model):
     data.index = pd.to_datetime(data.index, utc=True)
-    decomp = seasonal_decompose(data['total load actual'][0:(train_days +
-                                                             test_days) * 24],
-                                model=model, freq=24)
-    data['adjusted'] = decomp.observed - decomp.seasonal if model == \
-                                                            "additive" else \
-        decomp.observed / decomp.seasonal
+    decomp = seasonal_decompose(
+        data['total load actual'][0:train_hours + test_hours], model=model,
+        freq=24)
+    data[
+        'adjusted'] = decomp.observed - decomp.seasonal - decomp.trend if model == \
+                                                                          "additive" else \
+        (decomp.observed / decomp.seasonal) - decomp.trend
+
+
+# Non-seasonally difference the data
+def difference(data):
+    data['differenced'] = data['total load actual'].diff(1)
+
+
+# Seasonally difference the data
+def seasonally_difference(data):
+    data['seasonally differenced'] = data['total load actual'].diff(24)
+
+
+# Difference both seasonally and locally
+def double_difference(data):
+    seasonally_differenced = data['total load actual'].diff(24)
+    data['double differenced'] = seasonally_differenced.diff(1)
+
+
+# Calculate the Mean Absolute Percentage Error of a prediction
+def sMAPE(predicted, actual):
+    act = actual.to_numpy()
+    pred = predicted.to_numpy()
+    mask = act != 0
+    return (2 * np.fabs(act[mask] - pred[mask]) / (np.fabs(act[mask]) +
+                                                   np.fabs(pred[mask]))).mean() \
+           * 100
+
+
+# Calculate the Root Mean Squared Error of a prediction
+def RMSE(predicted, actual):
+    act = actual.to_numpy()
+    pred = predicted.to_numpy()
+    return sqrt(np.sum(np.square(act - pred)) / len(actual))
+
+
+# Calculate the Mean Average Scaled Error of a prediction
+def MASE(predicted, actual, season):
+    act = actual.to_numpy()
+    pred = predicted.to_numpy()
+    return np.fabs(
+        ((act - pred) / np.fabs(act[season:] - act[:-season]).mean())).mean()
+
+# Calculate the Mean Absolute Error of a prediction
+def MAE(predicted, actual):
+    act = actual.to_numpy()
+    pred = predicted.to_numpy()
+    return np.fabs(act - pred).mean()

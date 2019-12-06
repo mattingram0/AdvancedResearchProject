@@ -2,8 +2,9 @@ import pandas as pd
 import numpy as np
 from statsmodels.tsa.api import ExponentialSmoothing
 
-def forecast(data, train_days, test_days):
-    train = data.iloc[0:train_days * 24]
+
+def forecast(data, train_hours, test_hours):
+    train = data.iloc[:train_hours]
 
     # Create the Holt-Winters model
     model = ExponentialSmoothing(np.asarray(train['total load actual']),
@@ -12,5 +13,5 @@ def forecast(data, train_days, test_days):
 
     # Fit the model, and forecast
     fit = model.fit()
-    pred = fit.forecast((test_days * 24) - 1)
+    pred = fit.forecast(test_hours)
     data['holtWinters'] = list(fit.fittedvalues) + list(pred)

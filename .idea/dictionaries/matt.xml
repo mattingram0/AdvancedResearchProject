@@ -5,6 +5,7 @@
       <w>matplotlib</w>
       <w>resample</w>
       <w>stationarity</w>
+      <w>undifference</w>
     </words>
   </dictionary>
 </component>
