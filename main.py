@@ -1,12 +1,9 @@
 import pandas as pd
-
 from pandas.plotting import register_matplotlib_converters
-from statsmodels.tsa.holtwinters import SimpleExpSmoothing, Holt
-from statsmodels.graphics.tsaplots import plot_pacf, plot_acf
 import matplotlib.pyplot as plt
-import numpy as np
+
 from stats import ses, helpers, naive1, naive2, naiveS, holt, holtDamped, \
-    holtWinters, autoSarima, sarima
+    holtWinters, autoSarima, sarima, ses_adjusted
 
 
 def load_data(filename):
@@ -16,9 +13,8 @@ def load_data(filename):
 
 
 def main():
-
     # Training/Test Data Parameters
-    offset_days = 7
+    offset_days = 9
     train_days = 14
     test_days = 2
 
@@ -34,7 +30,28 @@ def main():
     data.index = pd.to_datetime(data.index, utc=True)
 
     # Run the demo
-    demo(data, offset_days, train_hours, test_hours)
+    demo(data, offset_hours, train_hours, test_hours)
+
+    # print(data.head())
+    # print(data.index)
+    # data = data[offset_hours:offset_hours + train_hours + test_hours]
+    # print(data.head())
+    # print(data.index)
+    #
+    # fig = plt.figure(figsize=(12.8, 9.6), dpi=250)
+    # ax = fig.add_subplot(1, 1, 1)
+    # ax.set_title("Forecasts of Non-Seasonally Differenced Data")
+    #
+    # # Plot the non-seasonally adjusted actual data
+    # ax.plot(data.index[0:train_hours],
+    #         data['total load actual'][0:train_hours],
+    #         label="Training Data")
+    # ax.plot(data.index[train_hours:],
+    #         data['total load actual'][train_hours:],
+    #         label="Test Data")
+    #
+    # ax.legend(loc="best")
+    # plt.show()
 
 
 def demo(data, offset_hours, train_hours, test_hours):
@@ -42,7 +59,9 @@ def demo(data, offset_hours, train_hours, test_hours):
     helpers.resample_plots(data)
 
     # For the rest of the demo, consider only the first month of data
+    print(data.index)
     data = data[offset_hours:offset_hours + train_hours + test_hours]
+    print(data.index)
 
     # Plot the ACF of the first two weeks to further assess seasonality
     helpers.acf_plots(data)
@@ -57,13 +76,16 @@ def demo(data, offset_hours, train_hours, test_hours):
     # Plot the ACF and PACF of differenced and seasonally differenced data
     helpers.differenced_plots(data, train_hours, test_hours)
 
+    helpers.adjust_and_index(data, train_hours, test_hours)
+
     # Statistical test for stationarity
     helpers.test_stationarity(data)
 
     # Naive 1, Naive S and the ARIMA models use the original data
     naive1.forecast(data, train_hours)
     naiveS.forecast(data, train_hours, test_hours)
-    autoSarima.forecast(data, train_hours, test_hours)
+    # autoSarima.forecast(data, train_hours, test_hours)
+    data['auto sarima'] = data['total load actual'][train_hours]  # Dummy data
     sarima.forecast(data, train_hours, test_hours)
 
     # The other statistical forecasts use the seasonally adjusted data
@@ -72,6 +94,7 @@ def demo(data, offset_hours, train_hours, test_hours):
     holt.forecast(data, train_hours, test_hours)
     holtDamped.forecast(data, train_hours, test_hours)
     holtWinters.forecast(data, train_hours, test_hours)
+    ses_adjusted.forecast(data, train_hours, test_hours)
 
     # Convert differenced forecasts back into actual forecasts
     naive2.undifference(data, train_hours, test_hours)
@@ -107,8 +130,7 @@ def demo(data, offset_hours, train_hours, test_hours):
             label="Naive1")
     ax.plot(data.index[train_hours:], data['naiveS'][train_hours:],
             label="NaiveS")
-    ax.plot(data.index[train_hours:],
-            data['holtWinters'][train_hours:],
+    ax.plot(data.index[train_hours:], data['holtWinters'][train_hours:],
             label="Holt Winters")
 
     # Add the legend and show the plot
@@ -181,16 +203,37 @@ def demo(data, offset_hours, train_hours, test_hours):
             data['total load actual'][train_hours:],
             label="Test Data")
 
-    ax.plot(data.index[train_hours:], data['auto sarima'][train_hours:],
-            label="Auto SARIMA")
+    # ax.plot(data.index[train_hours:], data['auto sarima'][train_hours:],
+    #         label="Auto SARIMA")
     ax.plot(data.index[train_hours:], data['sarima'][train_hours:],
             label="SARIMA")
     ax.legend(loc="best")
+    plt.show()
+
+    # Figure for the adjusted forecasts
+    fig = plt.figure(figsize=(12.8, 9.6), dpi=250)
+    ax = fig.add_subplot(1, 1, 1)
+    ax.set_title("Forecasts using Seasonally Adjusted Data")
+
+    # Plot the non-seasonally adjusted actual data
+    ax.plot(data.index[0:train_hours],
+            data['total load actual'][0:train_hours],
+            label="Training Data")
+    ax.plot(data.index[train_hours:],
+            data['total load actual'][train_hours:],
+            label="Test Data")
+
+    ax.plot(data.index[train_hours:], data['ses adjusted'][train_hours:],
+            label="SES")
+
+    # Add the legend and show the plot
+    ax.legend(loc="best")
+    plt.show()
 
     # Show the error statistics
     error_dict = {
         "Method": ["Naive 1", "Naive S", "Naive 2", "SES", "Holt", "Damped",
-                   "Holt Winters", "Auto SARIMA", "ARIMA"],
+                   "Holt Winters", "Auto SARIMA", "ARIMA", "SES*"],
         "MAPE": [helpers.sMAPE(data["naive1"][train_hours:],
                                data["total load actual"][train_hours:]),
                  helpers.sMAPE(data["naiveS"][train_hours:],
@@ -208,7 +251,10 @@ def demo(data, offset_hours, train_hours, test_hours):
                  helpers.sMAPE(data['auto sarima'][train_hours:],
                                data["total load actual"][train_hours:]),
                  helpers.sMAPE(data['sarima'][train_hours:],
+                               data["total load actual"][train_hours:]),
+                 helpers.sMAPE(data['ses adjusted'][train_hours:],
                                data["total load actual"][train_hours:])],
+
         "RMSE": [helpers.RMSE(data["naive1"][train_hours:],
                               data["total load actual"][train_hours:]),
                  helpers.RMSE(data["naiveS"][train_hours:],
@@ -226,7 +272,10 @@ def demo(data, offset_hours, train_hours, test_hours):
                  helpers.RMSE(data['auto sarima'][train_hours:],
                               data["total load actual"][train_hours:]),
                  helpers.RMSE(data['sarima'][train_hours:],
-                              data["total load actual"][train_hours:])],
+                              data["total load actual"][train_hours:]),
+                 helpers.RMSE(data['ses adjusted'][train_hours:],
+                              data["total load actual"][train_hours:])
+                 ],
         "MASE": [helpers.MASE(data["naive1"][train_hours:],
                               data["total load actual"][train_hours:], 1),
                  helpers.MASE(data["naiveS"][train_hours:],
@@ -244,6 +293,8 @@ def demo(data, offset_hours, train_hours, test_hours):
                  helpers.MASE(data['auto sarima'][train_hours:],
                               data["total load actual"][train_hours:], 1),
                  helpers.MASE(data['sarima'][train_hours:],
+                              data["total load actual"][train_hours:], 1),
+                 helpers.MASE(data['ses adjusted'][train_hours:],
                               data["total load actual"][train_hours:], 1)
                  ],
         "MAE": [helpers.MAE(data["naive1"][train_hours:],
@@ -263,7 +314,10 @@ def demo(data, offset_hours, train_hours, test_hours):
                 helpers.MAE(data['auto sarima'][train_hours:],
                             data["total load actual"][train_hours:]),
                 helpers.MAE(data['sarima'][train_hours:],
-                            data["total load actual"][train_hours:])]
+                            data["total load actual"][train_hours:]),
+                helpers.MAE(data['ses adjusted'][train_hours:],
+                            data["total load actual"][train_hours:])
+                ]
     }
 
     error_data = pd.DataFrame(error_dict)

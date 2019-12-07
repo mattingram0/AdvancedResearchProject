@@ -271,6 +271,45 @@ def double_difference(data):
     data['double differenced'] = seasonally_differenced.diff(1)
 
 
+# Calculate a seasonal index for each hour, and then divide by the seasonal
+# index to get an adjusted value
+def adjust_and_index(data, train_hours, test_hours):
+    data['moving average'] = data['total load actual'].rolling(24).mean()
+    data['seasonal ratio'] = data['total load actual'] / data['moving average']
+    seasonal_indices = []
+    for i in range(24):
+        subset = data['seasonal ratio'][i::24]
+        seasonal_indices.append(subset.mean())
+
+    data['seasonal indices'] = seasonal_indices * int(
+        (train_hours + test_hours) / 24
+    )
+    data['seasonally adjusted'] = data['total load actual'] / data[
+        'seasonal indices'
+    ]
+    # Figure for the the seasonally-adjusted forecasts
+    fig = plt.figure(figsize=(12.8, 9.6), dpi=250)
+    ax = fig.add_subplot(1, 1, 1)
+    ax.set_title("Seasonally Adjusted Data")
+
+    # Plot the seasonally adjusted actual data
+    ax.plot(data.index[0:train_hours],
+            data['total load actual'][0:train_hours],
+            label="Train Data")
+    ax.plot(data.index[train_hours:],
+            data['total load actual'][train_hours:],
+            label="Test Data")
+
+    # Plot the Naive2, SES, Holt and Damped Holt Difference Forecasts
+    ax.plot(data.index, data['moving average'], label="Moving Average")
+    ax.plot(data.index, data['seasonally adjusted'],
+            label="Seasonally Adjusted")
+
+    # Add the legend and show the plot
+    ax.legend(loc="best")
+    plt.show()
+
+
 # Calculate the Mean Absolute Percentage Error of a prediction
 def sMAPE(predicted, actual):
     act = actual.to_numpy()
@@ -294,6 +333,7 @@ def MASE(predicted, actual, season):
     pred = predicted.to_numpy()
     return np.fabs(
         ((act - pred) / np.fabs(act[season:] - act[:-season]).mean())).mean()
+
 
 # Calculate the Mean Absolute Error of a prediction
 def MAE(predicted, actual):
