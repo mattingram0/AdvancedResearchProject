@@ -16,6 +16,8 @@ def undifference(data, train_hours, test_hours):
     data['naive2 undiff'] = 0
     data['naive2 undiff'][train_hours:] = start_value + cum_forecast
 
+
+
     # print("UNDIFFERENCE")
     # a = data['total load actual'].iloc[train_hours - 1]
     # b = data['total load actual'].iloc[train_hours - 24]

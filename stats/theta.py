@@ -5,7 +5,7 @@ from statsmodels.tsa.holtwinters import SimpleExpSmoothing
 import statsmodels.api as sm
 
 
-def forecast(data, train_hours, test_hours):
+def forecast(data, train_hours, test_hours, in_place=True):
     theta0 = 0
     theta2 = 2
 
@@ -56,6 +56,8 @@ def forecast(data, train_hours, test_hours):
 
     # Take the arithmetic average of the two theta lines to get the final
     # forecast
-    data['theta'] = (
-        (data['theta0'] + data['theta2']) / 2
-    ) * data['seasonal indices']
+    fcst = ((data['theta0'] + data['theta2']) / 2) * data['seasonal indices']
+    if in_place:
+        data['theta'] = fcst
+    else:
+        return fcst

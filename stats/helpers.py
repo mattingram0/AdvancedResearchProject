@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.api import seasonal_decompose
 
@@ -7,12 +8,16 @@ from statsmodels.tsa.api import seasonal_decompose
 def decomp_adjust(data, train_hours, test_hours, model):
     data.index = pd.to_datetime(data.index, utc=True)
     decomp = seasonal_decompose(
-        data['total load actual'][0:train_hours + test_hours], model=model,
-        freq=24)
-    data[
-        'adjusted'] = decomp.observed - decomp.seasonal - decomp.trend if model == \
-                                                                          "additive" else \
-        (decomp.observed / decomp.seasonal) - decomp.trend
+        data['total load actual'][0:train_hours], model=model,
+        freq=24
+    )
+    seasonality = list(decomp.seasonal[:24]) * int((train_hours +
+                                                    test_hours) / 24)
+
+    data['seasonality'] = seasonality
+    data['seasonally decomposed'] = \
+        data['total load actual'] - seasonality if model == "additive" \
+        else data['total load actual'] / seasonality
 
 
 # Seasonally adjust the data using seasonal indices
@@ -21,7 +26,7 @@ def indices_adjust(data, train_hours, test_hours):
     data['seasonal ratio'] = data['total load actual'] / data['moving average']
     seasonal_indices = []
     for i in range(24):
-        subset = data['seasonal ratio'][i::24]
+        subset = data['seasonal ratio'][:train_hours][i::24]
         seasonal_indices.append(subset.mean())
 
     data['seasonal indices'] = seasonal_indices * int(

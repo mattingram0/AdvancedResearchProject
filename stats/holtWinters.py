@@ -3,7 +3,7 @@ import numpy as np
 from statsmodels.tsa.api import ExponentialSmoothing
 
 
-def forecast(data, train_hours, test_hours):
+def forecast(data, train_hours, test_hours, in_place=True):
     train = data.iloc[:train_hours]
 
     # Create the Holt-Winters model
@@ -14,4 +14,9 @@ def forecast(data, train_hours, test_hours):
     # Fit the model, and forecast
     fit = model.fit()
     pred = fit.forecast(test_hours)
-    data['holtWinters'] = list(fit.fittedvalues) + list(pred)
+    fcst = list(fit.fittedvalues) + list(pred)
+
+    if in_place:
+        data['holtWinters'] = fcst
+    else:
+        return fcst

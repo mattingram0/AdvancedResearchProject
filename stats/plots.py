@@ -121,7 +121,7 @@ def differenced_plots(data, train_hours, test_hours):
 
     # Plot the time series data
     ax1.plot(data.index, data['total load actual'], label="Actual")
-    ax1.plot(data.index, data['adjusted'], label="Adjusted")
+    ax1.plot(data.index, data['seasonally decomposed'], label="Adjusted")
     ax1.plot(data.index, data['differenced'], label="Differenced")
     ax1.plot(data.index, data['seasonally differenced'], label="Seasonally "
                                                                "Differenced")
@@ -182,8 +182,7 @@ def decomp_adjusted_plots(data, model):
     data.index = pd.to_datetime(data.index, utc=True)
 
     # Decompose
-    decomp = seasonal_decompose(data['total load actual'][0:168],
-                                model=model, freq=24)
+    decomp = seasonal_decompose(data['total load actual'], model, freq=24)
 
     # Plot the decomposition
     fig, axes = plt.subplots(nrows=5, ncols=1, figsize=(12.8, 9.6), dpi=250)
@@ -191,9 +190,10 @@ def decomp_adjusted_plots(data, model):
     axes[1].plot(decomp.trend)
     axes[2].plot(decomp.seasonal)
     axes[3].plot(decomp.resid)
-    axes[4].plot(decomp.observed - decomp.seasonal - decomp.trend if model ==
-                                                                     "additive"
-                 else (decomp.observed / decomp.seasonal) - decomp.trend)
+    axes[4].plot(
+        decomp.observed - decomp.seasonal - decomp.trend if model == "additive"
+        else (decomp.observed / decomp.seasonal) - decomp.trend
+    )
 
     # Add titles
     axes[0].set_title("Observed Data")
@@ -201,6 +201,7 @@ def decomp_adjusted_plots(data, model):
     axes[2].set_title("Seasonal Component")
     axes[3].set_title("Residual Component")
     axes[4].set_title("Seasonally and Trend Adjusted Data")
+
 
     # Show the figure
     plt.show()

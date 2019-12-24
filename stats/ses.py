@@ -17,6 +17,8 @@ def forecast(data, train_hours, test_hours):
     # Fit the model, and forecast
     fit = model.fit()
     pred = fit.forecast(test_hours)
+
+
     data['ses'] = 0
     data['ses'][25:] = list(fit.fittedvalues) + list(pred)
 

@@ -1,5 +1,6 @@
 import pmdarima as pm
 
+
 def forecast(data, train_hours, test_hours):
     model = pm.auto_arima(data['total load actual'][:(train_hours)],
                           start_p=0, start_q=0, max_p=2, max_q=2,
