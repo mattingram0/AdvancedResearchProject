@@ -20,6 +20,7 @@ def forecast(data, train_hours, test_hours):
     # print("Holt: Optimal Alpha:", str(fit.params['smoothing_level'])[:4])
     # print("Holt: Optimal Beta:", str(fit.params['smoothing_slope'])[:4])
 
+
 def undifference(data, train_hours, test_hours):
     start_value = [data['total load actual'][train_hours] for i in range(
         test_hours)]
