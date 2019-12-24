@@ -2,26 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="564df88f-763d-43a5-ba2e-b5cd80214a9e" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/stats/comb.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/stats/comb_adjusted.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/stats/errors.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/stats/plots.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/stats/theta.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/AdvancedResearchProject.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/AdvancedResearchProject.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/other.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/other.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stats/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/stats/helpers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stats/holtDamped.py" beforeDir="false" afterPath="$PROJECT_DIR$/stats/holtDamped.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stats/holtDamped_adjusted.py" beforeDir="false" afterPath="$PROJECT_DIR$/stats/holtDamped_adjusted.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stats/holt_adjusted.py" beforeDir="false" afterPath="$PROJECT_DIR$/stats/holt_adjusted.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stats/naive2_adjusted.py" beforeDir="false" afterPath="$PROJECT_DIR$/stats/naive2_adjusted.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stats/ses_adjusted.py" beforeDir="false" afterPath="$PROJECT_DIR$/stats/ses_adjusted.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BrysonPredictor/get-started-python/hello.py" beforeDir="false" afterPath="$PROJECT_DIR$/../BrysonPredictor/get-started-python/hello.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BrysonPredictor/get-started-python/static/count.csv" beforeDir="false" afterPath="$PROJECT_DIR$/../BrysonPredictor/get-started-python/static/count.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BrysonPredictor/predict.py" beforeDir="false" afterPath="$PROJECT_DIR$/../BrysonPredictor/predict.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -45,11 +26,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="537">
-              <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
+            <state relative-caret-position="413">
+              <caret line="28" column="31" lean-forward="true" selection-start-line="28" selection-end-line="29" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -90,11 +71,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/stats/helpers.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="465">
-              <caret line="52" column="64" lean-forward="true" selection-start-line="52" selection-start-column="64" selection-end-line="52" selection-end-column="64" />
+            <state relative-caret-position="705">
+              <caret line="68" lean-forward="true" selection-start-line="68" selection-end-line="68" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
                 <element signature="e#610#1031#0" />
@@ -489,7 +470,7 @@
       <workItem from="1576242877798" duration="341000" />
       <workItem from="1576243799015" duration="501000" />
       <workItem from="1576244467986" duration="1497000" />
-      <workItem from="1576934547923" duration="3403000" />
+      <workItem from="1576934547923" duration="4175000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit. Git setup.">
       <created>1573219288446</created>
@@ -575,11 +556,18 @@
       <option name="project" value="LOCAL" />
       <updated>1575741664907</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Refactored some of the helper code into different files, and added the comb and comb_adjusted forecasting methods.">
+      <created>1577195374840</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1577195374840</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="215497000" />
+    <option name="totallyTimeSpent" value="216269000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -592,7 +580,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-1920" y="-180" width="1920" height="1080" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Structure" order="0" side_tool="true" weight="0.29646018" />
       <window_info id="Favorites" order="1" side_tool="true" />
@@ -708,7 +695,8 @@
     <MESSAGE value="Added Holt, Damped Holt, and Holt-Winters forecasting." />
     <MESSAGE value="Converted (seasonally) differenced forecasts back to actual forecasts, and computed error statistics on those." />
     <MESSAGE value="Added another forecasting method, which creates seasonal indices and then uses these to convert data into seasonally adjusted data, on which SES etc is performed, before the data is converted back." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added another forecasting method, which creates seasonal indices and then uses these to convert data into seasonally adjusted data, on which SES etc is performed, before the data is converted back." />
+    <MESSAGE value="Refactored some of the helper code into different files, and added the comb and comb_adjusted forecasting methods." />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactored some of the helper code into different files, and added the comb and comb_adjusted forecasting methods." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/AdvancedResearchProject$Main.coverage" NAME="Main Coverage Results" MODIFIED="1575040168345" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -1058,24 +1046,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="537">
-          <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/stats/helpers.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="465">
-          <caret line="52" column="64" lean-forward="true" selection-start-line="52" selection-start-column="64" selection-end-line="52" selection-end-column="64" />
+        <state relative-caret-position="705">
+          <caret line="68" lean-forward="true" selection-start-line="68" selection-end-line="68" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
             <element signature="e#610#1031#0" />
             <element signature="e#1198#1694#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="413">
+          <caret line="28" column="31" lean-forward="true" selection-start-line="28" selection-end-line="29" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
