@@ -2,6 +2,7 @@ import pandas as pd
 from pandas.plotting import register_matplotlib_converters
 import matplotlib.pyplot as plt
 import numpy as np
+import os.path
 
 import stats.plots
 from stats import ses, helpers, naive1, naive2, naiveS, holt, holtDamped, \
@@ -27,18 +28,23 @@ def main():
     test_hours = test_days * 24
 
     # Load and Pre-process the Data
-    data = load_data("/Users/matt/Projects/AdvancedResearchProject/data/spain/"
-                     "energy_dataset.csv")
+    file_path = os.path.abspath(os.path.dirname(__file__))
+    full_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
+    data = load_data(full_path)
     data.interpolate(inplace=True)  # Interpolate missing values
     data = data.set_index('time').asfreq('H')
     data.index = pd.to_datetime(data.index, utc=True)
     # data = data[offset_hours:offset_hours + train_hours + test_hours]
 
     # Compare differenced vs seasonal indices vs seasonal adjustment
-    # helpers.decomp_adjust(data, train_hours, test_hours, "multiplicative")
-    # helpers.seasonally_difference(data)
+    helpers.decomp_adjust(data, train_hours, test_hours, "multiplicative")
+    helpers.seasonally_difference(data)
+    pd.set_option('display.max_columns', 500)
+    results = test(data[:504], seasonality, test_hours)
+    for t, v in results.items():
+        print("Number of Training Days:", t)
+        print(pd.DataFrame(v), "\n")
 
-    print(test(data[:504], seasonality, test_hours))
 
     # fig = plt.figure(figsize=(12.8, 9.6), dpi=250)
     # ax = fig.add_subplot(1, 1, 1)
@@ -79,7 +85,6 @@ def main():
     # ax.legend(loc="best")
     # plt.setp(ax.get_xticklabels(), rotation=45)
     # plt.show()
-
 def test(data, seasonality, test_hours):
     forecast_methods = [naive1.forecast, naiveS.forecast,
                         naive2_adjusted.forecast, ses_adjusted.forecast,
@@ -493,13 +498,13 @@ def demo(data, offset_hours, train_hours, test_hours):
     plt.show()
 
 
-if __name__ == "main":
-    # matplotlib.style.use('seaborn-deep')
-    register_matplotlib_converters()
-    # pd.options.mode.chained_assignment = None TURN OFF CHAINED ASSIGNMENTS
-    # WARNING - possibly use in the future if I run into that message again
-    main()
-
+#
+# if __name__ == "main":
+#     # matplotlib.style.use('seaborn-deep')
+#     register_matplotlib_converters()
+#     # pd.options.mode.chained_assignment = None TURN OFF CHAINED ASSIGNMENTS
+#     # WARNING - possibly use in the future if I run into that message again
+#     main()
 # Entry point when using PyCharm - REMOVE
 # matplotlib.style.use('seaborn-deep')
 register_matplotlib_converters()
