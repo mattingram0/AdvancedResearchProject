@@ -1,6 +1,7 @@
 import pandas as pd
 from pandas.plotting import register_matplotlib_converters
 import matplotlib.pyplot as plt
+import numpy as np
 
 import stats.plots
 from stats import ses, helpers, naive1, naive2, naiveS, holt, holtDamped, \
@@ -18,7 +19,8 @@ def main():
     # Training/Test Data Parameters
     offset_days = 12
     train_days = 5
-    test_days = 9
+    test_days = 2
+    seasonality = 24
 
     offset_hours = offset_days * 24
     train_hours = train_days * 24
@@ -30,21 +32,22 @@ def main():
     data.interpolate(inplace=True)  # Interpolate missing values
     data = data.set_index('time').asfreq('H')
     data.index = pd.to_datetime(data.index, utc=True)
-    data = data[offset_hours:offset_hours + train_hours + test_hours]
+    # data = data[offset_hours:offset_hours + train_hours + test_hours]
 
     # Compare differenced vs seasonal indices vs seasonal adjustment
-    helpers.indices_adjust(data, train_hours, test_hours)
-    helpers.decomp_adjust(data, train_hours, test_hours, "multiplicative")
-    helpers.seasonally_difference(data)
+    # helpers.decomp_adjust(data, train_hours, test_hours, "multiplicative")
+    # helpers.seasonally_difference(data)
 
-    fig = plt.figure(figsize=(12.8, 9.6), dpi=250)
-    ax = fig.add_subplot(1, 1, 1)
-    ax.plot(data.index, data['seasonally differenced'], label="Differenced")
-    ax.plot(data.index, data['seasonally decomposed'], label="Decomposed")
-    ax.plot(data.index, data['seasonally adjusted'], label="Adjusted")
+    print(test(data[:504], seasonality, test_hours))
 
-    ax.legend(loc="best")
-    plt.show()
+    # fig = plt.figure(figsize=(12.8, 9.6), dpi=250)
+    # ax = fig.add_subplot(1, 1, 1)
+    # ax.plot(data.index, data['seasonally differenced'], label="Differenced")
+    # ax.plot(data.index, data['seasonally decomposed'], label="Decomposed")
+    # ax.plot(data.index, data['seasonally adjusted'], label="Adjusted")
+    #
+    # ax.legend(loc="best")
+    # plt.show()
 
 
     # Run the demo
@@ -77,49 +80,56 @@ def main():
     # plt.setp(ax.get_xticklabels(), rotation=45)
     # plt.show()
 
-# TODO YOU ARE HERE - MAKE SURE THE ADJUSTING GETS DONE, THEN TEST THIS TEST
-#  FNUCTION
-def test(data):
+def test(data, seasonality, test_hours):
     forecast_methods = [naive1.forecast, naiveS.forecast,
                         naive2_adjusted.forecast, ses_adjusted.forecast,
                         holt_adjusted.forecast,
                         holtDamped_adjusted.forecast, theta.forecast,
-                        comb_adjusted.forecast, sarima]
+                        comb_adjusted.forecast, sarima.forecast]
     forecast_names = ['naive1', 'naiveS', 'naive2', 'ses', 'holt', 'damped',
                       'theta', 'comb', 'sarima']
     error_measures = [errors.sMAPE, errors.RMSE, errors.MASE, errors.MAE]
-    error_names = ["sMAPE", "RMSE", "MASES", "MAE"]
+    error_names = ["sMAPE", "RMSE", "MASE", "MAE"]
 
-    max_train_days = 1  # TODO - vary!
-    results = {t: {f: {str(e): 0}} for t in range(1, max_train_days + 1)
-               for f in forecast_names for e in error_measures}
-    test_hours = 24
+    min_train_days = 5
+    max_train_days = 7  # TODO - vary!
+    results = {t: {f: {e: 0 for e in error_names} for f in forecast_names}
+               for t in range(min_train_days, max_train_days + 1)}
 
-    for t in range(1, max_train_days + 1):
-        error_vals = {e: [] for e in error_names}
+    for t in range(min_train_days, max_train_days + 1):
+        error_vals = {f: {e: [] for e in error_names} for f in forecast_names}
+        train_hours = t * seasonality
 
-        for f_name, f in zip(forecast_names, forecast_methods):
-            for o in range(len(data)):
-                train_hours = t * 24
-                forecast = f.forecast(
-                    data[o: o + train_hours + test_hours],
-                    train_hours,
-                    test_hours,
-                    True
-                )
+        for o in range(len(data) - train_hours - test_hours + 1):
+            data_subset = data[o: o + train_hours + test_hours]
+
+            for f_name, f in zip(forecast_names, forecast_methods):
+                helpers.indices_adjust(data_subset, train_hours, test_hours)
+                forecast = f(
+                    data_subset, train_hours, test_hours, False
+                )[train_hours: train_hours + test_hours]
 
                 for e_name, e in zip(error_names, error_measures):
-                    start = o + train_hours
-                    end = train_hours + test_hours
-                    error = e(
-                        data['total load actual'][o + start: o + end],
-                        forecast,
-                        24
-                    )
-                    error_vals[e_name].append(error)
+                    if e_name == "MASE":
+                        start = o + train_hours - seasonality
+                        end = o + train_hours + test_hours
+                        error = e(
+                            forecast,
+                            data['total load actual'][start: end],
+                            seasonality
+                        )
+                    else:
+                        start = o + train_hours
+                        end = o + train_hours + test_hours
+                        error = e(
+                            forecast,
+                            data['total load actual'][start: end]
+                        )
+                    error_vals[f_name][e_name].append(error)
 
-            for e, v in error_vals:
-                results[t][f_name][e] = v.mean()
+        for f, v in error_vals.items():
+            for e, w in v.items():
+                results[t][f][e] = np.mean(w)
 
     return results
 

@@ -19,4 +19,5 @@ def forecast(data, train_hours, test_hours, in_place=True):
     if in_place:
         data['ses adjusted'] = fcst
     else:
+        data['ses adjusted'] = fcst
         return fcst

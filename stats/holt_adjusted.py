@@ -19,5 +19,6 @@ def forecast(data, train_hours, test_hours, in_place=True):
     if in_place:
         data['holt adjusted'] = fcst
     else:
+        data['holt adjusted'] = fcst
         return fcst
 

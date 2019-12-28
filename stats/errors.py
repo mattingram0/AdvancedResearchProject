@@ -3,7 +3,7 @@ import numpy as np
 
 
 # Calculate the Mean Absolute Percentage Error of a prediction
-def sMAPE(predicted, actual, season):
+def sMAPE(predicted, actual):
     act = actual.to_numpy()
     pred = predicted.to_numpy()
     mask = act != 0
@@ -14,22 +14,22 @@ def sMAPE(predicted, actual, season):
 
 
 # Calculate the Root Mean Squared Error of a prediction
-def RMSE(predicted, actual, season):
+def RMSE(predicted, actual):
     act = actual.to_numpy()
     pred = predicted.to_numpy()
     return sqrt(np.sum(np.square(act - pred)) / len(actual))
 
 
-# Calculate the Mean Average Scaled Error of a prediction
-def MASE(predicted, actual, season):
-    act = actual.to_numpy()
-    pred = predicted.to_numpy()
-    temp = ((act - pred) / np.fabs(act[season:] - act[:-season]).mean())
-    return np.fabs(temp).mean()
-
-
 # Calculate the Mean Absolute Error of a prediction
-def MAE(predicted, actual, season):
+def MAE(predicted, actual):
     act = actual.to_numpy()
     pred = predicted.to_numpy()
     return np.fabs(act - pred).mean()
+
+
+# Calculate the Mean Average Scaled Error of a prediction
+def MASE(predicted, actual, seasonality):
+    prev = actual[:seasonality]
+    act = actual[seasonality:].to_numpy()
+    pred = predicted.to_numpy()
+    return np.fabs(act - pred).mean() / np.fabs(act - prev).mean()
