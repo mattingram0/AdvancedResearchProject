@@ -28,8 +28,9 @@ def MAE(predicted, actual):
 
 
 # Calculate the Mean Average Scaled Error of a prediction
-def MASE(predicted, actual, seasonality):
-    prev = actual[:seasonality]
-    act = actual[seasonality:].to_numpy()
+def MASE(predicted, actual, seasonality, test_hours):
+    act = actual[-test_hours:].to_numpy()
     pred = predicted.to_numpy()
-    return np.fabs(act - pred).mean() / np.fabs(act - prev).mean()
+    prev_1 = actual[seasonality:-test_hours].to_numpy()
+    prev_2 = actual[:-(seasonality + test_hours)].to_numpy()
+    return np.fabs(act - pred).mean() / np.fabs(prev_1 - prev_2).mean()

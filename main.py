@@ -37,8 +37,8 @@ def main():
     # data = data[offset_hours:offset_hours + train_hours + test_hours]
 
     # Compare differenced vs seasonal indices vs seasonal adjustment
-    helpers.decomp_adjust(data, train_hours, test_hours, "multiplicative")
-    helpers.seasonally_difference(data)
+    # helpers.decomp_adjust(data, train_hours, test_hours, "multiplicative")
+    # helpers.seasonally_difference(data)
     pd.set_option('display.max_columns', 500)
     results = test(data[:504], seasonality, test_hours)
     for t, v in results.items():
@@ -116,12 +116,12 @@ def test(data, seasonality, test_hours):
 
                 for e_name, e in zip(error_names, error_measures):
                     if e_name == "MASE":
-                        start = o + train_hours - seasonality
                         end = o + train_hours + test_hours
                         error = e(
                             forecast,
-                            data['total load actual'][start: end],
-                            seasonality
+                            data['total load actual'][o: end],
+                            seasonality,
+                            test_hours
                         )
                     else:
                         start = o + train_hours
