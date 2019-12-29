@@ -29,8 +29,8 @@ def main():
 
     # Load and Pre-process the Data
     file_path = os.path.abspath(os.path.dirname(__file__))
-    full_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
-    data = load_data(full_path)
+    data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
+    data = load_data(data_path)
     data.interpolate(inplace=True)  # Interpolate missing values
     data = data.set_index('time').asfreq('H')
     data.index = pd.to_datetime(data.index, utc=True)
@@ -39,11 +39,31 @@ def main():
     # Compare differenced vs seasonal indices vs seasonal adjustment
     # helpers.decomp_adjust(data, train_hours, test_hours, "multiplicative")
     # helpers.seasonally_difference(data)
-    pd.set_option('display.max_columns', 500)
-    results = test(data[:504], seasonality, test_hours)
+    pd.set_option('display.max_columns', 500)  # Shows all columns
+    pd.set_option('display.expand_frame_repr', False)  # Prevents line break
+    results = test(data[:240], seasonality, test_hours)
+    all_results = pd.DataFrame()
+
     for t, v in results.items():
-        print("Number of Training Days:", t)
-        print(pd.DataFrame(v), "\n")
+        res = pd.DataFrame(v)
+        res_path = os.path.join(
+            file_path,
+            "../run/results/" + str(t) + ".csv"
+        )
+
+        res.to_csv(res_path)
+        res.reset_index(inplace=True)
+        res.rename(columns={"index": "Error"}, inplace=True)
+        res["Train Time"] = t
+        all_results = pd.concat([all_results, res])
+
+    all_results.set_index("Train Time", inplace=True)
+    print(all_results)
+    all_res_path = os.path.join(
+        file_path,
+        "../run/results/all_results.csv"
+    )
+    all_results.to_csv(all_res_path)
 
 
     # fig = plt.figure(figsize=(12.8, 9.6), dpi=250)
@@ -101,19 +121,23 @@ def test(data, seasonality, test_hours):
     results = {t: {f: {e: 0 for e in error_names} for f in forecast_names}
                for t in range(min_train_days, max_train_days + 1)}
 
+    # Loop through the number of training days used
     for t in range(min_train_days, max_train_days + 1):
         error_vals = {f: {e: [] for e in error_names} for f in forecast_names}
         train_hours = t * seasonality
 
+        # Loop through the entire time series
         for o in range(len(data) - train_hours - test_hours + 1):
             data_subset = data[o: o + train_hours + test_hours]
 
+            # Loop through each forecasting function
             for f_name, f in zip(forecast_names, forecast_methods):
                 helpers.indices_adjust(data_subset, train_hours, test_hours)
                 forecast = f(
                     data_subset, train_hours, test_hours, False
                 )[train_hours: train_hours + test_hours]
 
+                # Loop through the error functions
                 for e_name, e in zip(error_names, error_measures):
                     if e_name == "MASE":
                         end = o + train_hours + test_hours
@@ -132,9 +156,20 @@ def test(data, seasonality, test_hours):
                         )
                     error_vals[f_name][e_name].append(error)
 
+        # Calculate the average error for the given training length,
+        # forecast method and error function
         for f, v in error_vals.items():
             for e, w in v.items():
                 results[t][f][e] = np.mean(w)
+
+    # Calculate the OWA for each training length/forecast method/
+    for t in range(min_train_days, max_train_days + 1):
+        for f in forecast_names:
+            results[t][f]["OWA"] = errors.OWA(
+                results[t]["naive2"],
+                results[t][f]["sMAPE"],
+                results[t][f]["MASE"]
+            )
 
     return results
 

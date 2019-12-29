@@ -34,3 +34,8 @@ def MASE(predicted, actual, seasonality, test_hours):
     prev_1 = actual[seasonality:-test_hours].to_numpy()
     prev_2 = actual[:-(seasonality + test_hours)].to_numpy()
     return np.fabs(act - pred).mean() / np.fabs(prev_1 - prev_2).mean()
+
+
+# Calculate the Overall Weighted Average (OWA) of the prediction (see M4 paper)
+def OWA(naive2, sMAPE, MASE):
+    return ((sMAPE / naive2) + (MASE / naive2)) / 2
