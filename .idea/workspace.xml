@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="564df88f-763d-43a5-ba2e-b5cd80214a9e" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stats/errors.py" beforeDir="false" afterPath="$PROJECT_DIR$/stats/errors.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stats/plots.py" beforeDir="false" afterPath="$PROJECT_DIR$/stats/plots.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -33,11 +33,30 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="759">
-              <caret line="173" lean-forward="true" selection-start-line="173" selection-end-line="173" />
+            <state relative-caret-position="236">
+              <caret line="36" column="39" lean-forward="true" selection-start-line="36" selection-start-column="39" selection-end-line="36" selection-end-column="39" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
+                <element signature="e#3784#6766#0" />
                 <element signature="e#5312#21571#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/stats/plots.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="362">
+              <caret line="246" column="24" selection-start-line="246" selection-start-column="24" selection-end-line="246" selection-end-column="24" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+                <element signature="e#417#2379#0" />
+                <element signature="e#2407#3824#0" />
+                <element signature="e#3885#7092#0" />
+                <element signature="e#7165#7418#0" />
+                <element signature="e#7465#8296#0" />
+                <element signature="e#8402#9278#0" />
               </folding>
             </state>
           </provider>
@@ -66,7 +85,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>seasonally_adjust</find>
       <find>25:</find>
       <find>test_s</find>
       <find>seasonally differenced</find>
@@ -96,6 +114,7 @@
       <find>data['seasonally adjusted</find>
       <find>seasonally adjusted</find>
       <find>data['adjusted']</find>
+      <find>xlab</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -129,7 +148,6 @@
         <option value="$PROJECT_DIR$/stats/holt.py" />
         <option value="$PROJECT_DIR$/stats/holtDamped.py" />
         <option value="$PROJECT_DIR$/stats/comb.py" />
-        <option value="$PROJECT_DIR$/stats/plots.py" />
         <option value="$PROJECT_DIR$/stats/helpers.py" />
         <option value="$PROJECT_DIR$/stats/autoSarima.py" />
         <option value="$PROJECT_DIR$/stats/ses.py" />
@@ -145,6 +163,7 @@
         <option value="$PROJECT_DIR$/stats/naive2.py" />
         <option value="$PROJECT_DIR$/stats/theta.py" />
         <option value="$PROJECT_DIR$/stats/errors.py" />
+        <option value="$PROJECT_DIR$/stats/plots.py" />
         <option value="$PROJECT_DIR$/main.py" />
       </list>
     </option>
@@ -388,7 +407,7 @@
       <workItem from="1576934547923" duration="21054000" />
       <workItem from="1577358953019" duration="9849000" />
       <workItem from="1577545569143" duration="293000" />
-      <workItem from="1577545973098" duration="16016000" />
+      <workItem from="1577545973098" duration="17837000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit. Git setup.">
       <created>1573219288446</created>
@@ -492,7 +511,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="259306000" />
+    <option name="totallyTimeSpent" value="261127000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -509,7 +528,7 @@
     <layout>
       <window_info id="Structure" order="0" side_tool="true" weight="0.29646018" />
       <window_info id="Favorites" order="1" sideWeight="0.50147057" side_tool="true" weight="0.18157615" />
-      <window_info active="true" content_ui="combo" id="Project" order="2" sideWeight="0.4985294" visible="true" weight="0.18743344" />
+      <window_info content_ui="combo" id="Project" order="2" sideWeight="0.4985294" visible="true" weight="0.18743344" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3284974" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32920793" />
@@ -522,11 +541,11 @@
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.5005325" side_tool="true" weight="0.37823835" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.3284974" />
-      <window_info anchor="bottom" x="9" y="580" width="1398" height="242" id="Python Console" order="12" sideWeight="0.4968051" weight="0.2746114" />
+      <window_info active="true" anchor="bottom" x="9" y="580" width="1398" height="242" id="Python Console" order="12" sideWeight="0.4968051" visible="true" weight="0.3896373" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" x="0" y="22" width="1440" height="878" id="SciView" maximized="true" order="3" sideWeight="0.48853615" type="WINDOWED" weight="0.9557522" />
+      <window_info anchor="right" x="0" y="22" width="1440" height="878" id="SciView" maximized="true" order="3" sideWeight="0.48853615" type="WINDOWED" visible="true" weight="0.9557522" />
       <window_info anchor="right" id="Database" order="4" weight="0.11874106" />
       <window_info anchor="right" x="0" y="0" width="310" height="700" id="Documentation" order="5" sideWeight="0.5114638" side_tool="true" weight="0.7839771" />
     </layout>
@@ -948,13 +967,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stats/plots.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="39" lean-forward="true" selection-start-line="5" selection-start-column="2" selection-end-line="5" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/stats/sarima.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
@@ -1012,12 +1024,29 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/stats/plots.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="362">
+          <caret line="246" column="24" selection-start-line="246" selection-start-column="24" selection-end-line="246" selection-end-column="24" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#417#2379#0" />
+            <element signature="e#2407#3824#0" />
+            <element signature="e#3885#7092#0" />
+            <element signature="e#7165#7418#0" />
+            <element signature="e#7465#8296#0" />
+            <element signature="e#8402#9278#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="759">
-          <caret line="173" lean-forward="true" selection-start-line="173" selection-end-line="173" />
+        <state relative-caret-position="236">
+          <caret line="36" column="39" lean-forward="true" selection-start-line="36" selection-start-column="39" selection-end-line="36" selection-end-column="39" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
+            <element signature="e#3784#6766#0" />
             <element signature="e#5312#21571#0" />
           </folding>
         </state>

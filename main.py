@@ -17,69 +17,33 @@ def load_data(filename):
 
 
 def main():
-    # Training/Test Data Parameters
+    # ---------------------- DATA PARAMETERS ------------------------
     offset_days = 12
     train_days = 5
     test_days = 2
     seasonality = 24
-
     offset_hours = offset_days * 24
     train_hours = train_days * 24
     test_hours = test_days * 24
 
-    # Load and Pre-process the Data
+    # ---------------------- LOAD AND PREPROCESS ------------------------
     file_path = os.path.abspath(os.path.dirname(__file__))
     data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
     data = load_data(data_path)
-    data.interpolate(inplace=True)  # Interpolate missing values
+    data.interpolate(inplace=True)
     data = data.set_index('time').asfreq('H')
     data.index = pd.to_datetime(data.index, utc=True)
+
+    # ----------------------- RUN THE TEST ------------------------
+    write_results(test(data[:240], seasonality, test_hours))
+
+    # ---------------------- PLOT THE RESULTS ------------------------
+    # stats.plots.results_plots()
+
+    # ----------------------- RUN THE DEMO ------------------------
     # data = data[offset_hours:offset_hours + train_hours + test_hours]
-
-    # Compare differenced vs seasonal indices vs seasonal adjustment
-    # helpers.decomp_adjust(data, train_hours, test_hours, "multiplicative")
-    # helpers.seasonally_difference(data)
-    pd.set_option('display.max_columns', 500)  # Shows all columns
-    pd.set_option('display.expand_frame_repr', False)  # Prevents line break
-    results = test(data[:240], seasonality, test_hours)
-    all_results = pd.DataFrame()
-
-    for t, v in results.items():
-        res = pd.DataFrame(v)
-        res_path = os.path.join(
-            file_path,
-            "../run/results/" + str(t) + ".csv"
-        )
-
-        res.to_csv(res_path)
-        res.reset_index(inplace=True)
-        res.rename(columns={"index": "Error"}, inplace=True)
-        res["Train Time"] = t
-        all_results = pd.concat([all_results, res])
-
-    all_results.set_index("Train Time", inplace=True)
-    print(all_results)
-    all_res_path = os.path.join(
-        file_path,
-        "../run/results/all_results.csv"
-    )
-    all_results.to_csv(all_res_path)
-
-
-    # fig = plt.figure(figsize=(12.8, 9.6), dpi=250)
-    # ax = fig.add_subplot(1, 1, 1)
-    # ax.plot(data.index, data['seasonally differenced'], label="Differenced")
-    # ax.plot(data.index, data['seasonally decomposed'], label="Decomposed")
-    # ax.plot(data.index, data['seasonally adjusted'], label="Adjusted")
-    #
-    # ax.legend(loc="best")
-    # plt.show()
-
-
-    # Run the demo
     # demo(data, offset_hours, train_hours, test_hours)
-    #
-    #
+
     # fig = plt.figure(figsize=(12.8, 9.6), dpi=250)
     # ax = fig.add_subplot(1, 1, 1)
     #
@@ -105,6 +69,8 @@ def main():
     # ax.legend(loc="best")
     # plt.setp(ax.get_xticklabels(), rotation=45)
     # plt.show()
+
+
 def test(data, seasonality, test_hours):
     forecast_methods = [naive1.forecast, naiveS.forecast,
                         naive2_adjusted.forecast, ses_adjusted.forecast,
@@ -173,6 +139,32 @@ def test(data, seasonality, test_hours):
             )
 
     return results
+
+
+def write_results(results):
+    file_path = os.path.abspath(os.path.dirname(__file__))
+    all_results = pd.DataFrame()
+
+    for t, v in results.items():
+        res = pd.DataFrame(v)
+        res_path = os.path.join(
+            file_path,
+            "../run/results/" + str(t) + ".csv"
+        )
+
+        res.to_csv(res_path)
+        res.reset_index(inplace=True)
+        res.rename(columns={"index": "Error"}, inplace=True)
+        res["Train Time"] = t
+        all_results = pd.concat([all_results, res])
+
+    all_results.set_index("Train Time", inplace=True)
+    print(all_results)
+    all_res_path = os.path.join(
+        file_path,
+        "../run/results/all_results.csv"
+    )
+    all_results.to_csv(all_res_path)
 
 
 def demo(data, offset_hours, train_hours, test_hours):
@@ -533,7 +525,6 @@ def demo(data, offset_hours, train_hours, test_hours):
 
     plt.show()
 
-
 #
 # if __name__ == "main":
 #     # matplotlib.style.use('seaborn-deep')
@@ -543,8 +534,11 @@ def demo(data, offset_hours, train_hours, test_hours):
 #     main()
 # Entry point when using PyCharm - REMOVE
 # matplotlib.style.use('seaborn-deep')
+
+
 register_matplotlib_converters()
 pd.options.mode.chained_assignment = None
-# plt.style.use('Solarize_Light2')
+pd.set_option('display.max_columns', 500)  # Shows all columns
+pd.set_option('display.expand_frame_repr', False)  # Prevents line break
 plt.style.use('seaborn-deep')
 main()

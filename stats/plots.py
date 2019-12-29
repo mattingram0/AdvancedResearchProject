@@ -233,3 +233,24 @@ def indices_adjusted_plots(data, train_hours, test_hours):
     # Add the legend and show the plot
     ax.legend(loc="best")
     plt.show()
+
+
+def results_plots():
+    df = pd.read_csv("all_results.csv")
+    df.set_index("Train Time", inplace=True)
+    owa = df.loc[df['Error'] == "OWA"]
+
+    fig = plt.figure(figsize=(19.2, 14.4), dpi=300)
+    ax = fig.add_subplot(1, 1, 1)
+
+    for col in owa.columns:
+        if col == "Error":
+            continue
+
+        ax.plot(owa.index, owa[col], label=col.capitalize())
+
+    ax.set_title("Overall Weighted Average Error for Different Training Days")
+    ax.set_xlabel("Number of Training Days Used")
+    ax.set_ylabel("Overall Weighted Average")
+    ax.legend(loc="best")
+    plt.show()
