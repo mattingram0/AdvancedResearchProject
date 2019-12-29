@@ -37,5 +37,5 @@ def MASE(predicted, actual, seasonality, test_hours):
 
 
 # Calculate the Overall Weighted Average (OWA) of the prediction (see M4 paper)
-def OWA(naive2, sMAPE, MASE):
-    return ((sMAPE / naive2) + (MASE / naive2)) / 2
+def OWA(naive2_sMAPE, naive2_MASE, pred_sMAPE, pred_MASE):
+    return ((pred_sMAPE / naive2_sMAPE) + (pred_MASE / naive2_MASE)) / 2

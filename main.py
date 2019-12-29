@@ -166,7 +166,8 @@ def test(data, seasonality, test_hours):
     for t in range(min_train_days, max_train_days + 1):
         for f in forecast_names:
             results[t][f]["OWA"] = errors.OWA(
-                results[t]["naive2"],
+                results[t]["naive2"]["sMAPE"],
+                results[t]["naive2"]["MASE"],
                 results[t][f]["sMAPE"],
                 results[t][f]["MASE"]
             )
