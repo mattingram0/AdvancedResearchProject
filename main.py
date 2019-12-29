@@ -35,7 +35,7 @@ def main():
     data.index = pd.to_datetime(data.index, utc=True)
 
     # ----------------------- RUN THE TEST ------------------------
-    write_results(test(data[:240], seasonality, test_hours))
+    write_results(test(data, seasonality, test_hours))
 
     # ---------------------- PLOT THE RESULTS ------------------------
     # stats.plots.results_plots()
@@ -83,7 +83,7 @@ def test(data, seasonality, test_hours):
     error_names = ["sMAPE", "RMSE", "MASE", "MAE"]
 
     min_train_days = 5
-    max_train_days = 7  # TODO - vary!
+    max_train_days = 14  # TODO - vary!
     results = {t: {f: {e: 0 for e in error_names} for f in forecast_names}
                for t in range(min_train_days, max_train_days + 1)}
 
