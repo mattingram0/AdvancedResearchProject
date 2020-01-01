@@ -77,8 +77,9 @@ def test(data, seasonality, test_hours):
                         holt_adjusted.forecast,
                         holtDamped_adjusted.forecast, theta.forecast,
                         comb_adjusted.forecast, sarima.forecast]
-    forecast_names = ['naive1', 'naiveS', 'naive2', 'ses', 'holt', 'damped',
-                      'theta', 'comb', 'sarima']
+    forecast_names = ['naive2', 'holtWinters']
+    # forecast_names = ['naive1', 'naiveS', 'naive2', 'ses', 'holt', 'damped',
+    #                   'theta', 'comb', 'sarima']
     error_measures = [errors.sMAPE, errors.RMSE, errors.MASE, errors.MAE]
     error_names = ["sMAPE", "RMSE", "MASE", "MAE"]
 

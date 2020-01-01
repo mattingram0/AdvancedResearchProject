@@ -150,7 +150,7 @@ def write_results(results):
         res = pd.DataFrame(v)
         res_path = os.path.join(
             file_path,
-            "../run/results/" + str(t) + ".csv"
+            "../run/results/" + str(t) + "8.csv"
         )
 
         res.to_csv(res_path)
@@ -163,7 +163,7 @@ def write_results(results):
     print(all_results)
     all_res_path = os.path.join(
         file_path,
-        "../run/results/all_results.csv"
+        "../run/results/all_results8.csv"
     )
     all_results.to_csv(all_res_path)
 

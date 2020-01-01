@@ -77,7 +77,7 @@ def test(data, seasonality, test_hours):
                         holt_adjusted.forecast,
                         holtDamped_adjusted.forecast, theta.forecast,
                         comb_adjusted.forecast, sarima.forecast]
-    forecast_names = ['naive1']
+    forecast_names = ['naive2', 'naive1']
     error_measures = [errors.sMAPE, errors.RMSE, errors.MASE, errors.MAE]
     error_names = ["sMAPE", "RMSE", "MASE", "MAE"]
 
@@ -148,7 +148,7 @@ def write_results(results):
         res = pd.DataFrame(v)
         res_path = os.path.join(
             file_path,
-            "../run/results/" + str(t) + ".csv"
+            "../run/results/" + str(t) + "1.csv"
         )
 
         res.to_csv(res_path)
@@ -161,7 +161,7 @@ def write_results(results):
     print(all_results)
     all_res_path = os.path.join(
         file_path,
-        "../run/results/all_results.csv"
+        "../run/results/all_results1.csv"
     )
     all_results.to_csv(all_res_path)
 
