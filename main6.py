@@ -72,11 +72,7 @@ def main():
 
 
 def test(data, seasonality, test_hours):
-    forecast_methods = [naive1.forecast, naiveS.forecast,
-                        naive2_adjusted.forecast, ses_adjusted.forecast,
-                        holt_adjusted.forecast,
-                        holtDamped_adjusted.forecast, theta.forecast,
-                        comb_adjusted.forecast, sarima.forecast]
+    forecast_methods = [naive2_adjusted.forecast, holtDamped_adjusted.forecast]
     forecast_names = ['naive2', 'damped']
     # forecast_names = ['naive1', 'naiveS', 'naive2', 'ses', 'holt', 'damped',
     #                   'theta', 'comb', 'sarima']

@@ -14,7 +14,7 @@ def forecast(data, train_hours, test_hours, in_place=True):
     # Fit the model, and forecast
     fit = model.fit()
     pred = fit.forecast(test_hours)
-    fcst = list(fit.fittedvalues) + list(pred)
+    fcst = pd.Series(list(fit.fittedvalues) + list(pred))
 
     if in_place:
         data['holtWinters'] = fcst
