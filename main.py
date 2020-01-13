@@ -3,6 +3,7 @@ from pandas.plotting import register_matplotlib_converters
 import matplotlib.pyplot as plt
 import numpy as np
 import os.path
+import sys
 
 import stats.plots
 from stats import ses, helpers, naive1, naive2, naiveS, holt, holtDamped, \
@@ -35,7 +36,67 @@ def main():
     data.index = pd.to_datetime(data.index, utc=True)
 
     # ----------------------- RUN THE TEST ------------------------
-    write_results(test(data, seasonality, test_hours))
+    test_dict = {
+        1: [
+            [naive2_adjusted.forecast, naive1.forecast],
+            ['naive2', 'naive1']
+        ],
+
+        2: [
+            [naive2_adjusted.forecast, naiveS.forecast],
+            ['naive2', 'naiveS']
+        ],
+
+        3: [
+            [naive2_adjusted.forecast],
+            ['naive2']
+        ],
+
+        4: [
+            [naive2_adjusted.forecast, ses_adjusted.forecast],
+            ['naive2', 'ses']
+        ],
+
+        5: [
+            [naive2_adjusted.forecast, holt_adjusted.forecast],
+            ['naive2', 'holt']
+        ],
+
+        6: [
+            [naive2_adjusted.forecast, holtDamped_adjusted.forecast],
+            ['naive2', 'damped']
+        ],
+
+        7: [
+            [naive2_adjusted.forecast, theta.forecast],
+            ['naive2', 'theta']
+        ],
+
+        8: [
+            [naive2_adjusted.forecast, ses_adjusted.forecast,
+             holt_adjusted.forecast, holtDamped_adjusted.forecast,
+             comb_adjusted.forecast],
+            ['naive2', 'ses', 'holt', 'damped', 'comb']
+        ],
+
+        9: [
+            [naive2_adjusted.forecast, sarima.forecast],
+            ['naive2', 'sarima']
+        ],
+
+        10: [
+            [naive2_adjusted.forecast, autoSarima.forecast],
+            ['naive2', 'auto sarima']
+        ],
+
+        11: [
+            [naive2_adjusted.forecast, holtWinters.forecast],
+            ['naive2', 'holtWinters']
+        ],
+    }
+    write_results(
+        test(data, seasonality, test_hours, *test_dict[sys.argv[1]])
+    )
 
     # ---------------------- PLOT THE RESULTS ------------------------
     # stats.plots.results_plots()
@@ -71,13 +132,9 @@ def main():
     # plt.show()
 
 
-def test(data, seasonality, test_hours):
-    forecast_methods = [naive1.forecast, naiveS.forecast,
-                        naive2_adjusted.forecast, ses_adjusted.forecast,
-                        holt_adjusted.forecast,
-                        holtDamped_adjusted.forecast, theta.forecast,
-                        comb_adjusted.forecast, sarima.forecast]
-    forecast_names = ['naive2', 'holtWinters']
+def test(data, seasonality, test_hours, methods, names):
+    forecast_methods = methods
+    forecast_names = names
     # forecast_names = ['naive1', 'naiveS', 'naive2', 'ses', 'holt', 'damped',
     #                   'theta', 'comb', 'sarima']
     error_measures = [errors.sMAPE, errors.RMSE, errors.MASE, errors.MAE]
