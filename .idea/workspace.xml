@@ -33,21 +33,41 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="282">
-              <caret line="102" lean-forward="true" selection-start-line="102" selection-end-line="102" />
+            <state relative-caret-position="218">
+              <caret line="233" lean-forward="true" selection-start-line="233" selection-end-line="233" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
-                <element signature="e#1305#2729#0" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main11.py">
+        <entry file="file://$PROJECT_DIR$/stats/holtDamped_adjusted.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="224">
-              <caret line="75" column="46" lean-forward="true" selection-start-line="75" selection-start-column="21" selection-end-line="75" selection-end-column="46" />
+            <state relative-caret-position="240">
+              <caret line="16" column="5" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/scipy/stats/morestats.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="13800">
+              <caret line="940" column="4" selection-start-line="940" selection-start-column="4" selection-end-line="940" selection-end-column="4" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/scipy/optimize/optimize.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="39825">
+              <caret line="2655" column="4" selection-start-line="2655" selection-start-column="4" selection-end-line="2655" selection-end-column="4" />
             </state>
           </provider>
         </entry>
@@ -63,8 +83,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>test_s</find>
-      <find>seasonally differenced</find>
       <find>sarimax</find>
       <find>fit(</find>
       <find>method</find>
@@ -93,6 +111,8 @@
       <find>data['adjusted']</find>
       <find>xlab</find>
       <find>holtwinters.</find>
+      <find>trend=</find>
+      <find>trend =</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -133,7 +153,6 @@
         <option value="$PROJECT_DIR$/stats/sarima.py" />
         <option value="$PROJECT_DIR$/stats/comb_adjusted.py" />
         <option value="$PROJECT_DIR$/stats/naive2_adjusted.py" />
-        <option value="$PROJECT_DIR$/stats/holtDamped_adjusted.py" />
         <option value="$PROJECT_DIR$/stats/ses_adjusted.py" />
         <option value="$PROJECT_DIR$/stats/holt_adjusted.py" />
         <option value="$PROJECT_DIR$/stats/naive2.py" />
@@ -153,6 +172,7 @@
         <option value="$PROJECT_DIR$/main10.py" />
         <option value="$PROJECT_DIR$/main8.py" />
         <option value="$PROJECT_DIR$/main1.py" />
+        <option value="$PROJECT_DIR$/stats/holtDamped_adjusted.py" />
         <option value="$PROJECT_DIR$/main.py" />
       </list>
     </option>
@@ -169,6 +189,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -176,16 +197,10 @@
               <item name="AdvancedResearchProject" type="b2602c69:ProjectViewProjectNode" />
               <item name="AdvancedResearchProject" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="AdvancedResearchProject" type="b2602c69:ProjectViewProjectNode" />
-              <item name="AdvancedResearchProject" type="462c0819:PsiDirectoryNode" />
-              <item name="stats" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -218,36 +233,11 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.Main 8">
-    <configuration name="Main 8" type="PythonConfigurationType" factoryName="Python">
-      <module name="AdvancedResearchProject" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main8.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="true" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Python.Main">
     <configuration name="Main" type="PythonConfigurationType" factoryName="Python">
       <module name="AdvancedResearchProject" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -255,7 +245,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
-      <option name="PARAMETERS" value="" />
+      <option name="PARAMETERS" value="6" />
       <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -378,7 +368,6 @@
       <item itemvalue="Python.Pandas2" />
       <item itemvalue="Python.Numpy" />
       <item itemvalue="Python.Main" />
-      <item itemvalue="Python.Main 8" />
       <item itemvalue="Python.Plotting" />
     </list>
   </component>
@@ -423,7 +412,8 @@
       <workItem from="1577358953019" duration="9849000" />
       <workItem from="1577545569143" duration="293000" />
       <workItem from="1577545973098" duration="25569000" />
-      <workItem from="1578911995599" duration="2169000" />
+      <workItem from="1578911995599" duration="8184000" />
+      <workItem from="1579430758282" duration="496000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit. Git setup.">
       <created>1573219288446</created>
@@ -527,7 +517,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="271028000" />
+    <option name="totallyTimeSpent" value="277539000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -544,7 +534,7 @@
     <layout>
       <window_info id="Structure" order="0" side_tool="true" weight="0.29646018" />
       <window_info id="Favorites" order="1" sideWeight="0.50147057" side_tool="true" weight="0.18157615" />
-      <window_info content_ui="combo" id="Project" order="2" sideWeight="0.4985294" visible="true" weight="0.18168813" />
+      <window_info content_ui="combo" id="Project" order="2" sideWeight="0.4985294" visible="true" weight="0.18383405" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3284974" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32920793" />
@@ -557,7 +547,7 @@
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.5005325" side_tool="true" weight="0.37823835" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.3284974" />
-      <window_info anchor="bottom" x="9" y="580" width="1398" height="242" id="Python Console" order="12" sideWeight="0.4968051" weight="0.38853502" />
+      <window_info anchor="bottom" x="9" y="580" width="1398" height="242" id="Python Console" order="12" sideWeight="0.4968051" weight="0.6853503" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -673,20 +663,6 @@
     <SUITE FILE_PATH="coverage/AdvancedResearchProject$Pandas.coverage" NAME="Pandas Coverage Results" MODIFIED="1573231911049" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/stats" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$APPLICATION_CONFIG_DIR$/pycharm.vmoptions">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="21" lean-forward="true" selection-start-line="6" selection-start-column="21" selection-end-line="6" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/tests/results/results_arima.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-69">
-          <caret line="27" column="16" selection-start-line="27" selection-start-column="16" selection-end-line="27" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/matplotlib/pyplot.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="172">
@@ -879,13 +855,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/holtwinters.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="1050" column="7" lean-forward="true" selection-start-line="1050" selection-start-column="7" selection-end-line="1050" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/stats/errors.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="585">
@@ -981,103 +950,73 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/main1.py" />
+    <entry file="file://$PROJECT_DIR$/main2.py" />
+    <entry file="file://$PROJECT_DIR$/main3.py" />
+    <entry file="file://$PROJECT_DIR$/main4.py" />
+    <entry file="file://$PROJECT_DIR$/main5.py" />
+    <entry file="file://$PROJECT_DIR$/main6.py" />
+    <entry file="file://$PROJECT_DIR$/main7.py" />
+    <entry file="file://$PROJECT_DIR$/main8.py" />
+    <entry file="file://$PROJECT_DIR$/main9.py" />
+    <entry file="file://$PROJECT_DIR$/main10.py" />
+    <entry file="file://$PROJECT_DIR$/main11.py" />
+    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/scipy/stats/morestats.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="13800">
+          <caret line="940" column="4" selection-start-line="940" selection-start-column="4" selection-end-line="940" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/scipy/optimize/optimize.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="39825">
+          <caret line="2655" column="4" selection-start-line="2655" selection-start-column="4" selection-end-line="2655" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/holtwinters.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="778">
+          <caret line="561" column="39" selection-start-line="561" selection-start-column="39" selection-end-line="561" selection-end-column="39" />
+          <folding>
+            <element signature="e#900#1184#0" />
+            <element signature="e#1242#1508#0" />
+            <element signature="e#1572#2042#0" />
+            <element signature="e#2106#2567#0" />
+            <element signature="e#2619#3038#0" />
+            <element signature="e#3103#3604#0" />
+            <element signature="e#3669#4182#0" />
+            <element signature="e#4254#4996#0" />
+            <element signature="e#5068#5818#0" />
+            <element signature="e#5890#6602#0" />
+            <element signature="e#6674#7409#0" />
+            <element signature="e#7424#7919#0" />
+            <element signature="e#7936#8365#0" />
+            <element signature="e#8407#15399#0" />
+            <element signature="e#15455#15824#0" />
+            <element signature="e#39898#42378#0" />
+            <element signature="e#42419#45650#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/stats/holtDamped_adjusted.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="10" lean-forward="true" selection-start-line="5" selection-start-column="10" selection-end-line="5" selection-end-column="10" />
+        <state relative-caret-position="240">
+          <caret line="16" column="5" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main1.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="526">
-          <caret line="74" column="23" lean-forward="true" selection-start-line="74" selection-start-column="23" selection-end-line="75" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="75" column="41" selection-start-line="75" selection-start-column="21" selection-end-line="75" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main3.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="75" column="31" lean-forward="true" selection-start-line="75" selection-start-column="21" selection-end-line="75" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main4.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="32">
-          <caret line="75" column="38" selection-start-line="75" selection-start-column="21" selection-end-line="75" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main5.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="47">
-          <caret line="75" column="39" selection-start-line="75" selection-start-column="21" selection-end-line="75" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main6.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="214">
-          <caret line="75" column="41" selection-start-line="75" selection-start-column="21" selection-end-line="75" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main7.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="396">
-          <caret line="75" column="40" selection-start-line="75" selection-start-column="21" selection-end-line="75" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main8.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="381">
-          <caret line="77" column="21" selection-start-line="77" selection-start-column="21" selection-end-line="77" selection-end-column="64" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main9.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="452">
-          <caret line="75" column="21" lean-forward="true" selection-start-line="75" selection-start-column="21" selection-end-line="75" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main10.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="78" column="73" selection-start-line="78" selection-start-column="21" selection-end-line="78" selection-end-column="73" />
-          <folding>
-            <element signature="e#599#2650#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main11.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="75" column="46" lean-forward="true" selection-start-line="75" selection-start-column="21" selection-end-line="75" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="282">
-          <caret line="102" lean-forward="true" selection-start-line="102" selection-end-line="102" />
+        <state relative-caret-position="218">
+          <caret line="233" lean-forward="true" selection-start-line="233" selection-end-line="233" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
-            <element signature="e#1305#2729#0" />
           </folding>
         </state>
       </provider>

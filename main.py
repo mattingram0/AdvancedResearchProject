@@ -95,7 +95,10 @@ def main():
         ],
     }
     write_results(
-        test(data, seasonality, test_hours, *test_dict[sys.argv[1]])
+        test(
+            data[0:672], seasonality, test_hours, *test_dict[int(sys.argv[1])]
+        ),
+        sys.argv[1]
     )
 
     # ---------------------- PLOT THE RESULTS ------------------------
@@ -140,13 +143,12 @@ def test(data, seasonality, test_hours, methods, names):
     error_measures = [errors.sMAPE, errors.RMSE, errors.MASE, errors.MAE]
     error_names = ["sMAPE", "RMSE", "MASE", "MAE"]
 
-    min_train_days = 5
-    max_train_days = 14  # TODO - vary!
+    all_train_days = [7]
     results = {t: {f: {e: 0 for e in error_names} for f in forecast_names}
-               for t in range(min_train_days, max_train_days + 1)}
+               for t in all_train_days}
 
     # Loop through the number of training days used
-    for t in range(min_train_days, max_train_days + 1):
+    for t in all_train_days:
         error_vals = {f: {e: [] for e in error_names} for f in forecast_names}
         train_hours = t * seasonality
 
@@ -187,7 +189,7 @@ def test(data, seasonality, test_hours, methods, names):
                 results[t][f][e] = np.mean(w)
 
     # Calculate the OWA for each training length/forecast method/
-    for t in range(min_train_days, max_train_days + 1):
+    for t in all_train_days:
         for f in forecast_names:
             results[t][f]["OWA"] = errors.OWA(
                 results[t]["naive2"]["sMAPE"],
@@ -199,7 +201,7 @@ def test(data, seasonality, test_hours, methods, names):
     return results
 
 
-def write_results(results):
+def write_results(results, test_no):
     file_path = os.path.abspath(os.path.dirname(__file__))
     all_results = pd.DataFrame()
 
@@ -207,7 +209,8 @@ def write_results(results):
         res = pd.DataFrame(v)
         res_path = os.path.join(
             file_path,
-            "../run/results/" + str(t) + ".csv"
+            "run/results/" + test_no + "_" + str(t) + ".csv"  # TODO CHANGE
+            # BACK TO ../run/results when pushing to hamilton
         )
 
         res.to_csv(res_path)
@@ -220,7 +223,7 @@ def write_results(results):
     print(all_results)
     all_res_path = os.path.join(
         file_path,
-        "../run/results/all_results.csv"
+        "run/results/all_results.csv"
     )
     all_results.to_csv(all_res_path)
 
