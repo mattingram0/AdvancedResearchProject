@@ -208,16 +208,16 @@ def decomp_adjusted_plots(data, model):
 
 
 # Plots of the seasonally-adjusted data
-def indices_adjusted_plots(data, train_hours, test_hours):
+def indices_adjusted_plots(data, train_hours, test_hours, method):
     # Adjust and index the data
-    indices_adjust(data, train_hours, test_hours)
+    indices_adjust(data, train_hours, test_hours, method)
 
     # Figure for the the seasonally-adjusted forecasts
     fig = plt.figure(figsize=(12.8, 9.6), dpi=250)
     ax = fig.add_subplot(1, 1, 1)
     ax.set_title("Seasonally Adjusted Data")
 
-    # Plot the seasonally adjusted actual data
+    # Plot the actual data
     ax.plot(data.index[0:train_hours],
             data['total load actual'][0:train_hours],
             label="Train Data")
@@ -225,8 +225,8 @@ def indices_adjusted_plots(data, train_hours, test_hours):
             data['total load actual'][train_hours:],
             label="Test Data")
 
-    # Plot the Naive2, SES, Holt and Damped Holt Difference Forecasts
-    ax.plot(data.index, data['moving average'], label="Moving Average")
+    # Plot the moving average and the seasonally adjusted data
+    ax.plot(data.index, data['2x24 - MA'], label="2x24 - Moving Average")
     ax.plot(data.index, data['seasonally adjusted'],
             label="Seasonally Adjusted")
 

@@ -8,7 +8,7 @@ def forecast(data, train_hours, test_hours, in_place=True):
 
     # Create the Holt-Winters model
     model = ExponentialSmoothing(np.asarray(train['total load actual']),
-                                 seasonal_periods=24, seasonal='add')
+                                 seasonal_periods=24, seasonal='mul')
     model._index = pd.to_datetime(train.index)
 
     # Fit the model, and forecast

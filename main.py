@@ -8,7 +8,8 @@ import sys
 import stats.plots
 from stats import ses, helpers, naive1, naive2, naiveS, holt, holtDamped, \
     holtWinters, autoSarima, sarima, naive2_adjusted, ses_adjusted, \
-    holt_adjusted, holtDamped_adjusted, comb, comb_adjusted, theta, errors
+    holt_adjusted, holtDamped_adjusted, comb, comb_adjusted, theta, errors, \
+    plots
 
 
 def load_data(filename):
@@ -94,6 +95,7 @@ def main():
             ['naive2', 'holtWinters']
         ],
     }
+
     write_results(
         test(
             data[0:672], seasonality, test_hours, *test_dict[int(sys.argv[1])]
@@ -155,10 +157,12 @@ def test(data, seasonality, test_hours, methods, names):
         # Loop through the entire time series
         for o in range(len(data) - train_hours - test_hours + 1):
             data_subset = data[o: o + train_hours + test_hours]
+            helpers.indices_adjust(
+                data_subset, train_hours, test_hours, "multiplicative"
+            )
 
             # Loop through each forecasting function
             for f_name, f in zip(forecast_names, forecast_methods):
-                helpers.indices_adjust(data_subset, train_hours, test_hours)
                 forecast = f(
                     data_subset, train_hours, test_hours, False
                 )[train_hours: train_hours + test_hours]

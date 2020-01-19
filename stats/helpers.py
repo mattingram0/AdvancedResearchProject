@@ -21,20 +21,43 @@ def decomp_adjust(data, train_hours, test_hours, model):
 
 
 # Seasonally adjust the data using seasonal indices
-def indices_adjust(data, train_hours, test_hours):
-    data['moving average'] = data['total load actual'].rolling(24).mean()
-    data['seasonal ratio'] = data['total load actual'] / data['moving average']
+def indices_adjust(data, train_hours, test_hours, method):
+    data['24 - MA'] = data['total load actual'].rolling(24, center=True).mean()
+    data['2x24 - MA'] = data['24 - MA'].rolling(2).mean().shift(-1)
+
+    if method == "additive":
+        data['detrended'] = data['total load actual'] - data['2x24 - MA']
+    else:
+        data['detrended'] = data['total load actual'] / data['2x24 - MA']
+
     seasonal_indices = []
     for i in range(24):
-        subset = data['seasonal ratio'][:train_hours][i::24]
+        subset = data['detrended'][:train_hours][i::24]
         seasonal_indices.append(subset.mean())
 
+    # Normalise the indices
+    if method == "additive":
+        seasonal_indices = [
+            i - np.mean(seasonal_indices) for i in seasonal_indices
+        ]
+    else:
+        seasonal_indices = [
+            24 * i / sum(seasonal_indices) for i in seasonal_indices
+        ]
+
+    # Copy seasonal indices down the entire column
     data['seasonal indices'] = seasonal_indices * int(
         (train_hours + test_hours) / 24
     )
-    data['seasonally adjusted'] = data['total load actual'] / data[
-        'seasonal indices'
-    ]
+
+    if method == "additive":
+        data['seasonally adjusted'] = data['total load actual'] - data[
+            'seasonal indices'
+        ]
+    else:
+        data['seasonally adjusted'] = data['total load actual'] / data[
+            'seasonal indices'
+        ]
 
 
 # Non-seasonally difference the data

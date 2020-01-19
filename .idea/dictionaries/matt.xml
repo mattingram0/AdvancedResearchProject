@@ -2,6 +2,7 @@
   <dictionary name="matt">
     <words>
       <w>autocorrelation</w>
+      <w>detrended</w>
       <w>fcst</w>
       <w>matplotlib</w>
       <w>resample</w>
