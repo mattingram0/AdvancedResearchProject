@@ -86,21 +86,22 @@ def main():
         ],
 
         10: [
-            [naive2_adjusted.forecast, autoSarima.forecast],
-            ['naive2', 'auto sarima']
-        ],
-
-        11: [
             [naive2_adjusted.forecast, holtWinters.forecast],
             ['naive2', 'holtWinters']
         ],
+
+        11: [
+            [naive2_adjusted.forecast, autoSarima.forecast],
+            ['naive2', 'auto sarima']
+        ]
     }
 
     write_results(
         test(
-            data[0:672], seasonality, test_hours, *test_dict[int(sys.argv[1])]
+            data[0:336], seasonality, test_hours, *test_dict[int(sys.argv[1])],
+            True
         ),
-        sys.argv[1]
+        sys.argv[1], True
     )
 
     # ---------------------- PLOT THE RESULTS ------------------------
@@ -137,7 +138,7 @@ def main():
     # plt.show()
 
 
-def test(data, seasonality, test_hours, methods, names):
+def test(data, seasonality, test_hours, methods, names, multiple):
     forecast_methods = methods
     forecast_names = names
     # forecast_names = ['naive1', 'naiveS', 'naive2', 'ses', 'holt', 'damped',
@@ -145,77 +146,151 @@ def test(data, seasonality, test_hours, methods, names):
     error_measures = [errors.sMAPE, errors.RMSE, errors.MASE, errors.MAE]
     error_names = ["sMAPE", "RMSE", "MASE", "MAE"]
 
-    all_train_days = [7]
-    results = {t: {f: {e: 0 for e in error_names} for f in forecast_names}
-               for t in all_train_days}
+    all_train_days = [7, 10]
 
-    # Loop through the number of training days used
-    for t in all_train_days:
-        error_vals = {f: {e: [] for e in error_names} for f in forecast_names}
-        train_hours = t * seasonality
+    if multiple:
+        results = {t: {f: {e: [0] * test_hours for e in error_names}
+                       for f in forecast_names} for t in all_train_days}
+        # Loop through the number of training days used
+        for t in all_train_days:
+            error_vals = {f: {e: [[] for i in range(test_hours)] for e in
+                              error_names} for f in forecast_names}
+            train_hours = t * seasonality
 
-        # Loop through the entire time series
-        for o in range(len(data) - train_hours - test_hours + 1):
-            data_subset = data[o: o + train_hours + test_hours]
-            helpers.indices_adjust(
-                data_subset, train_hours, test_hours, "multiplicative"
-            )
+            # Loop through the entire time series
+            for o in range(len(data) - train_hours - test_hours + 1):
+                data_subset = data[o: o + train_hours + test_hours]
+                helpers.indices_adjust(
+                    data_subset, train_hours, test_hours, "multiplicative"
+                )
 
-            # Loop through each forecasting function
-            for f_name, f in zip(forecast_names, forecast_methods):
-                forecast = f(
-                    data_subset, train_hours, test_hours, False
-                )[train_hours: train_hours + test_hours]
+                # Loop through each forecasting function
+                for f_name, f in zip(forecast_names, forecast_methods):
+                    forecast = f(
+                        data_subset, train_hours, test_hours, False
+                    )[train_hours: train_hours + test_hours]
 
-                # Loop through the error functions
-                for e_name, e in zip(error_names, error_measures):
-                    if e_name == "MASE":
-                        end = o + train_hours + test_hours
-                        error = e(
-                            forecast,
-                            data['total load actual'][o: end],
-                            seasonality,
-                            test_hours
-                        )
-                    else:
-                        start = o + train_hours
-                        end = o + train_hours + test_hours
-                        error = e(
-                            forecast,
-                            data['total load actual'][start: end]
-                        )
-                    error_vals[f_name][e_name].append(error)
+                    # Loop through the error functions
+                    for e_name, e in zip(error_names, error_measures):
 
-        # Calculate the average error for the given training length,
-        # forecast method and error function
-        for f, v in error_vals.items():
-            for e, w in v.items():
-                results[t][f][e] = np.mean(w)
+                        # Loop through the forecast horizon
+                        for i in range(1, test_hours + 1):
+                            if e_name == "MASE":
+                                end = o + train_hours + i
+                                error = e(
+                                    forecast[:i],
+                                    data['total load actual'][o: end],
+                                    seasonality,
+                                    i
+                                )
+                            else:
+                                start = o + train_hours
+                                end = o + train_hours + i
+                                error = e(
+                                    forecast[:i],
+                                    data['total load actual'][start: end]
+                                )
+                            error_vals[f_name][e_name][i - 1].append(error)
 
-    # Calculate the OWA for each training length/forecast method/
-    for t in all_train_days:
-        for f in forecast_names:
-            results[t][f]["OWA"] = errors.OWA(
-                results[t]["naive2"]["sMAPE"],
-                results[t]["naive2"]["MASE"],
-                results[t][f]["sMAPE"],
-                results[t][f]["MASE"]
-            )
+            # Calculate the average error for the given training length,
+            # forecast method and error function
+            for f, v in error_vals.items():
+                for e, w in v.items():
+                    for i in range(1, test_hours + 1):
+                        results[t][f][e][i - 1] = np.mean(w[i - 1])
+
+        # Calculate the OWA for each training length/forecast method/
+        for t in all_train_days:
+            for f in forecast_names:
+                results[t][f]["OWA"] = [0] * test_hours
+                for i in range(1, test_hours + 1):
+                    results[t][f]["OWA"][i - 1] = errors.OWA(
+                        results[t]["naive2"]["sMAPE"][i - 1],
+                        results[t]["naive2"]["MASE"][i - 1],
+                        results[t][f]["sMAPE"][i - 1],
+                        results[t][f]["MASE"][i - 1]
+                    )
+    else:
+
+        results = {t: {f: {e: 0 for e in error_names} for f in forecast_names}
+                   for t in all_train_days}
+
+        # Loop through the number of training days used
+        for t in all_train_days:
+            error_vals = {f: {e: [] for e in error_names} for f in
+                          forecast_names}
+            train_hours = t * seasonality
+
+            # Loop through the entire time series
+            for o in range(len(data) - train_hours - test_hours + 1):
+                data_subset = data[o: o + train_hours + test_hours]
+                helpers.indices_adjust(
+                    data_subset, train_hours, test_hours, "multiplicative"
+                )
+
+                # Loop through each forecasting function
+                for f_name, f in zip(forecast_names, forecast_methods):
+                    forecast = f(
+                        data_subset, train_hours, test_hours, False
+                    )[train_hours: train_hours + test_hours]
+
+                    for e_name, e in zip(error_names, error_measures):
+                        if e_name == "MASE":
+                            end = o + train_hours + test_hours
+                            error = e(
+                                forecast,
+                                data['total load actual'][o: end],
+                                seasonality,
+                                test_hours
+                            )
+                        else:
+                            start = o + train_hours
+                            end = o + train_hours + test_hours
+                            error = e(
+                                forecast,
+                                data['total load actual'][start: end]
+                            )
+                        error_vals[f_name][e_name].append(error)
+
+            # Calculate the average error for the given training length,
+            # forecast method and error function
+            for f, v in error_vals.items():
+                for e, w in v.items():
+                    results[t][f][e] = np.mean(w)
+
+        # Calculate the OWA for each training length/forecast method/
+        for t in all_train_days:
+            for f in forecast_names:
+                results[t][f]["OWA"] = errors.OWA(
+                    results[t]["naive2"]["sMAPE"],
+                    results[t]["naive2"]["MASE"],
+                    results[t][f]["sMAPE"],
+                    results[t][f]["MASE"]
+                )
 
     return results
 
 
-def write_results(results, test_no):
+def write_results(results, test_no, multiple):
     file_path = os.path.abspath(os.path.dirname(__file__))
     all_results = pd.DataFrame()
 
     for t, v in results.items():
         res = pd.DataFrame(v)
-        res_path = os.path.join(
-            file_path,
-            "run/results/" + test_no + "_" + str(t) + ".csv"  # TODO CHANGE
-            # BACK TO ../run/results when pushing to hamilton
-        )
+
+        if multiple:
+            res_path = os.path.join(
+                file_path,
+                "run/results/" + test_no + "_" + str(t) + "m.csv"
+            )
+            res = res.apply(pd.Series.explode)
+        else:
+            res_path = os.path.join(
+                file_path,
+                "run/results/" + test_no + "_" + str(t) + ".csv"
+            )
+
+        print(res)
 
         res.to_csv(res_path)
         res.reset_index(inplace=True)
@@ -227,7 +302,7 @@ def write_results(results, test_no):
     print(all_results)
     all_res_path = os.path.join(
         file_path,
-        "run/results/all_results.csv"
+        "run/results/all_results" + test_no + ".csv"
     )
     all_results.to_csv(all_res_path)
 
