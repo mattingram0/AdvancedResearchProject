@@ -299,7 +299,9 @@ def write_results(results, test_no, multiple):
         all_results = pd.concat([all_results, res])
 
     all_results.set_index("Train Time", inplace=True)
+    
     print(all_results)
+
     all_res_path = os.path.join(
         file_path,
         "run/results/all_results" + test_no + ".csv"
