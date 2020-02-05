@@ -10,6 +10,7 @@ from stats import ses, helpers, naive1, naive2, naiveS, holt, holtDamped, \
     holtWinters, autoSarima, sarima, naive2_adjusted, ses_adjusted, \
     holt_adjusted, holtDamped_adjusted, comb, comb_adjusted, theta, errors, \
     plots
+from ml import simple_lstm
 
 
 def load_data(filename):
@@ -21,7 +22,7 @@ def load_data(filename):
 def main():
     # ---------------------- DATA PARAMETERS ------------------------
     offset_days = 12
-    train_days = 5
+    train_days = 2
     test_days = 2
     seasonality = 24
     offset_hours = offset_days * 24
@@ -35,6 +36,35 @@ def main():
     data.interpolate(inplace=True)
     data = data.set_index('time').asfreq('H')
     data.index = pd.to_datetime(data.index, utc=True)
+
+    data = data[offset_hours:]
+    actual_vals = data[168:216]
+    data = data[:168]
+    forecast = simple_lstm.forecast(
+        data, train_hours, test_hours, in_place=True
+    )
+
+    print("Actual Values:", actual_vals)
+
+    # Plot the actual data and the forecast
+    fig = plt.figure(figsize=(12.8, 9.6), dpi=250)
+    ax = fig.add_subplot(1, 1, 1)
+    ax.set_title("Basic LSTM Forecasts")
+
+    ax.plot(data.index[0:168],
+            data['total load actual'][0:168],
+            label="Training Data")
+    ax.plot(actual_vals.index,
+            actual_vals['total load actual'],
+            label="Test Data")
+    ax.plot(actual_vals.index,
+            forecast,
+            label="Forecast")
+
+    ax.legend(loc="best")
+    plt.show()
+
+
 
     # ----------------------- RUN THE TEST ------------------------
     test_dict = {
@@ -96,13 +126,13 @@ def main():
         ]
     }
 
-    write_results(
-        test(
-            data[0:336], seasonality, test_hours, *test_dict[int(sys.argv[1])],
-            True
-        ),
-        sys.argv[1], True
-    )
+    # write_results(
+    #     test(
+    #         data[0:336], seasonality, test_hours, *test_dict[int(sys.argv[1])],
+    #         True
+    #     ),
+    #     sys.argv[1], True
+    # )
 
     # ---------------------- PLOT THE RESULTS ------------------------
     # stats.plots.results_plots()
@@ -299,7 +329,7 @@ def write_results(results, test_no, multiple):
         all_results = pd.concat([all_results, res])
 
     all_results.set_index("Train Time", inplace=True)
-    
+
     print(all_results)
 
     all_res_path = os.path.join(

@@ -12,7 +12,7 @@ def load_results(date, multiple, test_hours):
     folder = os.path.abspath(
         "/Users/matt/Projects/AdvancedResearchProject/run/results/"
     )
-    all_result_files = sorted(os.listdir(folder))
+    all_result_files = sorted(os.listdir(folder_str))
     dataframes = {}
 
     for result_file in all_result_files:
@@ -33,7 +33,7 @@ def load_results(date, multiple, test_hours):
                         result_file.rfind("_") + 1:result_file.find(".")]
                 )
 
-        temp_df = pd.read_csv(os.path.join(folder, result_file))
+        temp_df = pd.read_csv(os.path.join(folder_str, result_file))
         method_name = str(temp_df.columns[-1]).capitalize()
 
         # Create one dataframe per training day value, then concat after
@@ -61,7 +61,8 @@ def load_results(date, multiple, test_hours):
             existing_df = dataframes[train_days]
             existing_df[method_name] = temp_df[temp_df.columns[-1]].values
 
-    df = pd.concat(dataframes.values()).sort_index()
+    sorted_dataframes = {k: dataframes[k] for k in sorted(dataframes)}
+    df = pd.concat(sorted_dataframes.values(), sort=True)
     owa = df[df["Error"] == "OWA"]
 
     # Plot the results
@@ -72,11 +73,11 @@ def load_results(date, multiple, test_hours):
             ax = fig.add_subplot(1, 1, 1)
             ax.set_title(
                 "OWA Error Results - Multiple Point Forecast - " +
-                str(t) + "Training Days"
+                str(t) + " Training Days"
             )
 
             for method in owat.columns:
-                if method == "Error":
+                if method == "Error" or method == "Naive2":
                     continue
                 ax.plot(
                     [i for i in range(1, test_hours + 1)],
@@ -84,6 +85,8 @@ def load_results(date, multiple, test_hours):
                 )
 
             ax.legend(loc="best")
+            ax.set_xlabel("Hour Ahead Forecast")
+            ax.set_ylabel("OWA")
             plt.show()
 
     else:
@@ -100,4 +103,4 @@ def load_results(date, multiple, test_hours):
         plt.show()
 
 
-load_results("24_01", True, 48)
+load_results("30_01", True, 48)
