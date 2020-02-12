@@ -5,9 +5,12 @@
       <w>dataframes</w>
       <w>detrended</w>
       <w>fcst</w>
+      <w>lstm</w>
       <w>matplotlib</w>
       <w>resample</w>
+      <w>scaler</w>
       <w>stationarity</w>
+      <w>transf</w>
       <w>undifference</w>
       <w>vals</w>
     </words>

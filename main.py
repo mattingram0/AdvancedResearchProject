@@ -1,7 +1,9 @@
 import pandas as pd
 from pandas.plotting import register_matplotlib_converters
+from functools import reduce
 import matplotlib.pyplot as plt
 import numpy as np
+from math import fabs
 import os.path
 import sys
 
@@ -10,59 +12,108 @@ from stats import ses, helpers, naive1, naive2, naiveS, holt, holtDamped, \
     holtWinters, autoSarima, sarima, naive2_adjusted, ses_adjusted, \
     holt_adjusted, holtDamped_adjusted, comb, comb_adjusted, theta, errors, \
     plots
-from ml import simple_lstm
+from ml import lstm_adjusted, basic_lstm, lstm_48, lstm_48_multiple
 
 
-def load_data(filename):
-    return pd.read_csv(filename, parse_dates=["time"],
-                       usecols=["time", "total load actual"],
-                       infer_datetime_format=True)
+def load_data(filename, mult_ts):
+    if mult_ts:
+        df = pd.read_csv(
+            filename, parse_dates=["time"], infer_datetime_format=True
+        )
+
+        # Drop the forecast columns
+        df.drop(
+            columns=["forecast solar day ahead",
+                     "forecast wind offshore eday ahead",
+                     "forecast wind onshore day ahead",
+                     "total load forecast",
+                     "price day ahead"],
+            inplace=True
+        )
+
+        # Drop the columns whose values are all either 0 or missing
+        return df.loc[:, (pd.isna(df) == (df == 0)).any(axis=0)]
+
+    else:
+        return pd.read_csv(
+            filename, parse_dates=["time"],
+            usecols=["time", "total load actual"], infer_datetime_format=True
+        )
 
 
 def main():
+    # ---------------------- LOAD MULTIPLE TIME SERIES ----------------------
+    mult_ts = True
+
     # ---------------------- DATA PARAMETERS ------------------------
     offset_days = 12
-    train_days = 2
+    train_days = 28
+    valid_days = 7
     test_days = 2
-    seasonality = 24
+
     offset_hours = offset_days * 24
     train_hours = train_days * 24
+    valid_hours = valid_days * 24
     test_hours = test_days * 24
+    window_size = 268
+    output_size = 48
+    batch_size = calc_batch_size(
+        train_hours - window_size - output_size + 1, 64
+    )
+    seasonality = 24
 
     # ---------------------- LOAD AND PREPROCESS ------------------------
     file_path = os.path.abspath(os.path.dirname(__file__))
     data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
-    data = load_data(data_path)
+    data = load_data(data_path, mult_ts)
     data.interpolate(inplace=True)
     data = data.set_index('time').asfreq('H')
     data.index = pd.to_datetime(data.index, utc=True)
 
-    data = data[offset_hours:]
-    actual_vals = data[168:216]
-    data = data[:168]
-    forecast = simple_lstm.forecast(
-        data, train_hours, test_hours, in_place=True
+    # Train hours = 672 hours (28 days)
+    # Window size = 268 hours (7 days) -> This is the input size to our model
+    # => 672 - 268 = 404 training examples
+    #
+    # We have to feed in at 268 data points at a time to get it to
+    # generate a single forecast. So we now start at train_hours -
+    # window_size + 1, and go to
+    # Validate
+    # on the next 14 days:
+
+    data = data[
+        offset_hours:offset_hours + train_hours + valid_hours + test_hours
+    ]
+    forecast = lstm_48_multiple.forecast(
+        data, train_hours, valid_hours, test_hours, window_size,
+        output_size, batch_size, True
     )
 
-    print("Actual Values:", actual_vals)
-
-    # Plot the actual data and the forecast
-    fig = plt.figure(figsize=(12.8, 9.6), dpi=250)
-    ax = fig.add_subplot(1, 1, 1)
-    ax.set_title("Basic LSTM Forecasts")
-
-    ax.plot(data.index[0:168],
-            data['total load actual'][0:168],
-            label="Training Data")
-    ax.plot(actual_vals.index,
-            actual_vals['total load actual'],
-            label="Test Data")
-    ax.plot(actual_vals.index,
-            forecast,
-            label="Forecast")
-
-    ax.legend(loc="best")
-    plt.show()
+    # -------- Adjusted LSTM Testing ---------
+    # actual_vals = data[168:216]
+    # data = data[:168]
+    # forecast = lstm_adjusted.forecast(
+    #     data, train_hours, test_hours, in_place=True
+    # )
+    #
+    # print("Actual Values:", actual_vals)
+    #
+    # # Plot the actual data and the forecast
+    # fig = plt.figure(figsize=(12.8, 9.6), dpi=250)
+    # ax = fig.add_subplot(1, 1, 1)
+    # ax.set_title("Basic LSTM Forecasts")
+    #
+    # ax.plot(data.index[0:168],
+    #         data['total load actual'][0:168],
+    #         label="Training Data")
+    # ax.plot(actual_vals.index,
+    #         actual_vals['total load actual'],
+    #         label="Test Data")
+    # ax.plot(actual_vals.index,
+    #         forecast,
+    #         label="Forecast")
+    #
+    # ax.legend(loc="best")
+    # plt.show()
 
 
 
@@ -166,6 +217,19 @@ def main():
     # ax.legend(loc="best")
     # plt.setp(ax.get_xticklabels(), rotation=45)
     # plt.show()
+
+
+# Finds the closest number higher than the desired batch size bs which
+# divides the number of training examples
+def calc_batch_size(n, bs):
+    factors = list(set(
+        reduce(
+            list.__add__,
+            ([i, n//i] for i in range(1, int(n**0.5) + 1) if n % i == 0)
+        )
+    ))
+    return factors[np.argmin([fabs(v - bs) if v >= bs else sys.maxsize for v
+                              in factors])]
 
 
 def test(data, seasonality, test_hours, methods, names, multiple):
