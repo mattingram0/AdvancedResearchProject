@@ -9,12 +9,10 @@ import sys
 
 def forecast(data, train_hours, valid_hours, test_hours, window_size,
              output_size, batch_size, in_place):
-
-    # Scale data
-    # TODO - scale only on the training data. Scale differently for each
-    #  time series. 
+    # Scale data - scales all 16 features independently
     scaler = MinMaxScaler()
-    transf_data = scaler.fit_transform(data)
+    scaler.fit(data[:train_hours])
+    transf_data = scaler.transform(data)
 
     # Generate training, validation and testing pairs
     training_data, valid_data, test_data = create_pairs(
@@ -25,7 +23,7 @@ def forecast(data, train_hours, valid_hours, test_hours, window_size,
     # Training parameters
     num_epochs = 100
     learning_rate = 0.01
-    input_size = 16
+    input_size = 16  # 16 features now
     hidden_size = 40
     num_layers = 1
     output_size = 48
@@ -46,19 +44,17 @@ def forecast(data, train_hours, valid_hours, test_hours, window_size,
 
     # Make predictions
     lstm.eval()
-    test_model(lstm, data, valid_data, test_data, train_hours, window_size,
-               scaler)
+    test_model(lstm, data, valid_data, test_data, train_hours, window_size)
 
 
 def create_pairs(data, train_hours, valid_hours, test_hours,
                  window_size, output_size):
-
     # Split up the data
     train_data = data[:train_hours]
     valid_data = data[train_hours - window_size:
-                             train_hours + valid_hours]
+                      train_hours + valid_hours]
     test_data = data[train_hours + valid_hours - window_size:
-                            train_hours + valid_hours + test_hours]
+                     train_hours + valid_hours + test_hours]
 
     # Create the inputs and labels, and convert to tensors
     train_data = sliding_window(
@@ -83,12 +79,19 @@ def sliding_window(train_data, output_size, window_size, section):
 
     for i in range(0, len(train_data) - window_size - output_size + 1, step):
         x = train_data[i: i + window_size]
-        y = train_data[i + window_size: i + window_size + output_size]
+
+        # Use only the total load actual column (column 14) for the label
+        y = train_data[i + window_size: i + window_size + output_size,
+            14]
         inputs.append(x)
         labels.append(y)
 
-    return (torch.tensor(np.array(inputs), dtype=torch.double),
-            torch.tensor(np.array(labels), dtype=torch.double))
+    inputs = torch.tensor(np.array(inputs), dtype=torch.double)
+
+    # Reshape to be the correct shape for PyTorch
+    labels = torch.tensor(np.array(labels), dtype=torch.double)
+
+    return inputs, labels
 
 
 def train_model(lstm, optimizer, loss_func, num_epochs, training_data,
@@ -124,7 +127,7 @@ def batch_data(training_data, batch_size):
 
 def train_batch(lstm, optimizer, loss_func, inputs, labels):
     outputs = lstm(inputs.double())
-    labels = labels.view(labels.size(0), -1)  # Remove redundant dimension
+    # labels = labels.view(labels.size(0), -1)  # Remove redundant dimension
 
     optimizer.zero_grad()
     loss = loss_func(outputs, labels)
@@ -133,10 +136,17 @@ def train_batch(lstm, optimizer, loss_func, inputs, labels):
     return loss
 
 
-def test_model(lstm, data, valid_data, test_data, train_hours, window_size,
-               scaler):
+def test_model(lstm, data, valid_data, test_data, train_hours, window_size):
+    # Fit scaler to just one feature now, to inverse transform the data
+    scaler = MinMaxScaler()
+    scaler.fit(
+        data["total load actual"][:train_hours].to_numpy().reshape(-1, 1)
+    )
 
-    train_actual = np.array(data[window_size:train_hours]).reshape(-1)
+    # The LSTM requires the first window_size values to make a prediction,
+    # and so we don't include them when plotting our actual data
+    train_actual = np.array(data["total load actual"][
+                                 window_size:train_hours]).reshape(-1)
 
     valid_norm_prediction = lstm(valid_data[0]).view(-1, 1).detach()
     valid_norm_actual = valid_data[1].view(-1, 1).detach()
@@ -152,9 +162,6 @@ def test_model(lstm, data, valid_data, test_data, train_hours, window_size,
 
     prediction = np.concatenate((valid_prediction, test_prediction))
     actual = np.concatenate((train_actual, valid_actual, test_actual))
-
-    print(actual.shape)
-    print(prediction.shape)
 
     x1 = np.array([range(len(actual))]).reshape(-1)
     x2 = np.array([range(len(actual) - len(prediction),
@@ -177,7 +184,6 @@ def test_model(lstm, data, valid_data, test_data, train_hours, window_size,
 class LSTM(nn.Module):
     def __init__(self, output_size, input_size, batch_size, hidden_size,
                  num_layers):
-
         super().__init__()
 
         self.output_size = output_size
@@ -187,8 +193,10 @@ class LSTM(nn.Module):
         self.num_layers = num_layers
 
         # Allows the LSTM to be stateful between mini-batches
-        self.hidden = (torch.zeros(num_layers, batch_size, hidden_size),
-                       torch.zeros(num_layers, batch_size, hidden_size))
+        self.hidden = (torch.zeros(num_layers, batch_size, hidden_size,
+                                   dtype=torch.double),
+                       torch.zeros(num_layers, batch_size, hidden_size,
+                                   dtype=torch.double))
 
         self.lstm = nn.LSTM(
             input_size=input_size,
@@ -202,19 +210,31 @@ class LSTM(nn.Module):
     # Call once at the beginning of every epoch
     def init_hidden_states(self):
         self.hidden = (
-            torch.zeros(self.num_layers, self.batch_size, self.hidden_size),
-            torch.zeros(self.num_layers, self.batch_size, self.hidden_size)
+            torch.zeros(self.num_layers, self.batch_size, self.hidden_size,
+                        dtype=torch.double),
+            torch.zeros(self.num_layers, self.batch_size, self.hidden_size,
+                        dtype=torch.double)
         )
 
     def forward(self, x):
         # print("********")
         # print("LSTM Input: ", x.size())
         lstm_out, (h_out, c_out) = self.lstm(x.double())
+
+        # The LSTM model does not model the temporal dependency between
+        # samples within a batch, only the dependency of time steps within a
+        # sequence. So possibly need to include sequences which are more
+        # than one week long, to get the weekly seasonality. We can
+        # arbitrarily select any batch size to form a batch, and the
+        # sequences within a batch fo not need to be from continuous time
+        # segments. No need to have a batch of data as input when making
+        # prediction, just a single set of seq_len data points.
         self.hidden = (h_out, c_out)
         # print("LSTM Output:", lstm_out.size())
         # print("Hidden Output:", h_out.size())
         # print("Internal Output:", c_out.size())
-        linear_in = h_out.view(-1, self.hidden_size)
+        linear_in = h_out.view(-1, self.hidden_size)  # Just gets rid of
+        # extra dimension added by having more than one layer
         # print("Linear Input:", linear_in.size())
         out = self.linear(linear_in)
         # print("Linear Output", out.size())

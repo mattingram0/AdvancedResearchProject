@@ -19,11 +19,9 @@ def forecast(data, train_hours, valid_hours, test_hours, window_size,
         output_size
     )
 
-    all_inputs = torch.cat((training_data[0], valid_data[0], test_data[0]))
-    all_labels = torch.cat((training_data[1], valid_data[1], test_data[1]))
 
     # Training parameters
-    num_epochs = 2000
+    num_epochs = 50
     learning_rate = 0.01
     input_size = 1
     hidden_size = 40
@@ -156,9 +154,6 @@ def test_model(lstm, data, valid_data, test_data, train_hours, window_size,
 
     prediction = np.concatenate((valid_prediction, test_prediction))
     actual = np.concatenate((train_actual, valid_actual, test_actual))
-
-    print(actual.shape)
-    print(prediction.shape)
 
     x1 = np.array([range(len(actual))]).reshape(-1)
     x2 = np.array([range(len(actual) - len(prediction),
