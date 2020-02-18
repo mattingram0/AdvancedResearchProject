@@ -27,10 +27,10 @@ import torch.nn as nn
 
 
 class DRNN(nn.Module):
-
     def __init__(self, num_features, hidden_size, num_layers, dropout=0,
                  cell_type='LSTM', batch_first=False, dilations=None):
-        super(DRNN, self).__init__()
+
+        super().__init__()
 
         # Exponentially increasing dilations by default
         if dilations is None:
@@ -56,9 +56,18 @@ class DRNN(nn.Module):
         for i in range(num_layers):
             if i == 0:
                 c = cell(num_features, hidden_size, dropout=dropout)
+                c.double()  # TODO FOR SOME REASON THIS FIXED IT. Think it's
+                # because the model itself needs to be using doubles for the
+                # weight matrices, whereas prior to this it uses floats by
+                # default. possibly consider changing all to floats and
+                # removing this to save time and memory
             else:
                 c = cell(hidden_size, hidden_size, dropout=dropout)
+                c.double()
             self.layers.append(c)
+
+        for i, c in enumerate(self.layers):
+            self.add_module("rnn_layer_" + str(i), c)
 
     # Apply one forward pass. Expects batched inputs. Allow for stateful
     # LSTM by specifying initial hidden values
@@ -66,6 +75,7 @@ class DRNN(nn.Module):
     # a list of num_layers elements, where each of elements is of
     # shape (1, original_batch_size * dilation, hidden_size)
     def forward(self, inputs, hidden=None):
+
         if self.batch_first:
             inputs = inputs.transpose(0, 1)
 
@@ -112,8 +122,10 @@ class DRNN(nn.Module):
         batch_size = inputs.size(1)
         hidden_size = cell.hidden_size
 
-        inputs, _ = self.pad_inputs(inputs, seq_len, dilation)
-        dilated_inputs = self.prepare_inputs(inputs, dilation)
+        padded_inputs, _ = self.pad_inputs(inputs, seq_len, dilation)
+        dilated_inputs = self.prepare_inputs(padded_inputs, dilation)
+
+        # print(all((inputs == dilated_inputs).view(-1)))
 
         if hidden is None:
             dilated_outputs, hidden = self.apply_cell(
@@ -147,7 +159,7 @@ class DRNN(nn.Module):
                 hidden = self.init_hidden(new_bs, hidden_size).unsqueeze(0)
 
         # Feed the batch into the cell, get the outputs
-        dilated_outputs, hidden_out = cell(dilated_inputs, hidden)
+        dilated_outputs, hidden_out = cell(dilated_inputs.double(), hidden)
 
         return dilated_outputs, hidden_out
 
@@ -197,7 +209,8 @@ class DRNN(nn.Module):
             zeros = torch.zeros(
                 dilated_steps * dilation - inputs.size(0),
                 inputs.size(1),
-                inputs.size(2)
+                inputs.size(2),
+                dtype=torch.double
             )
             inputs = torch.cat((inputs, zeros))
 
@@ -221,14 +234,16 @@ class DRNN(nn.Module):
     # a cell state, defined as 'memory' here. For RNN/GRU, we have only the
     # hidden layer
     def init_hidden(self, batch_size, hidden_dim):
-        hidden = torch.zeros(batch_size, hidden_dim)
+        hidden = torch.zeros(batch_size, hidden_dim, dtype=torch.double)
 
         if self.cell_type == "LSTM":
-            memory = torch.zeros(batch_size, hidden_dim)
+            cell_state = torch.zeros(
+                batch_size, hidden_dim, dtype=torch.double
+            )
 
-            return hidden, memory
+            return hidden.double(), cell_state.double()
         else:
-            return hidden
+            return hidden.double()
 
 
 # main()

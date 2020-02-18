@@ -12,7 +12,7 @@ from stats import ses, helpers, naive1, naive2, naiveS, holt, holtDamped, \
     holtWinters, autoSarima, sarima, naive2_adjusted, ses_adjusted, \
     holt_adjusted, holtDamped_adjusted, comb, comb_adjusted, theta, errors, \
     plots
-from ml import lstm_adjusted, basic_lstm, lstm_48, lstm_48_multiple
+from ml import lstm_adjusted, basic_lstm, lstm_48, lstm_48_multiple, drnn_48
 
 
 def load_data(filename, mult_ts):
@@ -43,7 +43,7 @@ def load_data(filename, mult_ts):
 
 def main():
     # ---------------------- LOAD MULTIPLE TIME SERIES ----------------------
-    mult_ts = True
+    mult_ts = False
 
     # ---------------------- DATA PARAMETERS ------------------------
     offset_days = 12
@@ -55,7 +55,7 @@ def main():
     train_hours = train_days * 24
     valid_hours = valid_days * 24
     test_hours = test_days * 24
-    window_size = 268
+    window_size = 168
     output_size = 48
     batch_size = calc_batch_size(
         train_hours - window_size - output_size + 1, 64
@@ -83,7 +83,7 @@ def main():
     data = data[
         offset_hours:offset_hours + train_hours + valid_hours + test_hours
     ]
-    forecast = lstm_48_multiple.forecast(
+    forecast = lstm_48.forecast(
         data, train_hours, valid_hours, test_hours, window_size,
         output_size, batch_size, True
     )

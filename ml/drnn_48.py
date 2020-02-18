@@ -1,12 +1,17 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import torch
 import torch.nn as nn
-from sklearn.preprocessing import MinMaxScaler
+import torch
 import sys
 
+from sklearn.preprocessing import MinMaxScaler
+
+from ml import drnn
 from ml.helpers import create_pairs, batch_data
 
+
+#TODO - make stateful when testing if testing more than a single 48 hour
+# look-ahead
 
 def forecast(data, train_hours, valid_hours, test_hours, window_size,
              output_size, batch_size, in_place):
@@ -27,18 +32,21 @@ def forecast(data, train_hours, valid_hours, test_hours, window_size,
     hidden_size = 40
     num_layers = 1
     output_size = 48
+    dilations = [1]
 
     # Create model
-    lstm = LSTM(
-        output_size, input_size, batch_size, hidden_size, num_layers
-    ).double()
+    lstm = DRNN_48(
+        output_size, input_size, batch_size, hidden_size, num_layers,
+        batch_first=True, dilations=dilations
+    )
+
+    lstm = lstm.double()
 
     loss_func = torch.nn.MSELoss()
     optimizer = torch.optim.Adam(lstm.parameters(), lr=learning_rate)
 
     # for n, p in lstm.named_parameters():
     #     print(n, p.shape)
-
 
     # Train model
     lstm.train()
@@ -49,7 +57,7 @@ def forecast(data, train_hours, valid_hours, test_hours, window_size,
     # Make predictions
     lstm.eval()
     test_model(lstm, data, valid_data, test_data, train_hours, window_size,
-               scaler)
+                scaler)
 
 
 def train_model(lstm, optimizer, loss_func, num_epochs, training_data,
@@ -116,14 +124,15 @@ def test_model(lstm, data, valid_data, test_data, train_hours, window_size,
     plt.gca().set_xlabel("Time")
     plt.gca().set_ylabel("Total Energy Demand")
     plt.gca().legend(loc="best")
-    plt.gca().set_title("No Dilation")
+    plt.gca().set_title('Dilations: [1]')
     plt.show()
 
 
-# Stateful, mini-batch trained LSTM. One feature.
-class LSTM(nn.Module):
+# Stateful, mini-batch trained DRNN. One feature.
+class DRNN_48(nn.Module):
     def __init__(self, output_size, input_size, batch_size, hidden_size,
-                 num_layers):
+                 num_layers, dropout=0, cell_type='LSTM', batch_first=False,
+                 dilations=None):
 
         super().__init__()
 
@@ -132,17 +141,27 @@ class LSTM(nn.Module):
         self.batch_size = batch_size
         self.hidden_size = hidden_size
         self.num_layers = num_layers
+        self.cell_type = cell_type
 
         # Allows the LSTM to be stateful between mini-batches
-        self.hidden = (torch.zeros(num_layers, batch_size, hidden_size),
-                       torch.zeros(num_layers, batch_size, hidden_size))
+        # TODO - this is not correct, but doesn't require changing at the
+        # moment as I'm not using stateful LSTM. init_hidden_states needs
+        # changing too
+        if self.cell_type == "LSTM":
+            self.hidden = (torch.zeros(num_layers, batch_size, hidden_size),
+                           torch.zeros(num_layers, batch_size, hidden_size))
+        else:
+            self.hidden = torch.zeros(num_layers, batch_size, hidden_size)
 
-        self.lstm = nn.LSTM(
-            input_size=input_size,
-            hidden_size=hidden_size,
-            num_layers=num_layers,
-            batch_first=True
-        ).double()
+        self.drnn = drnn.DRNN(
+            input_size,
+            hidden_size,
+            num_layers,
+            dropout=dropout,
+            cell_type=cell_type,
+            batch_first=batch_first,
+            dilations=dilations
+        )
 
         self.linear = nn.Linear(hidden_size, output_size)
 
@@ -153,20 +172,17 @@ class LSTM(nn.Module):
             torch.zeros(self.num_layers, self.batch_size, self.hidden_size)
         )
 
-    def forward(self, x):
-        # print("********")
-        # print("LSTM Input: ", x.size())
-        lstm_out, (h_out, c_out) = self.lstm(x.double())
-        self.hidden = (h_out, c_out)
-        # print("LSTM Output:", lstm_out.size())
-        # print("Hidden Output:", h_out.size())
-        # print("Internal Output:", c_out.size())
-        linear_in = h_out.view(-1, self.hidden_size)
-        # print("Linear Input:", linear_in.size())
+    def forward(self, x, hidden=None):
+        if hidden is None:
+            lstm_out, hidden = self.drnn(x.double())
+            h_out = hidden[0][-1]
+            self.hidden = hidden
+
+        else:
+            lstm_out, h_out = self.drnn(x.double(), hidden)
+            self.hidden = h_out
+
+        linear_in = h_out[:, -x.size(0):, :].view(-1, self.hidden_size)
         out = self.linear(linear_in)
-        # print("Linear Output", out.size())
-        # print("********")
 
         return out
-
-
