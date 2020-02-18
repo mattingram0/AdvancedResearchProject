@@ -6,6 +6,8 @@ import torch.nn as nn
 from sklearn.preprocessing import MinMaxScaler
 import sys
 
+from ml.helpers import create_pairs, batch_data
+
 
 def forecast(data, train_hours, valid_hours, test_hours, window_size,
              output_size, batch_size, in_place):
@@ -17,7 +19,7 @@ def forecast(data, train_hours, valid_hours, test_hours, window_size,
     # Generate training, validation and testing pairs
     training_data, valid_data, test_data = create_pairs(
         transf_data, train_hours, valid_hours, test_hours, window_size,
-        output_size
+        output_size, True
     )
 
     # Training parameters
@@ -47,53 +49,6 @@ def forecast(data, train_hours, valid_hours, test_hours, window_size,
     test_model(lstm, data, valid_data, test_data, train_hours, window_size)
 
 
-def create_pairs(data, train_hours, valid_hours, test_hours,
-                 window_size, output_size):
-    # Split up the data
-    train_data = data[:train_hours]
-    valid_data = data[train_hours - window_size:
-                      train_hours + valid_hours]
-    test_data = data[train_hours + valid_hours - window_size:
-                     train_hours + valid_hours + test_hours]
-
-    # Create the inputs and labels, and convert to tensors
-    train_data = sliding_window(
-        train_data, output_size, window_size, "train"
-    )
-
-    valid_data = sliding_window(
-        valid_data, output_size, window_size, "valid"
-    )
-
-    test_data = sliding_window(
-        test_data, output_size, window_size, "test"
-    )
-
-    return train_data, valid_data, test_data
-
-
-def sliding_window(train_data, output_size, window_size, section):
-    inputs = []
-    labels = []
-    step = 1 if section == "train" else output_size
-
-    for i in range(0, len(train_data) - window_size - output_size + 1, step):
-        x = train_data[i: i + window_size]
-
-        # Use only the total load actual column (column 14) for the label
-        y = train_data[i + window_size: i + window_size + output_size,
-            14]
-        inputs.append(x)
-        labels.append(y)
-
-    inputs = torch.tensor(np.array(inputs), dtype=torch.double)
-
-    # Reshape to be the correct shape for PyTorch
-    labels = torch.tensor(np.array(labels), dtype=torch.double)
-
-    return inputs, labels
-
-
 def train_model(lstm, optimizer, loss_func, num_epochs, training_data,
                 batch_size):
     # Split into batches
@@ -112,17 +67,6 @@ def train_model(lstm, optimizer, loss_func, num_epochs, training_data,
 
         if epoch % 10 == 0:
             print("Epoch %d: Loss - %1.5f" % (epoch, loss.item()))
-
-
-def batch_data(training_data, batch_size):
-    input_batches = []
-    label_batches = []
-
-    for i in range(0, len(training_data[0]), batch_size):
-        input_batches.append(training_data[0][i:i + batch_size])
-        label_batches.append(training_data[1][i:i + batch_size])
-
-    return input_batches, label_batches
 
 
 def train_batch(lstm, optimizer, loss_func, inputs, labels):

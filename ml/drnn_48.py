@@ -22,7 +22,7 @@ def forecast(data, train_hours, valid_hours, test_hours, window_size,
 
     training_data, valid_data, test_data = create_pairs(
         transf_data, train_hours, valid_hours, test_hours, window_size,
-        output_size
+        output_size, False
     )
 
     # Training parameters
