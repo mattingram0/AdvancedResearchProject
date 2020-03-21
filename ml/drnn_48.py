@@ -95,6 +95,7 @@ def test_model(lstm, data, valid_data, test_data, train_hours, window_size,
                scaler):
 
     train_actual = np.array(data[window_size:train_hours]).reshape(-1)
+
     valid_norm_prediction = lstm(valid_data[0]).view(-1, 1).detach()
     valid_norm_actual = valid_data[1].view(-1, 1).detach()
     valid_prediction = scaler.inverse_transform(

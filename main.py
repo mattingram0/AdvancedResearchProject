@@ -10,10 +10,8 @@ import sys
 import stats.plots
 from stats import ses, helpers, naive1, naive2, naiveS, holt, holtDamped, \
     holtWinters, autoSarima, sarima, naive2_adjusted, ses_adjusted, \
-    holt_adjusted, holtDamped_adjusted, comb, comb_adjusted, theta, errors, \
-    plots
-from ml import lstm_adjusted, basic_lstm, lstm_48, lstm_48_multiple, \
-    drnn_48, drnn_48_multiple
+    holt_adjusted, holtDamped_adjusted, comb, comb_adjusted, theta, errors
+from hybrid import es_rnn
 
 
 def load_data(filename, mult_ts):
@@ -32,6 +30,9 @@ def load_data(filename, mult_ts):
             inplace=True
         )
 
+        # TODO - REMOVE AND PROPERLY FIX THE ZERO VALUES
+        df = df[["time", "total load actual", "price actual"]]
+
         # Drop the columns whose values are all either 0 or missing
         return df.loc[:, (pd.isna(df) == (df == 0)).any(axis=0)]
 
@@ -48,7 +49,7 @@ def main():
 
     # ---------------------- DATA PARAMETERS ------------------------
     offset_days = 12
-    train_days = 28
+    train_days = 56
     valid_days = 7
     test_days = 2
 
@@ -68,8 +69,16 @@ def main():
     data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
     data = load_data(data_path, mult_ts)
     data.interpolate(inplace=True)
+
+    # print("Any missing values?", data.isnull().values.any())
+    # print("Any zero values?", data.eq(0).any())
+
     data = data.set_index('time').asfreq('H')
     data.index = pd.to_datetime(data.index, utc=True)
+    data.rename(
+        columns={"generation other": "generation other on-renewable"},
+        inplace=True
+    )
 
     # Train hours = 672 hours (28 days)
     # Window size = 268 hours (7 days) -> This is the input size to our model
@@ -84,7 +93,7 @@ def main():
     data = data[
         offset_hours:offset_hours + train_hours + valid_hours + test_hours
     ]
-    forecast = drnn_48_multiple.forecast(
+    forecast = es_rnn.forecast(
         data, train_hours, valid_hours, test_hours, window_size,
         output_size, batch_size, True
     )
@@ -219,6 +228,72 @@ def main():
     # plt.setp(ax.get_xticklabels(), rotation=45)
     # plt.show()
 
+def stats_test(data, season_no, method_no):
+    test_dict = {
+        1: [
+            [naive2_adjusted.forecast, naive1.forecast],
+            ['naive2', 'naive1']
+        ],
+
+        2: [
+            [naive2_adjusted.forecast],
+            ['naive2']
+        ],
+
+        3: [
+            [naive2_adjusted.forecast, naiveS.forecast],
+            ['naive2', 'naiveS']
+        ],
+
+        4: [
+            [naive2_adjusted.forecast, ses_adjusted.forecast],
+            ['naive2', 'ses']
+        ],
+
+        5: [
+            [naive2_adjusted.forecast, holt_adjusted.forecast],
+            ['naive2', 'holt']
+        ],
+
+        6: [
+            [naive2_adjusted.forecast, holtDamped_adjusted.forecast],
+            ['naive2', 'damped']
+        ],
+
+        7: [
+            [naive2_adjusted.forecast, holtWinters.forecast],
+            ['naive2', 'holtWinters']
+        ],
+
+        8: [
+            [naive2_adjusted.forecast, ses_adjusted.forecast,
+             holt_adjusted.forecast, holtDamped_adjusted.forecast,
+             comb_adjusted.forecast],
+            ['naive2', 'ses', 'holt', 'damped', 'comb']
+        ],
+
+        9: [
+            [naive2_adjusted.forecast, arima.forecast],
+            ['naive2', 'arima']
+        ],
+
+        10: [
+            [naive2_adjusted.forecast, sarima.forecast],
+            ['naive2', 'sarima']
+        ],
+
+        11: [
+            [naive2_adjusted.forecast, autoSarima.forecast],
+            ['naive2', 'auto sarima']
+        ],
+
+        12: [
+            [naive2_adjusted.forecast, theta.forecast],
+            ['naive2', 'theta']
+        ]
+    }
+
+    # The method must accept two parameters: season number and method number
 
 # Finds the closest number higher than the desired batch size bs which
 # divides the number of training examples

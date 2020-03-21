@@ -36,7 +36,10 @@ def sliding_window(train_data, output_size, window_size, section, multiple):
 
         if multiple:
             # Use only the total load actual column (column 14) for the label
-            y = train_data[i + window_size: i + window_size + output_size, 14]
+            # y = train_data[i + window_size: i + window_size + output_size,
+        # 14]
+            # TODO - CHANGE BACK when fixed the zero values
+            y = train_data[i + window_size: i + window_size + output_size, 1]
         else:
             y = train_data[i + window_size: i + window_size + output_size]
 
@@ -58,3 +61,11 @@ def batch_data(training_data, batch_size):
         label_batches.append(training_data[1][i:i + batch_size])
 
     return input_batches, label_batches
+
+
+def pinball_loss(pred, actual, tau):
+    return torch.mean(torch.where(
+        actual >= pred,
+        (actual - pred) * tau,
+        (pred - actual) * (1 - tau)
+    ))

@@ -20,3 +20,4 @@ def forecast(data, train_hours, test_hours, in_place=True):
         data['auto sarima'] = fcst
     else:
         return fcst
+
