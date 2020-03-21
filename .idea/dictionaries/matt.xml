@@ -1,11 +1,13 @@
 <component name="ProjectDictionaryState">
   <dictionary name="matt">
     <words>
+      <w>arima</w>
       <w>autocorrelation</w>
       <w>dataframes</w>
       <w>detrended</w>
       <w>dilations</w>
       <w>fcst</w>
+      <w>forecasted</w>
       <w>lstm</w>
       <w>matplotlib</w>
       <w>resample</w>

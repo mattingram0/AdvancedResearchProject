@@ -1,23 +1,13 @@
-import numpy as np
 from statsmodels.tsa.holtwinters import SimpleExpSmoothing
-import pandas as pd
 
 
-def forecast(data, train_hours, test_hours, in_place=True):
-    train = data.iloc[25:train_hours]
-    model = SimpleExpSmoothing(np.asarray(train['seasonally adjusted']))
-    fit = model.fit()
-    pred = fit.forecast(test_hours)
+# Pass in seasonally adjusted data if required, then reseasonalise after.
+# Train_index needs to be the index of the very final training_value.
+def forecast(data, train_index, forecast_length):
+    fitted_model = SimpleExpSmoothing(data).fit()
+    return fitted_model.predict(0, train_index + forecast_length)
 
-    fcst = pd.concat(
-        [pd.Series([0] * 25), data['seasonal indices'][25:].multiply(
-            list(fit.fittedvalues) + list(pred)
-        )
-         ]
-    )
 
-    if in_place:
-        data['ses adjusted'] = fcst
-    else:
-        data['ses adjusted'] = fcst
-        return fcst
+# Concatenating the fitted_values of the model with the forecast_length
+# forecasted_values  gives the exact same results as just predicting from 0
+# to the train_index + forecast length
