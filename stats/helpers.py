@@ -58,11 +58,11 @@ def deseasonalise(data, seasonality, method):
 
 #TODO - KEEP THIS ONE
 def reseasonalise(data, indices, method):
-    for i in range(data):
+    for i in range(len(data)):
         if method == "additive":
-            data[i] = data[i] + indices[i % len(indices)]
+            data.iloc[i] = data.iloc[i] + indices[i % len(indices)]
         else:
-            data[i] = data[i] * indices[i % len(indices)]
+            data.iloc[i] = data.iloc[i] * indices[i % len(indices)]
 
     return data
 

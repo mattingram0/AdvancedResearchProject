@@ -5,10 +5,11 @@ import pandas as pd
 
 
 def arima(data, forecast_length, order):
-    fitted_model = sm.tsa.ARIMA(data, order=order).fit()
+    fitted_model = sm.tsa.ARIMA(data, order=order).fit(disp=-1)
     prediction = fitted_model.predict(0, len(data) + forecast_length - 1)
-    return prediction, fitted_model.arparams, fitted_model.maparams, \
-        fitted_model.aic
+    return prediction, np.concatenate(
+        (fitted_model.arparams, fitted_model.maparams)
+    ).tolist()
 
     # May need to change 0 to 1 in predict (if decide differencing is needed,
     # and also may need to do typ="levels" instead of "linear" as it is
@@ -41,9 +42,9 @@ def arima(data, forecast_length, order):
 def sarima(data, forecast_length, order, seasonal_order):
     fitted_model = sm.tsa.statespace.SARIMAX(
         data, order=order, seasonal_order=seasonal_order
-    ).fit()
+    ).fit(disp=-1)
     prediction = fitted_model.predict(0, len(data) + forecast_length - 1)
-    return prediction, fitted_model.params, fitted_model.aic
+    return prediction, fitted_model.params.to_dict()
 
 
 def auto(data, forecast_length, seasonality):
@@ -52,12 +53,16 @@ def auto(data, forecast_length, seasonality):
         start_p=0, start_q=0, max_p=2, max_q=2,
         start_P=0, start_Q=0, max_Q=2, max_P=2,
         m=seasonality, max_d=2, max_D=2,
-        trace=True, suppress_warnings=True, stepwise=True,
+        trace=False, suppress_warnings=True, stepwise=True,
         information_criterion='aicc'
     )
     fitted = fitted_model.predict_in_sample(start=0, end=(len(data) - 1))
     prediction = fitted_model.predict(forecast_length)
-    return pd.Series(np.concatenate((fitted, prediction)))
+    params = fitted_model.params().tolist()
+    hyper_params = fitted_model.get_params()
+    params.append(hyper_params["order"])
+    params.append(hyper_params["seasonal_order"])
 
+    return pd.Series(np.concatenate((fitted, prediction))), params
     # Play with the stepwise. Stepwise=True enforces the H-K algo. Possibly
     # also increase the max values or the params?

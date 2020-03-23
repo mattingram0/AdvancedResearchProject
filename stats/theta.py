@@ -29,10 +29,10 @@ def theta(data, forecast_length):
 
     # Calculate theta0 and theta2 lines for the train data
     theta0_fitted = pd.Series(
-        [pd.a_theta0 + (b_theta0 * t) for t in range(len(data))]
+        [a_theta0 + (b_theta0 * t) for t in range(len(data))]
     )
     theta2_fitted = pd.Series(
-        [a_theta2 + (b_theta2 * t) + theta2 * data[t + 1]
+        [a_theta2 + (b_theta2 * t) + theta2 * data[t]
          for t in range(len(data))]
     )
 
@@ -49,5 +49,7 @@ def theta(data, forecast_length):
     theta0 = theta0_fitted.append(theta0_predicted).reset_index(drop=True)
     theta2 = theta2_fitted.append(theta2_predicted).reset_index(drop=True)
 
+    params = theta2_model_fitted.params
+    params['initial_seasons'] = params['initial_seasons'].tolist()
     # Take the arithmetic average of the two theta lines to get the forecast
-    return (theta0 + theta2) / 2
+    return (theta0 + theta2) / 2, theta2_model_fitted.params

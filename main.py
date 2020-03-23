@@ -7,6 +7,7 @@ from math import fabs
 import os.path
 import sys
 import json
+import sys
 
 import stats.plots
 from stats import ses, naive1, naive2, naiveS, holt, holtDamped, \
@@ -48,7 +49,8 @@ def load_data(filename, mult_ts):
 
 
 def main():
-    print(int(sys.argv[1]), int(sys.argv[2]), type(sys.argv[1]))
+    # reset_results_files()
+    stats_test(int(sys.argv[1]), int(sys.argv[2]))
     sys.exit(0)
     # ---------------------- LOAD MULTIPLE TIME SERIES ----------------------
     mult_ts = True
@@ -230,42 +232,45 @@ def stats_test(season_no, model_no):
     df = df.set_index('time').asfreq('H')
     df.interpolate(inplace=True)
 
-    # Model No.: Function, Name, Deseasonalise?, Additional Params
+    # Model No.: Function, Name, Deseasonalise?, Add. Params, Ret Params?
     test_dict = {
-        1: [naive.naive_1, 'Naive1', False, None],
+        1: [naive.naive_1, 'Naive1', False, None, False],
 
-        2: [naive.naive_2, 'Naive2', True, None],
+        2: [naive.naive_2, 'Naive2', True, None, False],
 
-        3: [naive.naive_s, 'NaiveS', False, [24]],
+        3: [naive.naive_s, 'NaiveS', False, [24], False],
 
-        4: [exponential_smoothing.ses, 'SES', True, None],
+        4: [exponential_smoothing.ses, 'SES', True, None, True],
 
-        5: [exponential_smoothing.holt, 'Holt', True, None],
+        5: [exponential_smoothing.holt, 'Holt', True, None, True],
 
-        6: [exponential_smoothing.damped, 'Damped', True, None],
+        6: [exponential_smoothing.damped, 'Damped', True, None, True],
 
-        7: [exponential_smoothing.holt_winters, 'Holt-Winters', False, [24]],
+        7: [exponential_smoothing.holt_winters, 'Holt-Winters', False, [24],
+            True],
 
-        8: [exponential_smoothing.comb, 'Comb', True, None],
+        8: [exponential_smoothing.comb, 'Comb', True, None, False],
 
-        9: [arima.arima, 'ARIMA', True, [(0, 0, 1)]],
+        9: [arima.arima, 'ARIMA', True, [(1, 0, 1)], True],
 
-        10: [arima.sarima, 'SARIMA', False, [(0, 0, 1), (1, 1, 1)]],
+        10: [arima.sarima, 'SARIMA', False, [(1, 0, 1), (1, 1, 1, 24)], True],
 
-        11: [arima.auto, 'Auto', False, None],
+        11: [arima.auto, 'Auto', False, [24], True],
 
-        12: [theta.theta, 'Theta', True, None]
+        12: [theta.theta, 'Theta', True, None, True]
     }
 
     # Testing hyper-parameters
-    num_reps = 10
+    num_reps = 1
     seasonality = 24
     forecast_length = 48
-    model_func, model_name, deseasonalise, params = test_dict[model_no]
+    model_func, model_name, deseasonalise, params, ret_params = test_dict[
+        model_no]
     error_pairs = [("sMAPE", errors.sMAPE), ("RMSE", errors.RMSE),
                    ("MASE", errors.MASE), ("MAE", errors.MAE)]
 
-    # Build empty results, naive results and forecasts data structures
+    # Build empty data structures to hol results, naive results, forecasts and
+    # fitted parameters
     results = {e: {r: {y: {t: [0] * forecast_length for t in range(1, 8)
                            } for y in range(1, 5)
                        } for r in range(1, num_reps + 1)
@@ -283,6 +288,8 @@ def stats_test(season_no, model_no):
                      } for y in range(1, 5)
                  }
 
+    final_params = {y: [] for y in range(1, 5)}
+
     # Get the 4 years of data for the input season
     if season_no == 1:
         year_1 = df.loc["2015-01-01 00:00:00+01:00":"2015-02-28 23:00:00+01:00"]
@@ -291,26 +298,31 @@ def stats_test(season_no, model_no):
         year_4 = df.loc["2017-12-01 00:00:00+01:00":"2018-02-28 23:00:00+01:00"]
 
     elif season_no == 2:
-        year_1 = df.loc["2015-03-01 00:00:00+01:00":"2015-05-31 23:00:00+02:00"]
-        year_2 = df.loc["2016-03-01 00:00:00+01:00":"2016-05-31 23:00:00+02:00"]
-        year_3 = df.loc["2017-03-01 00:00:00+01:00":"2017-05-31 23:00:00+02:00"]
-        year_4 = df.loc["2018-03-01 00:00:00+01:00":"2018-05-31 23:00:00+02:00"]
+        year_1 = df.loc["2015-03-01 00:00:00+01:00":"2015-05-31 23:00:00+01:00"]
+        year_2 = df.loc["2016-03-01 00:00:00+01:00":"2016-05-31 23:00:00+01:00"]
+        year_3 = df.loc["2017-03-01 00:00:00+01:00":"2017-05-31 23:00:00+01:00"]
+        year_4 = df.loc["2018-03-01 00:00:00+01:00":"2018-05-31 23:00:00+01:00"]
 
     elif season_no == 3:
-        year_1 = df.loc["2015-06-01 00:00:00+02:00":"2015-08-31 23:00:00+02:00"]
-        year_2 = df.loc["2016-06-01 00:00:00+02:00":"2016-08-31 23:00:00+02:00"]
-        year_3 = df.loc["2017-06-01 00:00:00+02:00":"2017-08-31 23:00:00+02:00"]
-        year_4 = df.loc["2018-06-01 00:00:00+02:00":"2018-08-31 23:00:00+02:00"]
+        year_1 = df.loc["2015-06-01 00:00:00+01:00":"2015-08-31 23:00:00+01:00"]
+        year_2 = df.loc["2016-06-01 00:00:00+01:00":"2016-08-31 23:00:00+01:00"]
+        year_3 = df.loc["2017-06-01 00:00:00+01:00":"2017-08-31 23:00:00+01:00"]
+        year_4 = df.loc["2018-06-01 00:00:00+01:00":"2018-08-31 23:00:00+01:00"]
     else:
-        year_1 = df.loc["2015-09-01 00:00:00+02:00":"2015-11-30 23:00:00+01:00"]
-        year_2 = df.loc["2016-09-01 00:00:00+02:00":"2016-11-30 23:00:00+01:00"]
-        year_3 = df.loc["2017-09-01 00:00:00+02:00":"2017-11-30 23:00:00+01:00"]
-        year_4 = df.loc["2018-09-01 00:00:00+02:00":"2018-11-30 23:00:00+01:00"]
+        year_1 = df.loc["2015-09-01 00:00:00+01:00":"2015-11-30 23:00:00+01:00"]
+        year_2 = df.loc["2016-09-01 00:00:00+01:00":"2016-11-30 23:00:00+01:00"]
+        year_3 = df.loc["2017-09-01 00:00:00+01:00":"2017-11-30 23:00:00+01:00"]
+        year_4 = df.loc["2018-09-01 00:00:00+01:00":"2018-11-30 23:00:00+01:00"]
 
-    years = [year_1, year_2, year_3, year_4]
+    years = [
+        year_1["total load actual"],
+        year_2["total load actual"],
+        year_3["total load actual"],
+        year_4["total load actual"]
+    ]
 
     for y_index, y in enumerate(years):  # Years
-        for t in range(7, 0, -1):  # Train times
+        for t in range(9, 2, -1):  # Train times
             # Get training data, deseasonalise if necessary
             train = y[:-(t * seasonality)]
             train_d, indices = helpers.deseasonalise(
@@ -319,27 +331,38 @@ def stats_test(season_no, model_no):
             if deseasonalise:
                 train = train_d
 
-            for r in range(num_reps): # Repetitions
+            for r in range(1, num_reps + 1):  # Repetitions
                 # Get test data
-                test = y[-(t * seasonality):-(t * seasonality + forecast_length)]
+                test = y[-(t * seasonality):-(t * seasonality - forecast_length)]
 
                 # Fit model and forecast, with additional params if needed
                 if params is not None:
-                    fitted_forecast = model_func(train, forecast_length, *params)
+                    forec_results = model_func(train, forecast_length, *params)
                 else:
-                    fitted_forecast = model_func(train, forecast_length)
+                    forec_results = model_func(train, forecast_length)
+
+                # Split results into fit-forecast and parameters if needed
+                if ret_params:
+                    fit_forecast, fit_params = forec_results
+                else:
+                    fit_forecast = forec_results
 
                 # Reseasonalise if necessary
                 if deseasonalise:
-                    fitted_forecast = helpers.reseasonalise(
-                        fitted_forecast, indices, "multiplicative"
+                    fit_forecast = helpers.reseasonalise(
+                        fit_forecast, indices, "multiplicative"
                     )
 
-                # Select only the forecast, not the fitted values
-                forecast = fitted_forecast[-forecast_length:]
-
                 # Generate naïve forecast
-                naive_forecast = naive.naive_2(train_d, forecast_length)
+                naive_fit_forecast = helpers.reseasonalise(
+                    naive.naive_2(train_d, forecast_length),
+                    indices,
+                    "multiplicative"
+                )
+
+                # Select only the forecast, not the fitted values
+                forecast = fit_forecast[-forecast_length:]
+                naive_forecast = naive_fit_forecast[-forecast_length:]
 
                 # Loop through the error functions
                 for e_name, e_func in error_pairs:
@@ -347,21 +370,27 @@ def stats_test(season_no, model_no):
                     for l in range(1, forecast_length + 1):
                         if e_name == "MASE":
                             error = e_func(
-                                forecast[:l], y[:-(t * seasonality + l)],
+                                forecast[:l], y[:-(t * seasonality - l)],
                                 seasonality, l
                             )
                             n_error = e_func(
-                                naive_forecast[:l], y[:-(t * seasonality + l)],
+                                naive_forecast[:l], y[:-(t * seasonality - l)],
                                 seasonality, l
                             )
                         else:
                             error = e_func(forecast[:l], test[:l])
                             n_error = e_func(naive_forecast[:l], test[:l])
 
-                        results[e_name][r][y_index + 1][t][l - 1] = error
-                        n_results[e_name][r][y_index + 1][t][l - 1] = n_error
+                        # Save error results for all lead times
+                        results[e_name][r][y_index + 1][t - 2][l - 1] = error
+                        n_results[e_name][r][y_index + 1][t - 2][l - 1] = n_error
 
-                forecasts[y_index + 1][r][t] = forecast.to_list()
+                # Save 48 hour forecast
+                forecasts[y_index + 1][r][t - 2] = forecast.to_list()
+
+                # Save model params only for final repetition and train time
+                if r == num_reps and t == 3 and ret_params:
+                    final_params[y_index + 1] = fit_params
 
     # Calculate OWA for all forecasts
     for r in range(1, num_reps + 1):
@@ -414,7 +443,7 @@ def stats_test(season_no, model_no):
         results_48 = json.load(file)
 
     for l in all_res.keys():
-        results_48[l][model_name][season_no - 1] = all_res[l]
+        results_48[str(l)][model_name][season_no - 1] = all_res[l]
 
     with open(res_path, "w") as file:
         json.dump(results_48, file)
@@ -429,6 +458,57 @@ def stats_test(season_no, model_no):
         json.dump(results, file)
     with open(forec_path, "w") as file:
         json.dump(forecasts, file)
+
+    # Save the parameters (if model returns parameters)
+    if ret_params:
+        param_path = os.path.join(file_path, "results/params.txt")
+        with open(param_path) as file:
+            saved_params = json.load(file)
+
+        for y in range(1, 5):
+            saved_params[model_name][str(season_no)][str(y)] = final_params[
+                y]
+
+        with open(param_path, "w") as file:
+            json.dump(saved_params, file)
+
+
+# Delete all files in results/, then run this function to regenerate
+def reset_results_files():
+    file_path = os.path.abspath(os.path.dirname(__file__))
+
+    # Parameters
+    param_path = os.path.join(file_path, "results/params.txt")
+    params = {m: {s: {y: [] for y in range(1, 5)} for s in range(1, 5)} for
+              m in ["SES", "Holt", "Damped", "Holt-Winters", "ARIMA", "SARIMA",
+                    "Auto", "Theta"]}
+    with open(param_path, "w") as f:
+        json.dump(params, f)
+
+    # Results 48 (all seasons)
+    res48s_path = os.path.join(file_path, "results/results_48_seasons.txt")
+    methods = ["Naive1", "Naive2", "NaiveS", "SES", "Holt", "Damped",
+               "Holt-Winters", "Comb", "ARIMA", "SARIMA", "Auto", "Theta"]
+    res48s = {l: {m: [0, 0, 0, 0] for m in methods} for l in range(1, 49)}
+    with open(res48s_path, "w") as f:
+        json.dump(res48s, f)
+
+    # Results 48
+    res48_path = os.path.join(file_path, "results/results_48.txt")
+    res48 = {l: {m: 0 for m in methods} for l in range(1, 49)}
+    with open(res48_path, "w") as f:
+        json.dump(res48, f)
+
+    # Results 1
+    res1_path = os.path.join(file_path, "results/results_1.txt")
+    seasons = ["Spring", "Summer", "Winter", "Autumn", "Average"]
+    res1 = {s: {m: [0, 0] for m in methods} for s in seasons}
+    with open(res1_path, "w") as f:
+        json.dump(res1, f)
+
+
+
+
 
 
 def test(data, seasonality, test_hours, methods, names, multiple):
