@@ -6,12 +6,13 @@ import numpy as np
 from math import fabs
 import os.path
 import sys
+import json
 
 import stats.plots
 from stats import ses, naive1, naive2, naiveS, holt, holtDamped, \
     holtWinters, autoSarima, sarima, naive2_adjusted, ses_adjusted, \
     holt_adjusted, holtDamped_adjusted, comb, comb_adjusted, theta, errors
-from hybrid import es_rnn
+# from hybrid import es_rnn
 
 from stats import arima, exponential_smoothing, naive, theta
 from stats import helpers
@@ -47,6 +48,8 @@ def load_data(filename, mult_ts):
 
 
 def main():
+    print(int(sys.argv[1]), int(sys.argv[2]), type(sys.argv[1]))
+    sys.exit(0)
     # ---------------------- LOAD MULTIPLE TIME SERIES ----------------------
     mult_ts = True
 
@@ -219,13 +222,11 @@ def calc_batch_size(n, bs):
 # The method must accept two parameters: season no. (0 - 3) and method no.
 def stats_test(season_no, model_no):
     # Load data
-    df = pd.read_csv(
-        "/Users/matt/Projects/AdvancedResearchProject/data/spain"
-        "/energy_dataset.csv",
-        parse_dates=["time"],
-        usecols=["time", "total load actual"],
-        infer_datetime_format=True
-    )
+    file_path = os.path.abspath(os.path.dirname(__file__))
+    data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
+    df = pd.read_csv(data_path, parse_dates=["time"],
+                     usecols=["time", "total load actual"],
+                     infer_datetime_format=True)
     df = df.set_index('time').asfreq('H')
     df.interpolate(inplace=True)
 
@@ -360,7 +361,7 @@ def stats_test(season_no, model_no):
                         results[e_name][r][y_index + 1][t][l - 1] = error
                         n_results[e_name][r][y_index + 1][t][l - 1] = n_error
 
-                forecasts[y_index + 1][r][t] = forecast
+                forecasts[y_index + 1][r][t] = forecast.to_list()
 
     # Calculate OWA for all forecasts
     for r in range(1, num_reps + 1):
@@ -374,9 +375,60 @@ def stats_test(season_no, model_no):
                         results["MASE"][r][y][t][l],
                     )
 
-    # Perform averaging
+    # Average 48 hour forecast results
+    all_res = []
+    for r in range(1, num_reps + 1):
+        for y in range(1, 5):
+            for t in range(1, 8):
+                all_res.append(results["OWA"][r][y][t][forecast_length - 1])
 
-    # Save forecasts and results
+    mean = np.around(np.mean(all_res), decimals=3)
+    std = np.around(np.std(all_res), decimals=3)
+
+    # Save averaged 48 forecast results
+    file_path = os.path.abspath(os.path.dirname(__file__))
+    res_path = os.path.join(file_path, "results/results_1.txt")
+    with open(res_path) as file:
+        results_1 = json.load(file)
+
+    seas_dict = {1: "Spring", 2: "Summer", 3: "Autumn", 4: "Winter"}
+    results_1[seas_dict[season_no]][model_name] = [mean, std]
+
+    with open(res_path, "w") as file:
+        json.dump(results_1, file)
+
+    # Average the lead time results
+    all_res = {l: [] for l in range(1, forecast_length + 1)}
+    for r in range(1, num_reps + 1):
+        for y in range(1, 5):
+            for t in range(1, 8):
+                for l in range(1, forecast_length + 1):
+                    all_res[l].append(results["OWA"][r][y][t][l - 1])
+
+    for l in all_res.keys():
+        all_res[l] = np.around(np.mean(all_res[l]), decimals=3)
+
+    # Save the lead time results
+    res_path = os.path.join(file_path, "results/results_48_seasons.txt")
+    with open(res_path) as file:
+        results_48 = json.load(file)
+
+    for l in all_res.keys():
+        results_48[l][model_name][season_no - 1] = all_res[l]
+
+    with open(res_path, "w") as file:
+        json.dump(results_48, file)
+
+    # Save the forecasts and results
+    res_filename = seas_dict[season_no] + "_" + model_name + "_results.txt"
+    forec_filename = seas_dict[season_no] + "_" + model_name + "_forecasts.txt"
+    res_path = os.path.join(file_path, "results/" + res_filename)
+    forec_path = os.path.join(file_path, "results/" + forec_filename)
+
+    with open(res_path, "w") as file:
+        json.dump(results, file)
+    with open(forec_path, "w") as file:
+        json.dump(forecasts, file)
 
 
 def test(data, seasonality, test_hours, methods, names, multiple):
