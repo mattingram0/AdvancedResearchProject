@@ -3,7 +3,7 @@ import pandas as pd
 from statsmodels.tsa.holtwinters import SimpleExpSmoothing
 
 
-def forecast(data, train_index, forecast_length):
+def theta(data, forecast_length):
     theta0 = 0
     theta2 = 2
 
@@ -22,23 +22,23 @@ def forecast(data, train_index, forecast_length):
 
         return term1 - term2
 
-    a_theta0 = a_theta(theta0, data[:train_index + 1])
-    a_theta2 = a_theta(theta2, data[:train_index + 1])
-    b_theta0 = b_theta(theta0, data[:train_index + 1])
-    b_theta2 = b_theta(theta2, data[:train_index + 1])
+    a_theta0 = a_theta(theta0, data)
+    a_theta2 = a_theta(theta2, data)
+    b_theta0 = b_theta(theta0, data)
+    b_theta2 = b_theta(theta2, data)
 
     # Calculate theta0 and theta2 lines for the train data
     theta0_fitted = pd.Series(
-        [pd.a_theta0 + (b_theta0 * t) for t in range(train_index + 1)]
+        [pd.a_theta0 + (b_theta0 * t) for t in range(len(data))]
     )
     theta2_fitted = pd.Series(
         [a_theta2 + (b_theta2 * t) + theta2 * data[t + 1]
-         for t in range(train_index + 1)]
+         for t in range(len(data))]
     )
 
     # Predict theta0 and theta2 lines for the test data
     theta0_predicted = pd.Series(
-        [a_theta0 + b_theta0 * (train_index + h)
+        [a_theta0 + b_theta0 * (len(data) + h)
          for h in range(forecast_length)]
     )
 

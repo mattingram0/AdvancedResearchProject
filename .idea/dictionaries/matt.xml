@@ -4,6 +4,7 @@
       <w>arima</w>
       <w>autocorrelation</w>
       <w>dataframes</w>
+      <w>deseasonalise</w>
       <w>detrended</w>
       <w>dilations</w>
       <w>fcst</w>
@@ -11,6 +12,7 @@
       <w>lstm</w>
       <w>matplotlib</w>
       <w>resample</w>
+      <w>reseasonalise</w>
       <w>scaler</w>
       <w>stationarity</w>
       <w>transf</w>

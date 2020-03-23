@@ -4,9 +4,9 @@ import numpy as np
 import pandas as pd
 
 
-def arima(data, train_index, forecast_length, order):
-    fitted_model = sm.tsa.ARIMA(data[:train_index + 1], order=order).fit()
-    prediction = fitted_model.predict(0, train_index + forecast_length)
+def arima(data, forecast_length, order):
+    fitted_model = sm.tsa.ARIMA(data, order=order).fit()
+    prediction = fitted_model.predict(0, len(data) + forecast_length - 1)
     return prediction, fitted_model.arparams, fitted_model.maparams, \
         fitted_model.aic
 
@@ -38,24 +38,24 @@ def arima(data, train_index, forecast_length, order):
     # and maximum number of iterations as well as the constant
 
 
-def sarima(data, train_index, forecast_length, order, seasonal_order):
+def sarima(data, forecast_length, order, seasonal_order):
     fitted_model = sm.tsa.statespace.SARIMAX(
-        data[:train_index + 1], order=(0, 1, 1), seasonal_order=(0, 1, 1, 24)
+        data, order=order, seasonal_order=seasonal_order
     ).fit()
-    prediction = fitted_model.predict(0, train_index + forecast_length)
+    prediction = fitted_model.predict(0, len(data) + forecast_length - 1)
     return prediction, fitted_model.params, fitted_model.aic
 
 
-def auto(data, train_index, forecast_length, seasonality):
+def auto(data, forecast_length, seasonality):
     fitted_model = pm.auto_arima(
-        data[:train_index + 1],
+        data,
         start_p=0, start_q=0, max_p=2, max_q=2,
         start_P=0, start_Q=0, max_Q=2, max_P=2,
         m=seasonality, max_d=2, max_D=2,
         trace=True, suppress_warnings=True, stepwise=True,
         information_criterion='aicc'
     )
-    fitted = fitted_model.predict_in_sample(start=0, end=train_index)
+    fitted = fitted_model.predict_in_sample(start=0, end=(len(data) - 1))
     prediction = fitted_model.predict(forecast_length)
     return pd.Series(np.concatenate((fitted, prediction)))
 

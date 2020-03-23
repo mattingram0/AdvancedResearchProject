@@ -20,6 +20,53 @@ def decomp_adjust(data, train_hours, test_hours, model):
         else data['total load actual'] / seasonality
 
 
+# Give training data (must be a multiple of a whole day). Returns
+# deseasonalised data, along with the seasonal indices TODO - KEEP THIS ONE
+def deseasonalise(data, seasonality, method):
+    # Use symmetric moving average to find the trend
+    ma_seas = data.rolling(seasonality, center=True).mean()
+    trend = ma_seas.rolling(2).mean().shift(-1)
+
+    if method == "additive":
+        detrended = data - trend
+    else:
+        detrended = data / trend
+
+    seasonal_indices = []
+    for i in range(24):
+        subset = detrended[i::24]
+        seasonal_indices.append(subset.mean())
+
+    if method == "additive":
+        seasonal_indices = [
+            i - np.mean(seasonal_indices) for i in seasonal_indices
+        ]
+    else:
+        seasonal_indices = [
+            24 * i / sum(seasonal_indices) for i in seasonal_indices
+        ]
+
+    seasonal_indices_repeated = seasonal_indices * int(len(data) / 24)
+
+    if method == "additive":
+        deseasonalised = data - seasonal_indices_repeated
+    else:
+        deseasonalised = data / seasonal_indices_repeated
+
+    return deseasonalised, seasonal_indices
+
+
+#TODO - KEEP THIS ONE
+def reseasonalise(data, indices, method):
+    for i in range(data):
+        if method == "additive":
+            data[i] = data[i] + indices[i % len(indices)]
+        else:
+            data[i] = data[i] * indices[i % len(indices)]
+
+    return data
+
+
 # Seasonally adjust the data using seasonal indices
 def indices_adjust(data, train_hours, test_hours, method):
     data['24 - MA'] = data['total load actual'].rolling(24, center=True).mean()

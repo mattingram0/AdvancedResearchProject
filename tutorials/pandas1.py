@@ -16,7 +16,7 @@ print(df['price actual'].min())
 print(df['time'][df['price day ahead']>=100])
 
 # Calculate the average price
-print(df['price actual'].mean())
+print(df['prixce actual'].mean())
 
 # Fill any Not a Number values with 0
 df.fillna(0)

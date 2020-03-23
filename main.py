@@ -8,10 +8,13 @@ import os.path
 import sys
 
 import stats.plots
-from stats import ses, helpers, naive1, naive2, naiveS, holt, holtDamped, \
+from stats import ses, naive1, naive2, naiveS, holt, holtDamped, \
     holtWinters, autoSarima, sarima, naive2_adjusted, ses_adjusted, \
     holt_adjusted, holtDamped_adjusted, comb, comb_adjusted, theta, errors
 from hybrid import es_rnn
+
+from stats import arima, exponential_smoothing, naive, theta
+from stats import helpers
 
 
 def load_data(filename, mult_ts):
@@ -97,35 +100,6 @@ def main():
         data, train_hours, valid_hours, test_hours, window_size,
         output_size, batch_size, True
     )
-
-    # -------- Adjusted LSTM Testing ---------
-    # actual_vals = data[168:216]
-    # data = data[:168]
-    # forecast = lstm_adjusted.forecast(
-    #     data, train_hours, test_hours, in_place=True
-    # )
-    #
-    # print("Actual Values:", actual_vals)
-    #
-    # # Plot the actual data and the forecast
-    # fig = plt.figure(figsize=(12.8, 9.6), dpi=250)
-    # ax = fig.add_subplot(1, 1, 1)
-    # ax.set_title("Basic LSTM Forecasts")
-    #
-    # ax.plot(data.index[0:168],
-    #         data['total load actual'][0:168],
-    #         label="Training Data")
-    # ax.plot(actual_vals.index,
-    #         actual_vals['total load actual'],
-    #         label="Test Data")
-    # ax.plot(actual_vals.index,
-    #         forecast,
-    #         label="Forecast")
-    #
-    # ax.legend(loc="best")
-    # plt.show()
-
-
 
     # ----------------------- RUN THE TEST ------------------------
     test_dict = {
@@ -228,72 +202,6 @@ def main():
     # plt.setp(ax.get_xticklabels(), rotation=45)
     # plt.show()
 
-def stats_test(data, season_no, method_no):
-    test_dict = {
-        1: [
-            [naive2_adjusted.forecast, naive1.forecast],
-            ['naive2', 'naive1']
-        ],
-
-        2: [
-            [naive2_adjusted.forecast],
-            ['naive2']
-        ],
-
-        3: [
-            [naive2_adjusted.forecast, naiveS.forecast],
-            ['naive2', 'naiveS']
-        ],
-
-        4: [
-            [naive2_adjusted.forecast, ses_adjusted.forecast],
-            ['naive2', 'ses']
-        ],
-
-        5: [
-            [naive2_adjusted.forecast, holt_adjusted.forecast],
-            ['naive2', 'holt']
-        ],
-
-        6: [
-            [naive2_adjusted.forecast, holtDamped_adjusted.forecast],
-            ['naive2', 'damped']
-        ],
-
-        7: [
-            [naive2_adjusted.forecast, holtWinters.forecast],
-            ['naive2', 'holtWinters']
-        ],
-
-        8: [
-            [naive2_adjusted.forecast, ses_adjusted.forecast,
-             holt_adjusted.forecast, holtDamped_adjusted.forecast,
-             comb_adjusted.forecast],
-            ['naive2', 'ses', 'holt', 'damped', 'comb']
-        ],
-
-        9: [
-            [naive2_adjusted.forecast, arima.forecast],
-            ['naive2', 'arima']
-        ],
-
-        10: [
-            [naive2_adjusted.forecast, sarima.forecast],
-            ['naive2', 'sarima']
-        ],
-
-        11: [
-            [naive2_adjusted.forecast, autoSarima.forecast],
-            ['naive2', 'auto sarima']
-        ],
-
-        12: [
-            [naive2_adjusted.forecast, theta.forecast],
-            ['naive2', 'theta']
-        ]
-    }
-
-    # The method must accept two parameters: season number and method number
 
 # Finds the closest number higher than the desired batch size bs which
 # divides the number of training examples
@@ -306,6 +214,169 @@ def calc_batch_size(n, bs):
     ))
     return factors[np.argmin([fabs(v - bs) if v >= bs else sys.maxsize for v
                               in factors])]
+
+
+# The method must accept two parameters: season no. (0 - 3) and method no.
+def stats_test(season_no, model_no):
+    # Load data
+    df = pd.read_csv(
+        "/Users/matt/Projects/AdvancedResearchProject/data/spain"
+        "/energy_dataset.csv",
+        parse_dates=["time"],
+        usecols=["time", "total load actual"],
+        infer_datetime_format=True
+    )
+    df = df.set_index('time').asfreq('H')
+    df.interpolate(inplace=True)
+
+    # Model No.: Function, Name, Deseasonalise?, Additional Params
+    test_dict = {
+        1: [naive.naive_1, 'Naive1', False, None],
+
+        2: [naive.naive_2, 'Naive2', True, None],
+
+        3: [naive.naive_s, 'NaiveS', False, [24]],
+
+        4: [exponential_smoothing.ses, 'SES', True, None],
+
+        5: [exponential_smoothing.holt, 'Holt', True, None],
+
+        6: [exponential_smoothing.damped, 'Damped', True, None],
+
+        7: [exponential_smoothing.holt_winters, 'Holt-Winters', False, [24]],
+
+        8: [exponential_smoothing.comb, 'Comb', True, None],
+
+        9: [arima.arima, 'ARIMA', True, [(0, 0, 1)]],
+
+        10: [arima.sarima, 'SARIMA', False, [(0, 0, 1), (1, 1, 1)]],
+
+        11: [arima.auto, 'Auto', False, None],
+
+        12: [theta.theta, 'Theta', True, None]
+    }
+
+    # Testing hyper-parameters
+    num_reps = 10
+    seasonality = 24
+    forecast_length = 48
+    model_func, model_name, deseasonalise, params = test_dict[model_no]
+    error_pairs = [("sMAPE", errors.sMAPE), ("RMSE", errors.RMSE),
+                   ("MASE", errors.MASE), ("MAE", errors.MAE)]
+
+    # Build empty results, naive results and forecasts data structures
+    results = {e: {r: {y: {t: [0] * forecast_length for t in range(1, 8)
+                           } for y in range(1, 5)
+                       } for r in range(1, num_reps + 1)
+                   } for e in list(zip(*error_pairs))[0] + tuple(["OWA"])
+               }
+
+    n_results = {e: {r: {y: {t: [0] * forecast_length for t in range(1, 8)
+                             } for y in range(1, 5)
+                         } for r in range(1, num_reps + 1)
+                     } for e in list(zip(*error_pairs))[0] + tuple(["OWA"])
+                 }
+
+    forecasts = {y: {r: {t: [] for t in range(1, 8)
+                         } for r in range(1, num_reps + 1)
+                     } for y in range(1, 5)
+                 }
+
+    # Get the 4 years of data for the input season
+    if season_no == 1:
+        year_1 = df.loc["2015-01-01 00:00:00+01:00":"2015-02-28 23:00:00+01:00"]
+        year_2 = df.loc["2015-12-01 00:00:00+01:00":"2016-02-29 23:00:00+01:00"]
+        year_3 = df.loc["2016-12-01 00:00:00+01:00":"2017-02-28 23:00:00+01:00"]
+        year_4 = df.loc["2017-12-01 00:00:00+01:00":"2018-02-28 23:00:00+01:00"]
+
+    elif season_no == 2:
+        year_1 = df.loc["2015-03-01 00:00:00+01:00":"2015-05-31 23:00:00+02:00"]
+        year_2 = df.loc["2016-03-01 00:00:00+01:00":"2016-05-31 23:00:00+02:00"]
+        year_3 = df.loc["2017-03-01 00:00:00+01:00":"2017-05-31 23:00:00+02:00"]
+        year_4 = df.loc["2018-03-01 00:00:00+01:00":"2018-05-31 23:00:00+02:00"]
+
+    elif season_no == 3:
+        year_1 = df.loc["2015-06-01 00:00:00+02:00":"2015-08-31 23:00:00+02:00"]
+        year_2 = df.loc["2016-06-01 00:00:00+02:00":"2016-08-31 23:00:00+02:00"]
+        year_3 = df.loc["2017-06-01 00:00:00+02:00":"2017-08-31 23:00:00+02:00"]
+        year_4 = df.loc["2018-06-01 00:00:00+02:00":"2018-08-31 23:00:00+02:00"]
+    else:
+        year_1 = df.loc["2015-09-01 00:00:00+02:00":"2015-11-30 23:00:00+01:00"]
+        year_2 = df.loc["2016-09-01 00:00:00+02:00":"2016-11-30 23:00:00+01:00"]
+        year_3 = df.loc["2017-09-01 00:00:00+02:00":"2017-11-30 23:00:00+01:00"]
+        year_4 = df.loc["2018-09-01 00:00:00+02:00":"2018-11-30 23:00:00+01:00"]
+
+    years = [year_1, year_2, year_3, year_4]
+
+    for y_index, y in enumerate(years):  # Years
+        for t in range(7, 0, -1):  # Train times
+            # Get training data, deseasonalise if necessary
+            train = y[:-(t * seasonality)]
+            train_d, indices = helpers.deseasonalise(
+                train, seasonality, "multiplicative"
+            )
+            if deseasonalise:
+                train = train_d
+
+            for r in range(num_reps): # Repetitions
+                # Get test data
+                test = y[-(t * seasonality):-(t * seasonality + forecast_length)]
+
+                # Fit model and forecast, with additional params if needed
+                if params is not None:
+                    fitted_forecast = model_func(train, forecast_length, *params)
+                else:
+                    fitted_forecast = model_func(train, forecast_length)
+
+                # Reseasonalise if necessary
+                if deseasonalise:
+                    fitted_forecast = helpers.reseasonalise(
+                        fitted_forecast, indices, "multiplicative"
+                    )
+
+                # Select only the forecast, not the fitted values
+                forecast = fitted_forecast[-forecast_length:]
+
+                # Generate naïve forecast
+                naive_forecast = naive.naive_2(train_d, forecast_length)
+
+                # Loop through the error functions
+                for e_name, e_func in error_pairs:
+                    # Loop through the lead times
+                    for l in range(1, forecast_length + 1):
+                        if e_name == "MASE":
+                            error = e_func(
+                                forecast[:l], y[:-(t * seasonality + l)],
+                                seasonality, l
+                            )
+                            n_error = e_func(
+                                naive_forecast[:l], y[:-(t * seasonality + l)],
+                                seasonality, l
+                            )
+                        else:
+                            error = e_func(forecast[:l], test[:l])
+                            n_error = e_func(naive_forecast[:l], test[:l])
+
+                        results[e_name][r][y_index + 1][t][l - 1] = error
+                        n_results[e_name][r][y_index + 1][t][l - 1] = n_error
+
+                forecasts[y_index + 1][r][t] = forecast
+
+    # Calculate OWA for all forecasts
+    for r in range(1, num_reps + 1):
+        for y in range(1, 5):
+            for t in range(1, 8):
+                for l in range(0, forecast_length):
+                    results["OWA"][r][y][t][l] = errors.OWA(
+                        n_results["sMAPE"][r][y][t][l],
+                        n_results["MASE"][r][y][t][l],
+                        results["sMAPE"][r][y][t][l],
+                        results["MASE"][r][y][t][l],
+                    )
+
+    # Perform averaging
+
+    # Save forecasts and results
 
 
 def test(data, seasonality, test_hours, methods, names, multiple):
