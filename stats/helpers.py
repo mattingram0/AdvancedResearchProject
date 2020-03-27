@@ -33,20 +33,24 @@ def deseasonalise(data, seasonality, method):
         detrended = data / trend
 
     seasonal_indices = []
-    for i in range(24):
-        subset = detrended[i::24]
+    for i in range(seasonality):
+        subset = detrended[i::seasonality]
         seasonal_indices.append(subset.mean())
 
+    # Normalise
     if method == "additive":
         seasonal_indices = [
             i - np.mean(seasonal_indices) for i in seasonal_indices
         ]
     else:
         seasonal_indices = [
-            24 * i / sum(seasonal_indices) for i in seasonal_indices
+            seasonality * i / sum(seasonal_indices) for i in seasonal_indices
         ]
 
-    seasonal_indices_repeated = seasonal_indices * int(len(data) / 24)
+    # Repeat indices along whole length of data
+    seasonal_indices_repeated = seasonal_indices * int(len(data) / seasonality)
+    seasonal_indices_repeated.extend(seasonal_indices)
+    seasonal_indices_repeated = seasonal_indices_repeated[:len(data)]
 
     if method == "additive":
         deseasonalised = data - seasonal_indices_repeated
@@ -66,6 +70,81 @@ def reseasonalise(data, indices, method):
 
     return data
 
+
+def double_deseasonalise(data, seasonality, method):
+    # Remove weekly seasonal effects first
+    daily_average = data.resample('D').mean()
+    ma_week = daily_average.rolling(7, center=True).mean()
+    week_trend = ma_week.rolling(2).mean().shift(-1)
+    seasonal_indices = []
+
+    if method == "additive":
+        detrended_week = daily_average - week_trend
+    else:
+        detrended_week = daily_average / week_trend
+
+    for i in range(7):
+        subset = detrended_week[i::7]
+        seasonal_indices.append(subset.mean())
+
+    # Normalise
+    if method == "additive":
+        week_seasonal_indices = [
+            i - np.mean(seasonal_indices) for i in seasonal_indices
+        ]
+    else:
+        week_seasonal_indices = [
+            7 * i / sum(seasonal_indices) for i in seasonal_indices
+        ]
+
+    week_indices = [i for i in week_seasonal_indices for _ in range(24)]
+    # Repeat weekly indices along whole length of data
+    week_indices_repeated = week_indices * int(len(data) / 168)
+    week_indices_repeated.extend(week_indices)
+    week_indices_repeated = week_indices_repeated[:len(data)]
+
+    if method == "additive":
+        data_w = data - week_indices_repeated
+    else:
+        data_w = data / week_indices_repeated
+
+    # Now remove the daily effects
+
+    # Use symmetric moving average to find the trend
+    ma_seas = data_w.rolling(seasonality, center=True).mean()
+    trend = ma_seas.rolling(2).mean().shift(-1)
+
+    if method == "additive":
+        detrended = data_w - trend
+    else:
+        detrended = data_w / trend
+
+    seasonal_indices = []
+    for i in range(seasonality):
+        subset = detrended[i::seasonality]
+        seasonal_indices.append(subset.mean())
+
+    if method == "additive":
+        seasonal_indices = [
+            i - np.mean(seasonal_indices) for i in seasonal_indices
+        ]
+    else:
+        seasonal_indices = [
+            seasonality * i / sum(seasonal_indices) for i in seasonal_indices
+        ]
+
+    # Repeat seasonal indices along whole length of data
+    seasonal_indices_repeated = seasonal_indices * int(len(data) / seasonality)
+    seasonal_indices_repeated.extend(seasonal_indices)
+    seasonal_indices_repeated = seasonal_indices_repeated[:len(data)]
+
+    if method == "additive":
+        deseasonalised = data_w - seasonal_indices_repeated
+    else:
+        deseasonalised = data_w / seasonal_indices_repeated
+
+    return deseasonalised, seasonal_indices, week_seasonal_indices, trend, \
+           data_w, week_trend
 
 # Seasonally adjust the data using seasonal indices
 def indices_adjust(data, train_hours, test_hours, method):
