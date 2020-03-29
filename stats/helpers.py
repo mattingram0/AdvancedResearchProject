@@ -4,40 +4,26 @@ from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.api import seasonal_decompose
 
 
-# Seasonally adjust the data using statsmodels decomposition
-def decomp_adjust(data, train_hours, test_hours, model):
-    data.index = pd.to_datetime(data.index, utc=True)
-    decomp = seasonal_decompose(
-        data['total load actual'][0:train_hours], model=model,
-        freq=24
-    )
-    seasonality = list(decomp.seasonal[:24]) * int((train_hours +
-                                                    test_hours) / 24)
-
-    data['seasonality'] = seasonality
-    data['seasonally decomposed'] = \
-        data['total load actual'] - seasonality if model == "additive" \
-        else data['total load actual'] / seasonality
-
-
 # Give training data (must be a multiple of a whole day). Returns
-# deseasonalised data, along with the seasonal indices TODO - KEEP THIS ONE
+# deseasonalised data, along with the seasonal indices
 def deseasonalise(data, seasonality, method):
     # Use symmetric moving average to find the trend
     ma_seas = data.rolling(seasonality, center=True).mean()
     trend = ma_seas.rolling(2).mean().shift(-1)
 
+    # Remove trend
     if method == "additive":
         detrended = data - trend
     else:
         detrended = data / trend
 
+    # Calculate seasonal indices
     seasonal_indices = []
     for i in range(seasonality):
         subset = detrended[i::seasonality]
         seasonal_indices.append(subset.mean())
 
-    # Normalise
+    # Normalise indices
     if method == "additive":
         seasonal_indices = [
             i - np.mean(seasonal_indices) for i in seasonal_indices
@@ -52,6 +38,7 @@ def deseasonalise(data, seasonality, method):
     seasonal_indices_repeated.extend(seasonal_indices)
     seasonal_indices_repeated = seasonal_indices_repeated[:len(data)]
 
+    # Remove seasonality
     if method == "additive":
         deseasonalised = data - seasonal_indices_repeated
     else:
@@ -60,7 +47,6 @@ def deseasonalise(data, seasonality, method):
     return deseasonalised, seasonal_indices
 
 
-#TODO - KEEP THIS ONE
 def reseasonalise(data, indices, method):
     for i in range(len(data)):
         if method == "additive":
@@ -69,6 +55,53 @@ def reseasonalise(data, indices, method):
             data.iloc[i] = data.iloc[i] * indices[i % len(indices)]
 
     return data
+
+
+def split_data(df):
+    return {
+        "Winter": [
+            df.loc["2015-01-01 00:00:00+01:00":"2015-02-28 23:00:00+01:00"],
+            df.loc["2015-12-01 00:00:00+01:00":"2016-02-29 23:00:00+01:00"],
+            df.loc["2016-12-01 00:00:00+01:00":"2017-02-28 23:00:00+01:00"],
+            df.loc["2017-12-01 00:00:00+01:00":"2018-02-28 23:00:00+01:00"]
+        ],
+        "Spring": [
+            df.loc["2015-12-01 00:00:00+01:00":"2016-02-29 23:00:00+01:00"],
+            df.loc["2016-03-01 00:00:00+01:00":"2016-05-31 23:00:00+01:00"],
+            df.loc["2017-03-01 00:00:00+01:00":"2017-05-31 23:00:00+01:00"],
+            df.loc["2018-03-01 00:00:00+01:00":"2018-05-31 23:00:00+01:00"]
+        ],
+        "Summer": [
+            df.loc["2015-06-01 00:00:00+01:00":"2015-08-31 23:00:00+01:00"],
+            df.loc["2015-12-01 00:00:00+01:00":"2016-02-29 23:00:00+01:00"],
+            df.loc["2017-06-01 00:00:00+01:00":"2017-08-31 23:00:00+01:00"],
+            df.loc["2018-06-01 00:00:00+01:00":"2018-08-31 23:00:00+01:00"]
+        ],
+        "Autumn": [
+            df.loc["2015-09-01 00:00:00+01:00":"2015-11-30 23:00:00+01:00"],
+            df.loc["2016-09-01 00:00:00+01:00":"2016-11-30 23:00:00+01:00"],
+            df.loc["2017-09-01 00:00:00+01:00":"2017-11-30 23:00:00+01:00"],
+            df.loc["2018-09-01 00:00:00+01:00":"2018-11-30 23:00:00+01:00"]
+        ]
+    }
+
+
+# ***************** Non Used Functions ************************
+
+# Seasonally adjust the data using statsmodels decomposition
+def decomp_adjust(data, train_hours, test_hours, model):
+    data.index = pd.to_datetime(data.index, utc=True)
+    decomp = seasonal_decompose(
+        data['total load actual'][0:train_hours], model=model,
+        freq=24
+    )
+    seasonality = list(decomp.seasonal[:24]) * int((train_hours +
+                                                    test_hours) / 24)
+
+    data['seasonality'] = seasonality
+    data['seasonally decomposed'] = \
+        data['total load actual'] - seasonality if model == "additive" \
+        else data['total load actual'] / seasonality
 
 
 def double_deseasonalise(data, seasonality, method):
@@ -145,6 +178,7 @@ def double_deseasonalise(data, seasonality, method):
 
     return deseasonalised, seasonal_indices, week_seasonal_indices, trend, \
            data_w, week_trend
+
 
 # Seasonally adjust the data using seasonal indices
 def indices_adjust(data, train_hours, test_hours, method):

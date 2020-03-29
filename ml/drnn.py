@@ -28,7 +28,8 @@ import torch.nn as nn
 
 class DRNN(nn.Module):
     def __init__(self, num_features, hidden_size, num_layers, dropout=0,
-                 cell_type='LSTM', batch_first=False, dilations=None):
+                 cell_type='LSTM', batch_first=False, dilations=None,
+                 residuals=tuple([])):
 
         super().__init__()
 
@@ -38,8 +39,9 @@ class DRNN(nn.Module):
         else:
             self.dilations = dilations
 
-        self.batch_first = batch_first
-        self.cell_type = cell_type
+        self.batch_first=batch_first
+        self.cell_type=cell_type
+        self.residuals=residuals
 
         # LSTM by default
         if self.cell_type == "GRU":
@@ -86,11 +88,27 @@ class DRNN(nn.Module):
         cell_state_out = []
         outputs = []  # Just to stop the linter complaining
 
+        connections = {}
+        saved_outputs = {}
+
+        for start, finish in self.residuals:
+            connections[finish] = start
+            saved_outputs[start] = None
+
+
         # Input initial inputs to first layer, then iteratively take layer
         # outputs and feed as inputs into the next layer
         for i, (cell, dilation) in enumerate(zip(self.layers, self.dilations)):
             if hidden is None:
                 outputs, h = self.apply_layer(cell, inputs, dilation)
+
+                # Apply residual connection
+                if i in saved_outputs.keys():
+                    saved_outputs[i] = outputs
+
+                if i in connections:
+                    outputs += saved_outputs[connections[i]]
+
                 inputs = outputs
 
             else:
