@@ -33,8 +33,12 @@ def es_rnn(df):
     output_size = 48
     batch_size = len(train_data) - window_size - output_size + 1
 
+    # Give the seasonality parameters a helping hand
+    _, indices = deseasonalise(train_data['total load actual'], 168,
+                               "multiplicative")
+
     # Training parameters
-    num_epochs = 35
+    num_epochs = 27
     init_learning_rate = 0.01
     input_size = 1
     hidden_size = 40
@@ -46,7 +50,7 @@ def es_rnn(df):
     grad_clipping = 20
     auto_lr = False  # Automatically adjust learning rates
     variable_lr = True  # Use list of epoch/rate pairs
-    variable_rates = {15: 5e-3, 25: 1e-3, 30: 3e-4}
+    variable_rates = {7: 5e-3, 18: 1e-3, 22: 3e-4}
     auto_rate_threshold = 1.005  # If loss(x - 1) < 1.005 * loss(x) reduce rate
     min_epochs_before_change = 2
     residuals = tuple([[1, 3]])  # Residual connection from output of 2nd layer
@@ -56,7 +60,8 @@ def es_rnn(df):
     lstm = ES_RNN(
         output_size, input_size, batch_size, hidden_size, num_layers,
         batch_first=True, dilations=dilations, features=train_data.columns,
-        seasonality_1=24, seasonality_2=168, residuals=residuals
+        seasonality_1=24, seasonality_2=168, residuals=residuals,
+        init_seasonality=indices, init_level_smoothing=-0.8
     ).double()
 
     # Register gradient clipping function
@@ -236,7 +241,7 @@ def test_model(lstm, data, window_size, output_size):
     )
 
     # Calculate ES_RNN predictions
-    predictions, actuals, out_levels, out_seas2 = lstm.predict(
+    predictions, actuals, level, out_seas2 = lstm.predict(
         test_data, window_size, output_size
     )
 
@@ -257,17 +262,15 @@ def test_model(lstm, data, window_size, output_size):
         actual = data["total load actual"][-(i * 24):actual_end]
 
         train_d, indices = deseasonalise(train, 168, "multiplicative")
-        # TODO RESEASONALISE THE WHOLE DATA THEN TAKE THE END OTHERWISE THE
-        #  OFFSET WILL BE WRONG IN TERMS OF DAYS!!
-        naive_forecast = reseasonalise(
-            naive_2(train_d, output_size)[-output_size:],
+        naive_fit_forecast = reseasonalise(
+            naive_2(train_d, output_size),
             indices,
             "multiplicative"
         )
+        naive_forecast = naive_fit_forecast[-output_size:]
 
         naive_predictions.append(naive_forecast.reset_index(drop=True))
         naive_actuals.append(actual)
-
 
     # Plot predictions and actual
     for i in range(num_pred - 1):
@@ -282,7 +285,7 @@ def test_model(lstm, data, window_size, output_size):
     # Create the required sections of the data for the MASE. To calculate
     # the MASE, [<- Train -> | <- Forecast ->] actual values are needed
     mase_actuals = []
-    for i in range(num_pred - 1, 0, -1):
+    for i in range(num_pred - 2, 0, -1):
         mase_actuals.append(
             pd.Series(data["total load actual"][:-(i * 24)])
         )
@@ -291,27 +294,46 @@ def test_model(lstm, data, window_size, output_size):
     # Calculate the MASE for ES_RNN
     mase = []
     for a, p in zip(mase_actuals, predictions):
+        m = MASE(p, a, 168, output_size)
+        print("ES-RNN MASE:", m)
         mase.append(MASE(p, a, 168, output_size))
 
     # Calculate the sMAPE for ES_RNN
     smape = []
     for a, p in zip(actuals, predictions):
-        smape.append(sMAPE(p, a))
+        m = sMAPE(p, a)
+        print("ES-RNN sMAPE:", m)
+        smape.append(m)
 
     # Calculate the MASE for Naive 2
     naive_mase = []
     for a, p in zip(mase_actuals, naive_predictions):
+        m = MASE(p, a, 168, output_size)
+        print("Naive MASE:", m)
         naive_mase.append(MASE(p, a, 168, output_size))
 
     # Calculate the sMAPE for Naive 2
     naive_smape = []
     for a, p in zip(naive_actuals, naive_predictions):
-        naive_smape.append(sMAPE(p, a))
+        m = sMAPE(p, a)
+        print("Naive sMAPE:", m)
+        smape.append(m)
+        naive_smape.append(m)
 
     # Calculate the OWA
     owa = []
     for m, s, nm, ns in zip(mase, smape, naive_mase, naive_smape):
         owa.append(OWA(ns, nm, s, m))
+
+    for n, p in lstm.named_parameters():
+        if n == "total load actual level smoothing":
+            print("Level Smoothing:", torch.sigmoid(p))
+        if n == "total load actual seasonality2 smoothing":
+            print("Seasonality Smoothing:", torch.sigmoid(p))
+
+    print("Final Level:", level[0])
+    print("Final Seasonality (Exponentiated):", out_seas2)
+    print("Final Seasonality:", torch.log(out_seas2))
 
     return owa, indices
 
@@ -348,7 +370,12 @@ class ES_RNN(nn.Module):
     def __init__(self, output_size, input_size, batch_size, hidden_size,
                  num_layers, features, seasonality_1, seasonality_2, dropout=0,
                  cell_type='LSTM', batch_first=False, dilations=None,
-                 residuals=tuple([[]])):
+                 residuals=tuple([[]]), init_seasonality=None,
+                 init_level_smoothing=None, init_seas_smoothing=None):
+
+        # TODO - the initial smoothing coefficients will need to be a
+        #  dictionary, and given for all the features, when I add the other
+        #  features
 
         super().__init__()
 
@@ -381,12 +408,25 @@ class ES_RNN(nn.Module):
         self.w_seasons = []
 
         # Add all parameters to the network
-        u1 = Uniform(-1, 1)  # Random initialisation of parameters
-        u2 = Uniform(0.65, 1.35)
+        u1 = Uniform(-1, 1)  # Smoothing coefficients
+        u2 = Uniform(0.65, 1.35)  # Seasonality parameters
         for f in features:
             # Create the parameters
-            self.level_smoothing_coeffs[f] = torch.nn.Parameter(
-                u1.sample(), requires_grad=True)
+            if init_level_smoothing:
+                self.level_smoothing_coeffs[f] = torch.nn.Parameter(
+                    torch.tensor(init_level_smoothing, dtype=torch.double),
+                    requires_grad=True)
+            else:
+                self.level_smoothing_coeffs[f] = torch.nn.Parameter(
+                    u1.sample(), requires_grad=True)
+
+            if init_seas_smoothing:
+                self.seasonality2_smoothing_coeffs[f] = torch.nn.Parameter(
+                    torch.tensor(init_seas_smoothing, dtype=torch.double),
+                    requires_grad=True)
+            else:
+                self.seasonality2_smoothing_coeffs[f] = torch.nn.Parameter(
+                    u1.sample(), requires_grad=True)
             # self.seasonality1_smoothing_coeffs[f] = torch.nn.Parameter(
             #     u1.sample(), requires_grad=True)
             self.seasonality2_smoothing_coeffs[f] = torch.nn.Parameter(
@@ -395,10 +435,18 @@ class ES_RNN(nn.Module):
             #     torch.nn.Parameter(u2.sample(), requires_grad=True)
             #     for _ in range(seasonality_1)
             # ]
-            self.weekly_seasonality_params[f] = [
-                torch.nn.Parameter(u2.sample(), requires_grad=True)
-                for _ in range(seasonality_2)
-            ]
+            if init_seasonality:
+                self.weekly_seasonality_params[f] = [
+                    torch.nn.Parameter(
+                        torch.tensor(s, dtype=torch.double), requires_grad=True
+                    )
+                    for s in init_seasonality
+                ]
+            else:
+                self.weekly_seasonality_params[f] = [
+                    torch.nn.Parameter(u2.sample(), requires_grad=True)
+                    for _ in range(seasonality_2)
+                ]
 
             # Register the parameters with the model
             self.register_parameter(f + " level smoothing",
@@ -667,6 +715,9 @@ class ES_RNN(nn.Module):
         # Unsquash the output, and re-add the final level and seasonality
         pred = torch.exp(out) * output_levels * output_wseas
 
+        # TODO - CHECK WHY NOT ENOUGH FINAL SEASONALITY ARE BEING OUTPUTTED,
+        #  AND WHY THE MASE IS SO MUCH WORSE FOR THE ES-RNN WHEN IT CLEARLY
+        #  SHOULD BE BETTER (I THINK, UNLESS IT IS JUST SHIFTING??)
         # Return the prediction, and also the final seasonalities and levels
         return (
             pred,
