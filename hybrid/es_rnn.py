@@ -27,6 +27,20 @@ def es_rnn(df):
         all_data["Autumn"][2][:-(15 * 24)]
     ]
 
+    valid_sets = [
+        all_data["Winter"][1][:-(7 * 24)],
+        all_data["Spring"][0][:-(7 * 24)],
+        all_data["Summer"][3][:-(7 * 24)],
+        all_data["Autumn"][2][:-(7 * 24)]
+    ]
+
+    test_sets = [
+        all_data["Winter"][1],
+        all_data["Spring"][0],
+        all_data["Summer"][3],
+        all_data["Autumn"][2]
+    ]
+
     # For now, just use one of the training sets
     train_data = training_sets[0]
     window_size = 336
@@ -56,6 +70,16 @@ def es_rnn(df):
     residuals = tuple([[1, 3]])  # Residual connection from output of 2nd layer
     # to output of 4th layer
 
+    data = valid_sets[1]
+    test_model_week(data, output_size, input_size, batch_size, hidden_size,
+                    num_layers, True, dilations, data.columns, 24, 168,
+                    residuals, indices, -0.8, window_size,
+                    level_variability_penalty, loss_func, num_epochs,
+                    init_learning_rate, percentile, auto_lr, variable_lr,
+                    auto_rate_threshold, min_epochs_before_change,
+                    variable_rates, grad_clipping)
+    sys.exit(0)
+
     # Create model
     lstm = ES_RNN(
         output_size, input_size, batch_size, hidden_size, num_layers,
@@ -64,16 +88,10 @@ def es_rnn(df):
         init_seasonality=indices, init_level_smoothing=-0.8
     ).double()
 
-    # Register gradient clipping function
-    for p in lstm.parameters():
-        p.register_hook(
-            lambda grad: torch.clamp(grad, -grad_clipping, grad_clipping))
 
     # for n, p in lstm.named_parameters():
     #     print(n, p.shape)
     #     print(len(list(lstm.named_parameters())))
-
-    #
 
     # Train model
     lstm.train()
@@ -81,21 +99,6 @@ def es_rnn(df):
                 level_variability_penalty, loss_func, num_epochs,
                 init_learning_rate, percentile, auto_lr, variable_lr,
                 auto_rate_threshold, min_epochs_before_change, variable_rates)
-
-
-    valid_sets = [
-        all_data["Winter"][1][:-(8 * 24)],
-        all_data["Spring"][0][:-(8 * 24)],
-        all_data["Summer"][3][:-(8 * 24)],
-        all_data["Autumn"][2][:-(8 * 24)]
-    ]
-
-    test_sets = [
-        all_data["Winter"][1],
-        all_data["Spring"][0],
-        all_data["Summer"][3],
-        all_data["Autumn"][2]
-    ]
 
     # Make predictions
     lstm.eval()
@@ -105,20 +108,142 @@ def es_rnn(df):
                                      output_size)
     print("Validation Average OWA:", np.mean(validation_results))
 
-    sys.exit(0)
 
     # Print the seasonality indices for ES_RNN and Classic Decomposition
-    fig = plt.figure(figsize=(20, 15), dpi=250)
-    ax = fig.add_subplot(1, 1, 1)
-    ax.plot(indices, label="Seasonal Decomposition Seasonality")
-    ax.plot(torch.tensor(lstm.w_seasons).tolist(), label="ES_RNN Seasonality")
-    ax.legend(loc="best")
-    plt.show()
+    # fig = plt.figure(figsize=(20, 15), dpi=250)
+    # ax = fig.add_subplot(1, 1, 1)
+    # ax.plot(indices, label="Seasonal Decomposition Seasonality")
+    # ax.plot(torch.tensor(lstm.w_seasons).tolist(), label="ES_RNN Seasonality")
+    # ax.legend(loc="best")
+    # plt.show()
 
 
     # test_data = test_sets[0]
     # test_results = test_model(lstm, valid_data, window_size, output_size)
     # print("Test Average OWA:", np.mean(test_results))
+
+# If output_size != 48 then this is broken. Pass in valid data or test
+# data!! (i.e all up to the end of the valid section/test section).
+def test_model_week(data, output_size, input_size, batch_size, hidden_size,
+                    num_layers, batch_first, dilations, features, seasonality1,
+                    seasonality2, residuals, init_seasonality,
+                    init_level_smoothing, window_size,
+                    level_variability_penalty, loss_func, num_epochs,
+                    init_learning_rate, percentile, auto_lr, variable_lr,
+                    auto_rate_threshold, min_epochs_before_change,
+                    variable_rates, grad_clipping):
+
+    es_rnn_predictions = []
+    es_rnn_smapes = []
+    es_rnn_mases = []
+    naive2_predictions = []
+    naive2_smapes = []
+    naive2_mases = []
+    actuals_mases = []
+    actuals = []
+    owas = []
+
+    for i in range(8, 1, -1):
+        # Figure out start and end points of the data
+        end_train = -(i * 24)
+        start_test = -(i * 24 + window_size)
+        end_test = -(i * 24 - output_size) if i != 2 else None
+
+        train_data = data[:end_train]
+        test_data = torch.tensor(
+            data["total load actual"][start_test:end_test],
+            dtype=torch.double
+        )
+        mase_data = data["total load actual"][:end_test]
+
+        # Deseasonalise data for naive forecast and to get initial indices
+        train_d, indices = deseasonalise(train_data["total load actual"], 168,
+                                         "multiplicative")
+
+        # Create a fresh model
+        lstm = ES_RNN(
+            output_size, input_size, batch_size, hidden_size, num_layers,
+            batch_first=batch_first, dilations=dilations, features=features,
+            seasonality_1=seasonality1, seasonality_2=seasonality2,
+            residuals=residuals
+        ).double()
+
+        # Register gradient clipping function
+        for p in lstm.parameters():
+            p.register_hook(
+                lambda grad: torch.clamp(grad, -grad_clipping, grad_clipping))
+
+        # Set model in training mode
+        lstm.train()
+
+        print("----- TEST", str(9 - i), "-----")
+        # Train the model
+        train_model(lstm, train_data, window_size, output_size,
+                    level_variability_penalty, loss_func, num_epochs,
+                    init_learning_rate, percentile, auto_lr, variable_lr,
+                    auto_rate_threshold, min_epochs_before_change,
+                    variable_rates)
+
+        # Set model into evaluation mode
+        lstm.eval()
+
+        # Make ES_RNN Prediction
+        prediction, actual, level, out_seas2 = lstm.predict(
+            test_data, window_size, output_size
+        )
+
+        # [[<- 48 ->],] generated, so remove the dimension
+        prediction = pd.Series(prediction.squeeze(0).detach().tolist())
+        actual = pd.Series(actual.squeeze(0).detach().tolist())
+
+        # Make Naive2 Prediction
+        naive_fit_forecast = reseasonalise(
+            naive_2(train_d, output_size),
+            indices,
+            "multiplicative"
+        )
+        naive_prediction = naive_fit_forecast[-output_size:].reset_index(
+            drop=True)
+
+        # Calculate errors
+        es_rnn_smape = sMAPE(prediction, actual)
+        es_rnn_mase = MASE(prediction, mase_data, 168, output_size)
+        naive_smape = sMAPE(naive_prediction, actual)
+        naive_mase = MASE(naive_prediction, mase_data, 168, output_size)
+        owa = OWA(naive_smape, naive_mase, es_rnn_smape, es_rnn_mase)
+
+        # Save values
+        es_rnn_smapes.append(es_rnn_smape)
+        es_rnn_mases.append(es_rnn_mase)
+        naive2_smapes.append(naive_smape)
+        naive2_mases.append(naive_mase)
+        es_rnn_predictions.append(prediction)
+        naive2_predictions.append(naive_prediction)
+        actuals.append(actual)
+        actuals_mases.append(mase_data)
+        owas.append(owa)
+
+        # Plot results
+        fig = plt.figure(figsize=(20, 15), dpi=250)
+        ax = fig.add_subplot(1, 1, 1)
+        ax.plot(prediction, label="ES_RNN Predicted")
+        ax.plot(naive_prediction, label="Naive2 Predictions")
+        ax.plot(actual, label="Actual")
+        ax.legend(loc="best")
+        plt.show()
+
+        # Print results
+        print("***** Test Results *****")
+        print("ES-RNN sMAPE:", es_rnn_smape)
+        print("Naive2 sMAPE:", naive_smape)
+        print("ES-RNN MASE:", es_rnn_mase)
+        print("Naive2 MASE:", naive_mase)
+        print("OWA", owa)
+        print("")
+
+    # Print final results
+    print("***** OVERALL RESULTS *****")
+    print("Average OWA:", np.around(np.mean(owas), decimals=3))
 
 
 def train_model(lstm, data, window_size, output_size, lvp, loss_func, num_epochs,
@@ -218,6 +343,7 @@ def train_model(lstm, data, window_size, output_size, lvp, loss_func, num_epochs
     # ax.legend(loc="best")
     plt.show()
 
+
 # This function takes all the data up to the end of the section (i.e up to
 # the end of the validation section or test section), then generates
 # forecasts for the last week of data. For an example data set, the first 12
@@ -225,7 +351,6 @@ def train_model(lstm, data, window_size, output_size, lvp, loss_func, num_epochs
 # for testing. So we pass 13 weeks in to test on the validation, and all 14
 # to test on the test data. This is because, to calculate the MASE,
 # the entire data set is required.
-
 # Only going to work with an output size of 48 I think, sadly :((
 # Returns a list of 7 OWA
 def test_model(lstm, data, window_size, output_size):

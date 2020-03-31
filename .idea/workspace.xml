@@ -4,6 +4,7 @@
     <list default="true" id="564df88f-763d-43a5-ba2e-b5cd80214a9e" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/hybrid/es_rnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/hybrid/es_rnn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stats/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/stats/helpers.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -47,8 +48,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/hybrid/es_rnn.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="373">
-                  <caret line="173" column="41" lean-forward="true" selection-start-line="173" selection-start-column="41" selection-end-line="173" selection-end-column="41" />
+                <state relative-caret-position="853">
+                  <caret line="113" column="35" lean-forward="true" selection-start-line="113" selection-start-column="35" selection-end-line="113" selection-end-column="35" />
                   <folding>
                     <element signature="e#0#18#0" expanded="true" />
                   </folding>
@@ -57,9 +58,21 @@
             </entry>
           </file>
           <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/stats/helpers.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="287">
+                  <caret line="68" column="68" lean-forward="true" selection-start-line="68" selection-start-column="68" selection-end-line="68" selection-end-column="68" />
+                  <folding>
+                    <element signature="e#0#19#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/torch/nn/modules/module.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="12780">
+                <state relative-caret-position="589">
                   <caret line="858" selection-start-line="858" selection-end-line="858" />
                 </state>
               </provider>
@@ -69,11 +82,11 @@
       </split-first>
       <split-second>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/hybrid/es_rnn.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="5745">
-                  <caret line="383" column="36" selection-start-line="383" selection-start-column="36" selection-end-line="383" selection-end-column="36" />
+                <state relative-caret-position="215">
+                  <caret line="756" column="8" selection-start-line="756" selection-start-column="8" selection-end-line="756" selection-end-column="53" />
                   <folding>
                     <element signature="e#0#18#0" expanded="true" />
                   </folding>
@@ -84,16 +97,16 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/ml/drnn.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="2190">
-                  <caret line="147" column="4" selection-start-line="147" selection-start-column="4" selection-end-line="147" selection-end-column="4" />
+                <state relative-caret-position="975">
+                  <caret line="66" column="36" selection-start-line="66" selection-start-column="25" selection-end-line="66" selection-end-column="36" />
                 </state>
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/stats/errors.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="120">
+                <state relative-caret-position="90">
                   <caret line="8" column="3" selection-start-line="8" selection-start-column="3" selection-end-line="8" selection-end-column="3" />
                   <folding>
                     <element signature="e#0#21#0" expanded="true" />
@@ -115,7 +128,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>linear</find>
       <find>loss</find>
       <find>iloc</find>
       <find>datetime</find>
@@ -145,6 +157,7 @@
       <find>plt</find>
       <find>Length W</find>
       <find>deseasonalise(</find>
+      <find>rese</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -210,12 +223,12 @@
         <option value="$PROJECT_DIR$/stats/arima.py" />
         <option value="$PROJECT_DIR$/stats/exponential_smoothing.py" />
         <option value="$PROJECT_DIR$/stats/theta.py" />
-        <option value="$PROJECT_DIR$/stats/helpers.py" />
         <option value="$PROJECT_DIR$/other/demo.py" />
         <option value="$PROJECT_DIR$/ml/helpers.py" />
         <option value="$PROJECT_DIR$/stats/errors.py" />
         <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/ml/drnn.py" />
+        <option value="$PROJECT_DIR$/stats/helpers.py" />
         <option value="$PROJECT_DIR$/hybrid/es_rnn.py" />
       </list>
     </option>
@@ -265,7 +278,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="full.screen.before.presentation.mode" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$/Documents/Durham/4th Year/Advanced Research Project/Results" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Desktop/Trained" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
@@ -278,15 +291,16 @@
     </option>
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/hybrid" />
+      <recent name="$PROJECT_DIR$/tutorials" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$USER_HOME$/Desktop/Trained" />
       <recent name="$USER_HOME$/Documents/Durham/4th Year/Advanced Research Project/Results" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/demo" />
       <recent name="$PROJECT_DIR$/stats" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/hybrid" />
-      <recent name="$PROJECT_DIR$/tutorials" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -590,7 +604,9 @@
       <workItem from="1585077880045" duration="6041000" />
       <workItem from="1585085460832" duration="15143000" />
       <workItem from="1585142305243" duration="110462000" />
-      <workItem from="1585561243572" duration="1800000" />
+      <workItem from="1585561243572" duration="17685000" />
+      <workItem from="1585640787792" duration="2867000" />
+      <workItem from="1585649706616" duration="5009000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit. Git setup.">
       <created>1573219288446</created>
@@ -694,7 +710,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="780982000" />
+    <option name="totallyTimeSpent" value="804743000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -711,7 +727,7 @@
     <layout>
       <window_info id="Structure" order="0" sideWeight="0.5020298" side_tool="true" weight="0.23109691" />
       <window_info id="Favorites" order="1" sideWeight="0.50147057" side_tool="true" weight="0.18157615" />
-      <window_info content_ui="combo" id="Project" order="2" sideWeight="0.49797022" visible="true" weight="0.16719915" />
+      <window_info content_ui="combo" id="Project" order="2" sideWeight="0.49797022" visible="true" weight="0.17039403" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32746115" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32920793" />
@@ -724,11 +740,11 @@
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.5037274" side_tool="true" weight="0.5233161" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.32435232" />
-      <window_info active="true" anchor="bottom" x="9" y="580" width="1398" height="242" id="Python Console" order="12" sideWeight="0.49627262" visible="true" weight="0.15544042" />
+      <window_info anchor="bottom" x="9" y="580" width="1398" height="242" id="Python Console" order="12" sideWeight="0.49627262" weight="0.38134715" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" x="0" y="22" width="1440" height="878" id="SciView" order="3" sideWeight="0.48853615" type="WINDOWED" visible="true" weight="0.9557522" />
+      <window_info anchor="right" x="1576" y="-58" width="1440" height="878" id="SciView" order="3" sideWeight="0.48853615" type="WINDOWED" visible="true" weight="0.9557522" />
       <window_info anchor="right" id="Database" order="4" weight="0.11874106" />
       <window_info anchor="right" x="0" y="0" width="310" height="700" id="Documentation" order="5" sideWeight="0.5114638" side_tool="true" weight="0.7839771" />
     </layout>
@@ -1107,16 +1123,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stats/helpers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-233">
-          <caret line="28" column="17" selection-start-line="28" selection-start-column="17" selection-end-line="28" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="600">
@@ -1127,23 +1133,16 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/torch/nn/modules/module.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="12780">
-          <caret line="858" selection-start-line="858" selection-end-line="858" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ml/drnn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2190">
-          <caret line="147" column="4" selection-start-line="147" selection-start-column="4" selection-end-line="147" selection-end-column="4" />
+        <state relative-caret-position="975">
+          <caret line="66" column="36" selection-start-line="66" selection-start-column="25" selection-end-line="66" selection-end-column="36" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/stats/errors.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
+        <state relative-caret-position="90">
           <caret line="8" column="3" selection-start-line="8" selection-start-column="3" selection-end-line="8" selection-end-column="3" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
@@ -1151,10 +1150,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/torch/nn/modules/module.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="589">
+          <caret line="858" selection-start-line="858" selection-end-line="858" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stats/helpers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="287">
+          <caret line="68" column="68" lean-forward="true" selection-start-line="68" selection-start-column="68" selection-end-line="68" selection-end-column="68" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/hybrid/es_rnn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="373">
-          <caret line="173" column="41" lean-forward="true" selection-start-line="173" selection-start-column="41" selection-end-line="173" selection-end-column="41" />
+        <state relative-caret-position="215">
+          <caret line="756" column="8" selection-start-line="756" selection-start-column="8" selection-end-line="756" selection-end-column="53" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
