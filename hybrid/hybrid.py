@@ -265,9 +265,10 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
     # Write results (NCC)
     print(results)
     if write_results:
-        res_path = os.path.join("/Users/matt/", str(sys.argv[1]))
-        # res_path = os.path.join("/home2/gkxx72/ARP/run/", str(sys.argv[1]))
-        with open(res_path, "a") as res:
+        # res_path = os.path.join("/Users/matt/", str(sys.argv[1]))
+        res_path = os.path.join("/ddn/home/gkxx72/AdvancedResearchProject/run",
+                                str(sys.argv[1]))
+        with open(res_path, "w") as res:
             json.dump(results, res)
 
 
