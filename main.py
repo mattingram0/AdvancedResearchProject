@@ -12,7 +12,7 @@ from math import fabs
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from stats import arima, exponential_smoothing, naive, theta, errors, helpers
-from hybrid import es_rnn
+from hybrid import hybrid
 
 
 def load_data(filename, mult_ts):
@@ -50,7 +50,7 @@ def main():
     df = load_data(data_path, False)
     df = df.set_index('time').asfreq('H')
     df.interpolate(inplace=True)
-    es_rnn.es_rnn(df)
+    hybrid.es_rnn(df)
 
     # ---------------------- LOAD MULTIPLE TIME SERIES ----------------------
 
