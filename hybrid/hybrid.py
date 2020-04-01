@@ -12,6 +12,8 @@ from stats.errors import sMAPE, MASE, OWA
 from stats.naive import naive_2
 from math import sqrt
 
+from hybrid.es_rnn import ES_RNN
+
 
 def es_rnn(df):
 
@@ -45,14 +47,14 @@ def es_rnn(df):
     window_size = 336
     output_size = 48
     batch_size = len(train_data) - window_size - output_size + 1
-    write_results = False
+    write_results = True
 
     # Give the seasonality parameters a helping hand
     _, indices = deseasonalise(train_data['total load actual'], 168,
                                "multiplicative")
 
     # Training parameters
-    num_epochs = 20
+    num_epochs = 27
     init_learning_rate = 0.01
     input_size = 1
     hidden_size = 40
@@ -244,11 +246,11 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
         print("")
 
         # Note results (NCC)
-        results["ESRNN_prediction"] = prediction
-        results["Naive2_prediction"] = naive_prediction
+        results["ESRNN_prediction"] = prediction.to_list()
+        results["Naive2_prediction"] = naive_prediction.to_list()
         results["actual_test"] = mase_data.tolist()
-        results["levels"] = lstm.levels
-        results["seasonality"] = lstm.w_seasons
+        results["levels"] = [float(l.data) for l in lstm.levels]
+        results["seasonality"] = [float(s.data) for s in lstm.w_seasons]
         results["level_smoothing"] = float(
             lstm.level_smoothing_coeffs["total load actual"].data
         )
@@ -261,11 +263,12 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
     print("Average OWA:", np.around(np.mean(owas), decimals=3))
 
     # Write results (NCC)
+    print(results)
     if write_results:
-        res_path = os.path.join("/home2/gkxx72/ARP/run/", str(sys.argv[1]))
+        res_path = os.path.join("/Users/matt/", str(sys.argv[1]))
+        # res_path = os.path.join("/home2/gkxx72/ARP/run/", str(sys.argv[1]))
         with open(res_path, "a") as res:
             json.dump(results, res)
-
 
 
 def train_model(lstm, data, window_size, output_size, lvp, loss_func, num_epochs,
@@ -350,6 +353,7 @@ def train_model(lstm, data, window_size, output_size, lvp, loss_func, num_epochs
             total_loss.backward()
             optimizer.step()
 
+
             if name == "total load actual":
                 print(
                     "Name: %s: Epoch %d: LVP - %1.5f, Loss - %1.5f, "
@@ -357,6 +361,17 @@ def train_model(lstm, data, window_size, output_size, lvp, loss_func, num_epochs
                     (name, epoch, level_var_loss.item(), loss.item(),
                      total_loss.item())
                 )
+
+                # Check if parameters are updating:
+                for n, p in lstm.named_parameters():
+                    if n == "total load actual level smoothing":
+                        print("Level Smoothing:", torch.sigmoid(p))
+                    if n == "total load actual seasonality2 smoothing":
+                        print("Seasonality Smoothing:", torch.sigmoid(p))
+
+                    # for i in range(168):
+                    #     if n == "total load actual seasonality2 " + str(i):
+                    #         print("Seasonality Index " + str(i) + ":", p)
 
             prev_loss = loss
 

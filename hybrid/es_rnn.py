@@ -1,4 +1,5 @@
 # Stateful, mini-batch trained DRNN. One feature.
+import torch
 import torch.nn as nn
 from torch.distributions import Normal, Uniform
 from ml import drnn, non_lin
@@ -120,6 +121,9 @@ class ES_RNN(nn.Module):
             torch.zeros(self.num_layers, self.batch_size, self.hidden_size),
             torch.zeros(self.num_layers, self.batch_size, self.hidden_size)
         )
+
+    def create_batch(self, x, feature, window_size, output_size, lvp):
+        pass
 
     # TODO - add Trend as well!! See if improved performance
     def forward(self, x, feature, window_size, output_size, lvp=0,
