@@ -48,6 +48,7 @@ def es_rnn(df):
     output_size = 48
     batch_size = len(train_data) - window_size - output_size + 1
     write_results = True
+    plot = False
 
     # Give the seasonality parameters a helping hand
     _, indices = deseasonalise(train_data['total load actual'], 168,
@@ -79,7 +80,7 @@ def es_rnn(df):
                     level_variability_penalty, loss_func, num_epochs,
                     init_learning_rate, percentile, auto_lr, variable_lr,
                     auto_rate_threshold, min_epochs_before_change,
-                    variable_rates, grad_clipping, write_results)
+                    variable_rates, grad_clipping, write_results, plot)
     sys.exit(0)
 
     # Create model
@@ -100,7 +101,8 @@ def es_rnn(df):
     train_model(lstm, train_data, window_size, output_size,
                 level_variability_penalty, loss_func, num_epochs,
                 init_learning_rate, percentile, auto_lr, variable_lr,
-                auto_rate_threshold, min_epochs_before_change, variable_rates)
+                auto_rate_threshold, min_epochs_before_change,
+                plot, variable_rates)
 
     # Make predictions
     lstm.eval()
@@ -133,7 +135,7 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
                     level_variability_penalty, loss_func, num_epochs,
                     init_learning_rate, percentile, auto_lr, variable_lr,
                     auto_rate_threshold, min_epochs_before_change,
-                    variable_rates, grad_clipping, write_results):
+                    variable_rates, grad_clipping, write_results, plot):
 
     es_rnn_predictions = []
     es_rnn_smapes = []
@@ -185,7 +187,7 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
         train_model(lstm, train_data, window_size, output_size,
                     level_variability_penalty, loss_func, num_epochs,
                     init_learning_rate, percentile, auto_lr, variable_lr,
-                    auto_rate_threshold, min_epochs_before_change,
+                    auto_rate_threshold, min_epochs_before_change, plot,
                     variable_rates)
 
         # Set model into evaluation mode
@@ -234,7 +236,9 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
         ax.plot(naive_prediction, label="Naive2 Predictions")
         ax.plot(actual, label="Actual")
         ax.legend(loc="best")
-        plt.show()
+
+        if plot:
+            plt.show()
 
         # Print results
         print("***** Test Results *****")
@@ -274,7 +278,7 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
 
 def train_model(lstm, data, window_size, output_size, lvp, loss_func, num_epochs,
                 init_learning_rate, percentile, auto_lr, variable_lr,
-                auto_rt, min_epochs_since_change, variable_rates=None):
+                auto_rt, min_epochs_since_change, plot, variable_rates=None):
     # to make this stochastic gradient descent??? Output the final level and
     # seasonality of the chunk?? Then we could feed this in as the initial
     # seasonality and level. Would we then also need to make sure that the
@@ -354,7 +358,6 @@ def train_model(lstm, data, window_size, output_size, lvp, loss_func, num_epochs
             total_loss.backward()
             optimizer.step()
 
-
             if name == "total load actual":
                 print(
                     "Name: %s: Epoch %d: LVP - %1.5f, Loss - %1.5f, "
@@ -378,8 +381,10 @@ def train_model(lstm, data, window_size, output_size, lvp, loss_func, num_epochs
 
             if not rate_changed:
                 num_epochs_since_change += 1
-    # ax.legend(loc="best")
-    plt.show()
+
+    if plot:
+        ax.legend(loc="best")
+        plt.show()
 
 
 # This function takes all the data up to the end of the section (i.e up to
