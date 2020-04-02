@@ -51,14 +51,14 @@ def es_rnn(df):
     output_size = 48
     batch_size = len(train_data) - window_size - output_size + 1
     write_results = True
-    plot = True
+    plot = False
 
     # Give the ssqueasonality parameters a helping hand
     _, indices = deseasonalise(train_data['total load actual'], 168,
                                "multiplicative")
 
     # Training parameters
-    num_epochs = 1
+    num_epochs = 27
     init_learning_rate = 0.01
     input_size = 1
     hidden_size = 40
@@ -84,36 +84,36 @@ def es_rnn(df):
                     init_learning_rate, percentile, auto_lr, variable_lr,
                     auto_rate_threshold, min_epochs_before_change,
                     variable_rates, grad_clipping, write_results, plot, year)
-    sys.exit(0)
-
-    # Create model
-    lstm = ES_RNN(
-        output_size, input_size, batch_size, hidden_size, num_layers,
-        batch_first=True, dilations=dilations, features=train_data.columns,
-        seasonality_1=24, seasonality_2=168, residuals=residuals,
-        init_seasonality=indices, init_level_smoothing=-0.8
-    ).double()
-
-
-    # for n, p in lstm.named_parameters():
-    #     print(n, p.shape)
-    #     print(len(list(lstm.named_parameters())))
-
-    # Train model
-    lstm.train()
-    train_model(lstm, train_data, window_size, output_size,
-                level_variability_penalty, loss_func, num_epochs,
-                init_learning_rate, percentile, auto_lr, variable_lr,
-                auto_rate_threshold, min_epochs_before_change,
-                plot, variable_rates)
-
-    # Make predictions
-    lstm.eval()
-
-    valid_data = valid_sets[0]
-    validation_results, indices = test_model(lstm, valid_data, window_size,
-                                     output_size)
-    print("Validation Average OWA:", np.mean(validation_results))
+    # sys.exit(0)
+    #
+    # # Create model
+    # lstm = ES_RNN(
+    #     output_size, input_size, batch_size, hidden_size, num_layers,
+    #     batch_first=True, dilations=dilations, features=train_data.columns,
+    #     seasonality_1=24, seasonality_2=168, residuals=residuals,
+    #     init_seasonality=indices, init_level_smoothing=-0.8
+    # ).double()
+    #
+    #
+    # # for n, p in lstm.named_parameters():
+    # #     print(n, p.shape)
+    # #     print(len(list(lstm.named_parameters())))
+    #
+    # # Train model
+    # lstm.train()
+    # train_model(lstm, train_data, window_size, output_size,
+    #             level_variability_penalty, loss_func, num_epochs,
+    #             init_learning_rate, percentile, auto_lr, variable_lr,
+    #             auto_rate_threshold, min_epochs_before_change,
+    #             plot, variable_rates)
+    #
+    # # Make predictions
+    # lstm.eval()
+    #
+    # valid_data = valid_sets[0]
+    # validation_results, indices = test_model(lstm, valid_data, window_size,
+    #                                  output_size)
+    # print("Validation Average OWA:", np.mean(validation_results))
 
 
     # Print the seasonality indices for ES_RNN and Classic Decomposition
@@ -150,7 +150,7 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
     actuals = []
     owas = []
 
-    results = {}
+    results = {i: {} for i in range(1, 8)}
 
     for i in range(8, 1, -1):
         # Plot for debugging
@@ -178,7 +178,7 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
             batch_first=batch_first, dilations=dilations, features=features,
             seasonality_1=seasonality1, seasonality_2=seasonality2,
             residuals=residuals, init_seasonality=indices,
-            init_level_smoothing=-0.8, init_seas_smoothing=0.5
+            init_level_smoothing=-0.8, init_seas_smoothing=-0.2
         ).double()
 
         # Register gradient clipping function
@@ -211,8 +211,8 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
         actual = pd.Series(actual.squeeze(0).detach().tolist())
         out_levels = out_levels.squeeze(0).detach().tolist()
         out_seas = out_seas.squeeze(0).detach().tolist()
-        all_levels = [l.detach().data for l in all_levels]
-        all_seasons = [s.detach().data for s in all_seasons]
+        all_levels = [l.detach().item() for l in all_levels]
+        all_seasons = [s.detach().item() for s in all_seasons]
         rnn_out = rnn_out.squeeze(0).detach().tolist()
 
         # Make Naive2 Prediction
@@ -251,7 +251,11 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
         print("OWA", owa)
         print("")
 
-        # Plots for debugging
+        # Plots for debugging. # Note that the output levels and out
+        # seasonality match with the final 48 hours of the all_levels and
+        # all_seasonality, as does the actual with the test_data, I just
+        # plot them to make sure and also so that they are a different
+        # colour to the input data on the plots!
         axes[0].plot(test_data.tolist(), label="Input Data")
         axes[0].plot([i for i in range(window_size, window_size +
                                        output_size)],
@@ -262,7 +266,7 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
         axes[0].plot([i for i in range(window_size, window_size +
                                        output_size)],
                      naive_prediction.to_list(), label="Naive2")
-        axes[0].axvline(x=window_size)
+        axes[0].axvline(x=window_size, linestyle=":", color="C5")
         axes[0].set_title("Actual Data and Forecasts")
         axes[0].legend(loc="best")
 
@@ -270,7 +274,7 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
         axes[1].plot([i for i in range(window_size, window_size +
                                        output_size)],
                      out_levels, label="Output Levels")
-        axes[1].axvline(x=window_size)
+        axes[1].axvline(x=window_size, linestyle=":", color="C5")
         axes[1].set_title("Levels")
         axes[1].legend(loc="best")
 
@@ -278,16 +282,16 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
         axes[2].plot([i for i in range(window_size, window_size +
                                        output_size)],
                      out_seas, label="Output Seasons")
-        axes[2].axvline(x=window_size)
+        axes[2].axvline(x=window_size, linestyle=":", color="C5")
         axes[2].set_title("Seasonality")
         axes[2].legend(loc="best")
 
-        axes[3].plot([i for i in range(window_size)],
-                     [1 for _ in range(window_size)])
+        axes[3].plot([i for i in range(window_size + 1)],
+                     [1 for _ in range(window_size + 1)])
         axes[3].plot([i for i in range(window_size, window_size +
                                        output_size)],
                      rnn_out, label="RNN Output")
-        axes[3].axvline(x=window_size)
+        axes[3].axvline(x=window_size, linestyle=":", color="C5")
         axes[3].set_title("RNN Output")
         axes[3].legend(loc="best")
 
@@ -295,21 +299,40 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
             plt.show()
 
         # Note results (NCC)
-        results["ESRNN_prediction"] = prediction.to_list()
-        results["Naive2_prediction"] = naive_prediction.to_list()
-        results["actual_test"] = mase_data.tolist()
-        results["levels"] = [float(l.data) for l in lstm.levels]
-        results["seasonality"] = [float(s.data) for s in lstm.w_seasons]
-        results["level_smoothing"] = float(
+        results[9 - i]["test_data"] = test_data.tolist()
+        results[9 - i]["ESRNN_prediction"] = prediction.to_list()
+        results[9 - i]["Naive2_prediction"] = naive_prediction.to_list()
+        results[9 - i]["all_levels"] = all_levels
+        results[9 - i]["out_levels"] = out_levels
+        results[9 - i]["all_seas"] = all_seasons
+        results[9 - i]["out_seas"] = out_seas
+        results[9 - i]["rnn_out"] = rnn_out
+        results[9 - i]["level_smoothing"] = float(
             lstm.level_smoothing_coeffs["total load actual"].data
         )
-        results["seasonality_smoothing"] = float(
+        results[9 - i]["seasonality_smoothing"] = float(
             lstm.seasonality2_smoothing_coeffs["total load actual"].data
         )
 
     # Print final results
+    owas_np = np.array(owas)
+    num_improved = len(owas_np[owas_np < 1.0])
+    avg_improve = float(np.around(owas_np[owas_np < 1.0].mean(), decimals=3))
+    avg_decline = float(np.around(owas_np[owas_np >= 1.0].mean(), decimals=3))
+    avg_owa = float(np.around(np.mean(owas), decimals=3))
     print("***** OVERALL RESULTS *****")
-    print("Average OWA:", np.around(np.mean(owas), decimals=3))
+    print("Average OWA:", avg_owa)
+    print("No. Improved:", num_improved)
+    print("Avg. Improvement:", avg_improve)
+    print("Avg. Decline:", avg_decline)
+
+    # Make note of final results
+    results["overall"] = {
+        "avg_owa": avg_owa,
+        "num_improved": num_improved,
+        "avg_improvement": avg_improve,
+        "avg_decline": avg_decline
+    }
 
     # Write results (NCC)
     if write_results:
@@ -318,6 +341,7 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
             sys.argv[1]) + "_year_" + str(year) + ".txt"
         res_path = os.path.join(
             "/ddn/home/gkxx72/AdvancedResearchProject/run/", filename)
+        # res_path = "/Users/matt/test.txt"
         with open(res_path, "w") as res:
             json.dump(results, res)
 
