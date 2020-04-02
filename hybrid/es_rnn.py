@@ -280,8 +280,8 @@ class ES_RNN(nn.Module):
         levels.extend([levels[-1] for _ in range(len(x) - window_size)])
 
         # Get only the final levels and seasonality values that we need
-        levels = self.levels[-len(x):]
-        w_seasons = self.w_seasons[-len(x):]
+        levels = levels[-len(x):]
+        w_seasons = w_seasons[-len(x):]
 
         inputs = []
         actuals = []
@@ -358,8 +358,11 @@ class ES_RNN(nn.Module):
 
         # Return the prediction, and also the final seasonalities and levels
         return (
-            pred,
-            actuals,
-            output_levels[0],
-            output_wseas[-self.seasonality_2:]
+            pred,           # 48 hour prediction
+            actuals,        # 48 hour actual
+            output_levels,  # 48 hour levels
+            output_wseas,   # 48 hour seasonality
+            levels,         # Levels for all of x
+            w_seasons,      # Seasonality for all x
+            torch.exp(out)            # Output from LSTM
         )

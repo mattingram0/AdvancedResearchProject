@@ -48,7 +48,7 @@ def es_rnn(df):
     output_size = 48
     batch_size = len(train_data) - window_size - output_size + 1
     write_results = True
-    plot = False
+    plot = True
 
     # Give the seasonality parameters a helping hand
     _, indices = deseasonalise(train_data['total load actual'], 168,
@@ -150,6 +150,9 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
     results = {}
 
     for i in range(8, 1, -1):
+        # Plot for debugging
+        fig, axes = plt.subplots(4, 1, figsize=(20, 15), dpi=250)
+
         # Figure out start and end points of the data
         end_train = -(i * 24)
         start_test = -(i * 24 + window_size)
@@ -171,7 +174,8 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
             output_size, input_size, batch_size, hidden_size, num_layers,
             batch_first=batch_first, dilations=dilations, features=features,
             seasonality_1=seasonality1, seasonality_2=seasonality2,
-            residuals=residuals
+            residuals=residuals, init_seasonality=indices,
+            init_level_smoothing=-0.8, init_seas_smoothing=0.5
         ).double()
 
         # Register gradient clipping function
@@ -194,13 +198,19 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
         lstm.eval()
 
         # Make ES_RNN Prediction
-        prediction, actual, level, out_seas2 = lstm.predict(
+        prediction, actual, out_levels, out_seas, all_levels, all_seasons, \
+        rnn_out = lstm.predict(
             test_data, window_size, output_size
         )
 
         # [[<- 48 ->],] generated, so remove the dimension
         prediction = pd.Series(prediction.squeeze(0).detach().tolist())
         actual = pd.Series(actual.squeeze(0).detach().tolist())
+        out_levels = out_levels.squeeze(0).detach().tolist()
+        out_seas = out_seas.squeeze(0).detach().tolist()
+        all_levels = [l.detach().data for l in all_levels]
+        all_seasons = [s.detach().data for s in all_seasons]
+        rnn_out = rnn_out.squeeze(0).detach().tolist()
 
         # Make Naive2 Prediction
         naive_fit_forecast = reseasonalise(
@@ -229,17 +239,6 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
         actuals_mases.append(mase_data)
         owas.append(owa)
 
-        # Plot results
-        fig = plt.figure(figsize=(20, 15), dpi=250)
-        ax = fig.add_subplot(1, 1, 1)
-        ax.plot(prediction, label="ES_RNN Predicted")
-        ax.plot(naive_prediction, label="Naive2 Predictions")
-        ax.plot(actual, label="Actual")
-        ax.legend(loc="best")
-
-        if plot:
-            plt.show()
-
         # Print results
         print("***** Test Results *****")
         print("ES-RNN sMAPE:", es_rnn_smape)
@@ -248,6 +247,49 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
         print("Naive2 MASE:", naive_mase)
         print("OWA", owa)
         print("")
+
+        # Plots for debugging
+        axes[0].plot(test_data.tolist(), label="Input Data")
+        axes[0].plot([i for i in range(window_size, window_size +
+                                       output_size)],
+                     actual.to_list(), label="Labels")
+        axes[0].plot([i for i in range(window_size, window_size +
+                                       output_size)],
+                     prediction.to_list(), label="ES_RNN")
+        axes[0].plot([i for i in range(window_size, window_size +
+                                       output_size)],
+                     naive_prediction.to_list(), label="Naive2")
+        axes[0].axvline(x=window_size)
+        axes[0].set_title("Actual Data and Forecasts")
+        axes[0].legend(loc="best")
+
+        axes[1].plot(all_levels, label="All Levels")
+        axes[1].plot([i for i in range(window_size, window_size +
+                                       output_size)],
+                     out_levels, label="Output Levels")
+        axes[1].axvline(x=window_size)
+        axes[1].set_title("Levels")
+        axes[1].legend(loc="best")
+
+        axes[2].plot(all_seasons, label="All Seasons")
+        axes[2].plot([i for i in range(window_size, window_size +
+                                       output_size)],
+                     out_seas, label="Output Seasons")
+        axes[2].axvline(x=window_size)
+        axes[2].set_title("Seasonality")
+        axes[2].legend(loc="best")
+
+        axes[3].plot([i for i in range(window_size)],
+                     [1 for _ in range(window_size)])
+        axes[3].plot([i for i in range(window_size, window_size +
+                                       output_size)],
+                     rnn_out, label="RNN Output")
+        axes[3].axvline(x=window_size)
+        axes[3].set_title("RNN Output")
+        axes[3].legend(loc="best")
+
+        if plot:
+            plt.show()
 
         # Note results (NCC)
         results["ESRNN_prediction"] = prediction.to_list()
@@ -267,7 +309,6 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
     print("Average OWA:", np.around(np.mean(owas), decimals=3))
 
     # Write results (NCC)
-    print(results)
     if write_results:
         # res_path = os.path.join("/Users/matt/", str(sys.argv[1]))
         res_path = os.path.join("/ddn/home/gkxx72/AdvancedResearchProject/run",
@@ -308,10 +349,10 @@ def train_model(lstm, data, window_size, output_size, lvp, loss_func, num_epochs
         optimizer_dict[k] = torch.optim.Adam(params=v, lr=init_learning_rate)
 
     # Plots for debugging:
-    fig = plt.figure(figsize=(20, 15), dpi=250)
-    ax = fig.add_subplot(1, 1, 1)
-    ax.plot(data["total load actual"].to_list())
-    ax.set_xticks([])
+    # fig = plt.figure(figsize=(20, 15), dpi=250)
+    # ax = fig.add_subplot(1, 1, 1)
+    # ax.plot(data["total load actual"].to_list())
+    # ax.set_xticks([])
 
     num_epochs_since_change = 0
     rate_changed = False
@@ -331,9 +372,9 @@ def train_model(lstm, data, window_size, output_size, lvp, loss_func, num_epochs
             # Get the per-time-series optimiser
             optimizer = optimizer_dict[name]
 
-            if (epoch + 1) % 10 == 0:
-                ax.plot(torch.tensor(lstm.levels).tolist(), label=str(epoch
-                                                                      + 1))
+            # if (epoch + 1) % 10 == 0:
+            #     ax.plot(torch.tensor(lstm.levels).tolist(), label=str(epoch
+            #                                                           + 1))
 
             # User defined, fixed, variable learning rates depending on epoch
             if variable_lr and epoch in list(variable_rates.keys()):
@@ -372,6 +413,8 @@ def train_model(lstm, data, window_size, output_size, lvp, loss_func, num_epochs
                         print("Level Smoothing:", torch.sigmoid(p))
                     if n == "total load actual seasonality2 smoothing":
                         print("Seasonality Smoothing:", torch.sigmoid(p))
+                    # if n.startswith("drnn.rnn_layer"):
+                    #     print(n, p)
 
                     # for i in range(168):
                     #     if n == "total load actual seasonality2 " + str(i):
@@ -382,9 +425,9 @@ def train_model(lstm, data, window_size, output_size, lvp, loss_func, num_epochs
             if not rate_changed:
                 num_epochs_since_change += 1
 
-    if plot:
-        ax.legend(loc="best")
-        plt.show()
+    # if plot:
+    #     ax.legend(loc="best")
+    #     plt.show()
 
 
 # This function takes all the data up to the end of the section (i.e up to
@@ -408,13 +451,15 @@ def test_model(lstm, data, window_size, output_size):
         dtype=torch.double
     )
 
-    # Calculate ES_RNN predictions
-    predictions, actuals, level, out_seas2 = lstm.predict(
+    # Calculate ES_RNN predictions TODO - CHANGED WHAT PREDICT RETURNS!!
+    predictions, actuals, out_levels, out_seas, all_levels, all_seasons, \
+    rnn_out = lstm.predict(
         test_data, window_size, output_size
     )
 
     predictions = [pd.Series(p) for p in predictions.detach().tolist()]
     actuals = [pd.Series(a) for a in actuals.detach().tolist()]
+    out_levels
 
     # Calculate Naive 2 predictions
     naive_predictions = []
