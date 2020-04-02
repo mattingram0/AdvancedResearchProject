@@ -17,29 +17,32 @@ from hybrid.es_rnn import ES_RNN
 
 def es_rnn(df):
 
+    # Optionally can supply a year as a command line argument
+    year = -1 if len(sys.argv) == 2 else int(sys.argv[2])
+
     # all_data = {Season: [Year1, ...]}
     all_data = split_data(df)
 
     # Each year = [<- 12 week Train -> | <- 1 week Val. -> | <- 1 week Test ->]
     training_sets = [
-        all_data["Winter"][1][:-(15 * 24)],
-        all_data["Spring"][0][:-(15 * 24)],
-        all_data["Summer"][3][:-(15 * 24)],
-        all_data["Autumn"][2][:-(15 * 24)]
+        all_data["Winter"][year if year >= 0 else 1][:-(15 * 24)],
+        all_data["Spring"][year if year >= 0 else 0][:-(15 * 24)],
+        all_data["Summer"][year if year >= 0 else 3][:-(15 * 24)],
+        all_data["Autumn"][year if year >= 0 else 2][:-(15 * 24)]
     ]
 
     valid_sets = [
-        all_data["Winter"][1][:-(7 * 24)],
-        all_data["Spring"][0][:-(7 * 24)],
-        all_data["Summer"][3][:-(7 * 24)],
-        all_data["Autumn"][2][:-(7 * 24)]
+        all_data["Winter"][year if year >= 0 else 1][:-(7 * 24)],
+        all_data["Spring"][year if year >= 0 else 0][:-(7 * 24)],
+        all_data["Summer"][year if year >= 0 else 3][:-(7 * 24)],
+        all_data["Autumn"][year if year >= 0 else 2][:-(7 * 24)]
     ]
 
     test_sets = [
-        all_data["Winter"][1],
-        all_data["Spring"][0],
-        all_data["Summer"][3],
-        all_data["Autumn"][2]
+        all_data["Winter"][year if year >= 0 else 1],
+        all_data["Spring"][year if year >= 0 else 0],
+        all_data["Summer"][year if year >= 0 else 3],
+        all_data["Autumn"][year if year >= 0 else 2]
     ]
 
     # For now, just use one of the training sets
@@ -55,7 +58,7 @@ def es_rnn(df):
                                "multiplicative")
 
     # Training parameters
-    num_epochs = 27
+    num_epochs = 1
     init_learning_rate = 0.01
     input_size = 1
     hidden_size = 40
@@ -80,7 +83,7 @@ def es_rnn(df):
                     level_variability_penalty, loss_func, num_epochs,
                     init_learning_rate, percentile, auto_lr, variable_lr,
                     auto_rate_threshold, min_epochs_before_change,
-                    variable_rates, grad_clipping, write_results, plot)
+                    variable_rates, grad_clipping, write_results, plot, year)
     sys.exit(0)
 
     # Create model
@@ -135,7 +138,7 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
                     level_variability_penalty, loss_func, num_epochs,
                     init_learning_rate, percentile, auto_lr, variable_lr,
                     auto_rate_threshold, min_epochs_before_change,
-                    variable_rates, grad_clipping, write_results, plot):
+                    variable_rates, grad_clipping, write_results, plot, year):
 
     es_rnn_predictions = []
     es_rnn_smapes = []
@@ -311,9 +314,10 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
     # Write results (NCC)
     if write_results:
         # res_path = os.path.join("/Users/matt/", str(sys.argv[1]))
+        filename = str(sys.argv[1]) + ".txt" if year == -1 else str(
+            sys.argv[1]) + "_year_" + str(year) + ".txt"
         res_path = os.path.join(
-            "/ddn/home/gkxx72/AdvancedResearchProject/run/",
-                                str(sys.argv[1]) + ".txt")
+            "/ddn/home/gkxx72/AdvancedResearchProject/run/", filename)
         with open(res_path, "w") as res:
             json.dump(results, res)
 

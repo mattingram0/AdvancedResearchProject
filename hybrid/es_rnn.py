@@ -237,7 +237,7 @@ class ES_RNN(nn.Module):
 
         # Pass DLSTM output through non-linear and linear layers
         linear_in = h_out[:, -inputs.size(0):, :].view(-1, self.hidden_size)
-        out = self.linear(self.tanh(linear_in))
+        out = selflinear(self.tanh(linear_in))
 
         # Save the level and seasonality values so that we can use them to make
         # predictions
