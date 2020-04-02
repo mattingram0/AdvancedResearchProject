@@ -50,7 +50,7 @@ def es_rnn(df):
     write_results = True
     plot = True
 
-    # Give the seasonality parameters a helping hand
+    # Give the ssqueasonality parameters a helping hand
     _, indices = deseasonalise(train_data['total load actual'], 168,
                                "multiplicative")
 
@@ -311,8 +311,9 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
     # Write results (NCC)
     if write_results:
         # res_path = os.path.join("/Users/matt/", str(sys.argv[1]))
-        res_path = os.path.join("/ddn/home/gkxx72/AdvancedResearchProject/run",
-                                str(sys.argv[1]))
+        res_path = os.path.join(
+            "/ddn/home/gkxx72/AdvancedResearchProject/run/",
+                                str(sys.argv[1]) + ".txt")
         with open(res_path, "w") as res:
             json.dump(results, res)
 
