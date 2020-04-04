@@ -45,12 +45,13 @@ def load_data(filename, mult_ts):
 
 
 def main():
-    file_path = os.path.abspath(os.path.dirname(__file__))
-    data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
-    df = load_data(data_path, False)
-    df = df.set_index('time').asfreq('H')
-    df.interpolate(inplace=True)
-    identify_arima(df, False)
+    stats_test(int(sys.argv[1]), int(sys.argv[2]))
+    # file_path = os.path.abspath(os.path.dirname(__file__))
+    # data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
+    # df = load_data(data_path, False)
+    # df = df.set_index('time').asfreq('H')
+    # df.interpolate(inplace=True)
+    # identify_arima(df, False)
     # hybrid.es_rnn(df)
 
     # ---------------------- LOAD MULTIPLE TIME SERIES ----------------------
@@ -709,12 +710,6 @@ def stats_test(season_no, model_no):
     seasonality = 168
     forecast_length = 48
 
-    # TODO: you're changing all this so that the number of repetitions is 10
-    #  for most but 1 for the SARIMA and auto method, as well as (
-    #  presumably) for the hybrid model. When averaging make sure to divide
-    #  by the correct number of repetitions made, otherwise the mean values
-    #  will be artificially decreased.
-
     # Model No.: [Function, Name, Deseasonalise?, Additional Parameters,
     # Return Parameters, Number of Repetitions]
     test_dict = {
@@ -758,8 +753,7 @@ def stats_test(season_no, model_no):
 
     # Get the parameters for the model
     model_func, model_name, deseasonalise, params, ret_params, num_reps = \
-        test_dict[
-        model_no]
+        test_dict[model_no]
     error_pairs = [("sMAPE", errors.sMAPE), ("RMSE", errors.RMSE),
                    ("MASE", errors.MASE), ("MAE", errors.MAE)]
 
