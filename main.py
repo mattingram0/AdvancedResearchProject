@@ -433,7 +433,7 @@ def identify_arima(df, plot):
                         best_order = new_order_1[:]
                         best_const = True
                         updated = True
-                except ValueError as err:
+                except (ValueError, np.linalg.LinAlgError) as err:
                     pass
 
                 try:
@@ -444,7 +444,7 @@ def identify_arima(df, plot):
                         best_order = new_order_1[:]
                         best_const = False
                         updated = True
-                except ValueError as err:
+                except (ValueError, np.linalg.LinAlgError) as err:
                     pass
 
                 try:
@@ -455,7 +455,7 @@ def identify_arima(df, plot):
                         best_order = new_order_2[:]
                         best_const = True
                         updated = True
-                except ValueError as err:
+                except (ValueError, np.linalg.LinAlgError) as err:
                     pass
 
                 try:
@@ -466,7 +466,7 @@ def identify_arima(df, plot):
                         best_order = new_order_2[:]
                         best_const = False
                         updated = True
-                except ValueError as err:
+                except (ValueError, np.linalg.LinAlgError) as err:
                     pass
 
             print("Year:", str(yn + 1), "- Season:", season)
@@ -474,6 +474,8 @@ def identify_arima(df, plot):
             print("Best AIC:", str(best))
             print("Best uses Constant:", str(best_const))
             print()
+            sys.stderr.flush()
+            sys.stdout.flush()
 
             c = "c" if best_const else "nc"
             fitted_model = sm.tsa.ARIMA(y[:-48], order=best_order).fit(
