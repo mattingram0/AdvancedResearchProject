@@ -50,7 +50,8 @@ def main():
     df = load_data(data_path, False)
     df = df.set_index('time').asfreq('H')
     df.interpolate(inplace=True)
-    hybrid.es_rnn(df)
+    identify_arima(df, False)
+    # hybrid.es_rnn(df)
 
     # ---------------------- LOAD MULTIPLE TIME SERIES ----------------------
 
@@ -394,14 +395,22 @@ def train_test_split(df):
 
 # Identify the correct ARIMA order for each season
 def identify_arima(df, plot):
+    # Optionally pass in a season as command line argument. If we do so,
+    # only that season
+    seas_in = -1 if len(sys.argv) == 1 else str(sys.argv[1])
     all_data = helpers.split_data(df)
 
     for season in ["Winter", "Spring", "Summer", "Autumn"]:
+        # If we passed in our own season, then skip all other seasons
+        if seas_in != -1 and seas_in != season:
+            continue
+
         years = all_data[season]
         years = [years[i]["total load actual"] for i in range(4)]
         resids = []
 
         for yn, y in enumerate(years):
+
             y, ind = helpers.deseasonalise(y, 168, "multiplicative")
             best_order = [1, 0, 0]
             best_const = True
