@@ -41,7 +41,7 @@ def arima(data, forecast_length, order):
 
 def sarima(data, forecast_length, order, seasonal_order):
     fitted_model = sm.tsa.statespace.SARIMAX(
-        data, order=order, seasonal_order=seasonal_order
+        data, order=order, seasonal_order=seasonal_order, trend='c'
     ).fit(disp=-1)
     prediction = fitted_model.predict(0, len(data) + forecast_length - 1)
     return prediction, fitted_model.params.to_dict()

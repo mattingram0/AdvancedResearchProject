@@ -694,7 +694,7 @@ def deseason(df):
     plt.show()
 
 
-# The method must accept two parameters: season no. (0 - 3) and method no.
+# The method must accept two parameters: season no. (1 - 4) and method no.
 def stats_test(season_no, model_no):
     # Load data
     file_path = os.path.abspath(os.path.dirname(__file__))
@@ -705,41 +705,60 @@ def stats_test(season_no, model_no):
     df = df.set_index('time').asfreq('H')
     df.interpolate(inplace=True)
 
-    # Model No.: Function, Name, Deseasonalise?, Add. Params, Ret Params?
+    # Testing hyper-parameters
+    seasonality = 168
+    forecast_length = 48
+
+    # TODO: you're changing all this so that the number of repetitions is 10
+    #  for most but 1 for the SARIMA and auto method, as well as (
+    #  presumably) for the hybrid model. When averaging make sure to divide
+    #  by the correct number of repetitions made, otherwise the mean values
+    #  will be artificially decreased.
+
+    # Model No.: [Function, Name, Deseasonalise?, Additional Parameters,
+    # Return Parameters, Number of Repetitions]
     test_dict = {
-        1: [naive.naive_1, 'Naive1', False, None, False],
+        1: [naive.naive_1, 'Naive1', False, None, False, 10],
 
-        2: [naive.naive_2, 'Naive2', True, None, False],
+        2: [naive.naive_2, 'Naive2', True, None, False, 10],
 
-        3: [naive.naive_s, 'NaiveS', False, [24], False],
+        3: [naive.naive_s, 'NaiveS', False, [24], False, 10],
 
-        4: [exponential_smoothing.ses, 'SES', True, None, True],
+        4: [exponential_smoothing.ses, 'SES', True, None, True, 10],
 
-        5: [exponential_smoothing.holt, 'Holt', True, None, True],
+        5: [exponential_smoothing.holt, 'Holt', True, None, True, 10],
 
-        6: [exponential_smoothing.damped, 'Damped', True, None, True],
+        6: [exponential_smoothing.damped, 'Damped', True, None, True, 10],
 
         7: [exponential_smoothing.holt_winters, 'Holt-Winters', False, [24],
-            True],
+            True, 10],
 
-        8: [exponential_smoothing.comb, 'Comb', True, None, False],
+        8: [exponential_smoothing.comb, 'Comb', True, None, False, 10],
 
-        9: [arima.arima, 'ARIMA', True, [(1, 0, 0)], True],
+        9: [arima.arima, 'ARIMA', True, "-- SEE arima_orders --", True, 10],
 
-        10: [arima.sarima, 'SARIMA', False, [(1, 0, 0), (1, 0, 0, 24)], True],
+        10: [arima.sarima, 'SARIMA', False,
+             [(2, 0, 1), (2, 0, 1, seasonality)], True, 1],
 
-        11: [arima.auto, 'Auto', False, [24], True],
+        11: [arima.auto, 'Auto', False, [24], True, 1],
 
-        12: [theta.theta, 'Theta', True, None, True]
+        12: [theta.theta, 'Theta', True, None, True, 10]
+    }
+
+    # Optimum ARIMA Parameters (automatically checked, using the
+    # identify_arima function)
+    arima_orders = {
+        1: [[2, 0, 0], [2, 0, 0], [1, 0, 2], [2, 0, 2]],
+        2: [[2, 0, 0], [2, 0, 0], [2, 0, 2], [2, 0, 2]],
+        3: [[1, 0, 1], [2, 0, 2], [2, 0, 2], [2, 0, 2]],
+        4: [[2, 0, 1], [2, 0, 2], [2, 0, 2], [2, 0, 2]],
     }
 
     seas_dict = {1: "Spring", 2: "Summer", 3: "Autumn", 4: "Winter"}
 
-    # Testing hyper-parameters
-    num_reps = 1
-    seasonality = 168
-    forecast_length = 48
-    model_func, model_name, deseasonalise, params, ret_params = test_dict[
+    # Get the parameters for the model
+    model_func, model_name, deseasonalise, params, ret_params, num_reps = \
+        test_dict[
         model_no]
     error_pairs = [("sMAPE", errors.sMAPE), ("RMSE", errors.RMSE),
                    ("MASE", errors.MASE), ("MAE", errors.MAE)]
@@ -771,6 +790,11 @@ def stats_test(season_no, model_no):
 
     start = timer()
     for y_index, y in enumerate(years):  # Years
+
+        # Specify correct ARIMA parameters
+        if model_no == 9:
+            params = arima_orders[season_no][y_index]
+
         for t in range(8, 1, -1):  # Train times
             # Get training data, deseasonalise if necessary
             train = y[:-(t * 24)]

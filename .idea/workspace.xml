@@ -4,6 +4,7 @@
     <list default="true" id="564df88f-763d-43a5-ba2e-b5cd80214a9e" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stats/arima.py" beforeDir="false" afterPath="$PROJECT_DIR$/stats/arima.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -35,8 +36,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/main.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="791">
-                  <caret line="468" column="58" selection-start-line="468" selection-start-column="58" selection-end-line="468" selection-end-column="58" />
+                <state relative-caret-position="-495">
+                  <caret line="866" column="54" lean-forward="true" selection-start-line="866" selection-start-column="54" selection-end-line="866" selection-end-column="54" />
                   <folding>
                     <element signature="e#0#19#0" expanded="true" />
                   </folding>
@@ -45,10 +46,31 @@
             </entry>
           </file>
           <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/stats/arima.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="454">
+                  <caret line="43" column="67" selection-start-line="43" selection-start-column="67" selection-end-line="43" selection-end-column="67" />
+                  <folding>
+                    <element signature="e#0#28#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/arima_model.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="313">
+                  <caret line="999" column="8" selection-start-line="999" selection-start-column="8" selection-end-line="999" selection-end-column="8" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="285">
-                  <caret line="19" column="4" lean-forward="true" selection-start-line="19" selection-start-column="4" selection-end-line="19" selection-end-column="57" />
+                  <caret line="19" column="4" selection-start-line="19" selection-start-column="4" selection-end-line="19" selection-end-column="57" />
                   <folding>
                     <element signature="e#0#18#0" expanded="true" />
                   </folding>
@@ -71,7 +93,7 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/stats/helpers.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="41">
+                <state relative-caret-position="542">
                   <caret line="60" column="12" selection-start-line="60" selection-start-column="12" selection-end-line="60" selection-end-column="12" />
                   <folding>
                     <element signature="e#0#19#0" expanded="true" />
@@ -157,9 +179,9 @@
       <find>subplot</find>
       <find>linestyl</find>
       <find>identif</find>
-      <find>test_data</find>
       <find>identi</find>
       <find>linalg</find>
+      <find>test_data</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -221,7 +243,6 @@
         <option value="$PROJECT_DIR$/tutorials/pandas1.py" />
         <option value="$PROJECT_DIR$/stats/naiveS.py" />
         <option value="$PROJECT_DIR$/stats/naive.py" />
-        <option value="$PROJECT_DIR$/stats/arima.py" />
         <option value="$PROJECT_DIR$/stats/exponential_smoothing.py" />
         <option value="$PROJECT_DIR$/stats/theta.py" />
         <option value="$PROJECT_DIR$/other/demo.py" />
@@ -231,6 +252,7 @@
         <option value="$PROJECT_DIR$/hybrid/es_rnn.py" />
         <option value="$PROJECT_DIR$/ml/helpers.py" />
         <option value="$PROJECT_DIR$/hybrid/hybrid.py" />
+        <option value="$PROJECT_DIR$/stats/arima.py" />
         <option value="$PROJECT_DIR$/main.py" />
       </list>
     </option>
@@ -613,7 +635,7 @@
       <workItem from="1585142305243" duration="110462000" />
       <workItem from="1585561243572" duration="17685000" />
       <workItem from="1585640787792" duration="2867000" />
-      <workItem from="1585649706616" duration="57103000" />
+      <workItem from="1585649706616" duration="61720000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit. Git setup.">
       <created>1573219288446</created>
@@ -717,7 +739,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="856837000" />
+    <option name="totallyTimeSpent" value="861454000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -751,7 +773,7 @@
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" x="11" y="22" width="1440" height="878" id="SciView" maximized="true" order="3" sideWeight="0.48853615" type="WINDOWED" visible="true" weight="0.9557522" />
+      <window_info active="true" anchor="right" x="11" y="22" width="1440" height="878" id="SciView" maximized="true" order="3" sideWeight="0.48853615" type="WINDOWED" visible="true" weight="0.9557522" />
       <window_info anchor="right" id="Database" order="4" weight="0.11874106" />
       <window_info anchor="right" x="0" y="0" width="310" height="700" id="Documentation" order="5" sideWeight="0.5114638" side_tool="true" weight="0.7839771" />
     </layout>
@@ -1037,24 +1059,7 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/stats/plots.py" />
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/arima_model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="813" column="8" selection-start-line="813" selection-start-column="8" selection-end-line="813" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/stats/ses.py" />
-    <entry file="file://$PROJECT_DIR$/stats/arima.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="483">
-          <caret line="45" column="13" selection-start-line="45" selection-start-column="13" selection-end-line="45" selection-end-column="13" />
-          <folding>
-            <element signature="e#0#28#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Library/Caches/PyCharm2019.1/python_stubs/-1361816944/math.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="313">
@@ -1160,9 +1165,19 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" column="4" selection-start-line="19" selection-start-column="4" selection-end-line="19" selection-end-column="57" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/stats/helpers.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="41">
+        <state relative-caret-position="542">
           <caret line="60" column="12" selection-start-line="60" selection-start-column="12" selection-end-line="60" selection-end-column="12" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
@@ -1170,20 +1185,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
+    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/arima_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="19" column="4" lean-forward="true" selection-start-line="19" selection-start-column="4" selection-end-line="19" selection-end-column="57" />
+        <state relative-caret-position="313">
+          <caret line="999" column="8" selection-start-line="999" selection-start-column="8" selection-end-line="999" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stats/arima.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="454">
+          <caret line="43" column="67" selection-start-line="43" selection-start-column="67" selection-end-line="43" selection-end-column="67" />
           <folding>
-            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#0#28#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="791">
-          <caret line="468" column="58" selection-start-line="468" selection-start-column="58" selection-end-line="468" selection-end-column="58" />
+        <state relative-caret-position="-495">
+          <caret line="866" column="54" lean-forward="true" selection-start-line="866" selection-start-column="54" selection-end-line="866" selection-end-column="54" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
