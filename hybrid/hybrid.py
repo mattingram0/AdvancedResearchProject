@@ -6,7 +6,7 @@ import sys
 import os
 import json
 
-from ml.helpers import pinball_loss
+from ml.helpers import pinball_loss, plot_test
 from stats.helpers import split_data, deseasonalise, reseasonalise
 from stats.errors import sMAPE, MASE, OWA
 from stats.naive import naive_2
@@ -16,7 +16,6 @@ from hybrid.es_rnn import ES_RNN
 
 
 def es_rnn(df):
-
     # Optionally can supply a year as a command line argument
     year = -1 if len(sys.argv) == 2 else int(sys.argv[2])
 
@@ -50,15 +49,22 @@ def es_rnn(df):
     window_size = 336
     output_size = 48
     batch_size = len(train_data) - window_size - output_size + 1
-    write_results = True
-    plot = False
+    write_results = False
+    plot = True
+
+    # Plot a result TODO - YOU ARE HERE - REMOVE BEFORE MORE TEST
+    test_path = "/Users/matt/Projects/AdvancedResearchProject/test" \
+                "/ind_winter_year_2.txt"
+    with open(test_path) as f:
+        plot_test(json.load(f), window_size, output_size, True)
+    sys.exit(0)
 
     # Give the ssqueasonality parameters a helping hand
     _, indices = deseasonalise(train_data['total load actual'], 168,
                                "multiplicative")
 
     # Training parameters
-    num_epochs = 27
+    num_epochs = 1
     init_learning_rate = 0.01
     input_size = 1
     hidden_size = 40
@@ -152,10 +158,7 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
 
     results = {i: {} for i in range(1, 8)}
 
-    for i in range(8, 1, -1):
-        # Plot for debugging
-        fig, axes = plt.subplots(4, 1, figsize=(20, 15), dpi=250)
-
+    for i in range(2, 1, -1):
         # Figure out start and end points of the data
         end_train = -(i * 24)
         start_test = -(i * 24 + window_size)
@@ -251,53 +254,6 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
         print("OWA", owa)
         print("")
 
-        # Plots for debugging. # Note that the output levels and out
-        # seasonality match with the final 48 hours of the all_levels and
-        # all_seasonality, as does the actual with the test_data, I just
-        # plot them to make sure and also so that they are a different
-        # colour to the input data on the plots!
-        axes[0].plot(test_data.tolist(), label="Input Data")
-        axes[0].plot([i for i in range(window_size, window_size +
-                                       output_size)],
-                     actual.to_list(), label="Labels")
-        axes[0].plot([i for i in range(window_size, window_size +
-                                       output_size)],
-                     prediction.to_list(), label="ES_RNN")
-        axes[0].plot([i for i in range(window_size, window_size +
-                                       output_size)],
-                     naive_prediction.to_list(), label="Naive2")
-        axes[0].axvline(x=window_size, linestyle=":", color="C5")
-        axes[0].set_title("Actual Data and Forecasts")
-        axes[0].legend(loc="best")
-
-        axes[1].plot(all_levels, label="All Levels")
-        axes[1].plot([i for i in range(window_size, window_size +
-                                       output_size)],
-                     out_levels, label="Output Levels")
-        axes[1].axvline(x=window_size, linestyle=":", color="C5")
-        axes[1].set_title("Levels")
-        axes[1].legend(loc="best")
-
-        axes[2].plot(all_seasons, label="All Seasons")
-        axes[2].plot([i for i in range(window_size, window_size +
-                                       output_size)],
-                     out_seas, label="Output Seasons")
-        axes[2].axvline(x=window_size, linestyle=":", color="C5")
-        axes[2].set_title("Seasonality")
-        axes[2].legend(loc="best")
-
-        axes[3].plot([i for i in range(window_size + 1)],
-                     [1 for _ in range(window_size + 1)])
-        axes[3].plot([i for i in range(window_size, window_size +
-                                       output_size)],
-                     rnn_out, label="RNN Output")
-        axes[3].axvline(x=window_size, linestyle=":", color="C5")
-        axes[3].set_title("RNN Output")
-        axes[3].legend(loc="best")
-
-        if plot:
-            plt.show()
-
         # Note results (NCC)
         results[9 - i]["test_data"] = test_data.tolist()
         results[9 - i]["ESRNN_prediction"] = prediction.to_list()
@@ -344,6 +300,9 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
         # res_path = "/Users/matt/test.txt"
         with open(res_path, "w") as res:
             json.dump(results, res)
+
+    if plot:
+        plot_test(results, window_size, output_size, print_results=True)
 
 
 def train_model(lstm, data, window_size, output_size, lvp, loss_func, num_epochs,

@@ -393,7 +393,7 @@ def train_test_split(df):
 
 
 # Identify the correct ARIMA order for each season
-def identify_arima(df):
+def identify_arima(df, plot):
     all_data = helpers.split_data(df)
 
     for season in ["Winter", "Spring", "Summer", "Autumn"]:
@@ -471,29 +471,30 @@ def identify_arima(df):
                 disp=-1, trend=c)
             resids.append(fitted_model.resid)
 
-        # Plot Residuals
-        fig, axes = plt.subplots(2, 2, figsize=(20, 15), dpi=250)
-        plt.suptitle(season + " Residuals", y=0.99)
-        for y, (ax, res) in enumerate(zip(axes.flatten(), resids)):
-            ax.plot(res)
-            ax.set_title("Year:" + str(y + 1))
-        plt.show()
+        if plot:
+            # Plot Residuals
+            fig, axes = plt.subplots(2, 2, figsize=(20, 15), dpi=250)
+            plt.suptitle(season + " Residuals", y=0.99)
+            for y, (ax, res) in enumerate(zip(axes.flatten(), resids)):
+                ax.plot(res)
+                ax.set_title("Year:" + str(y + 1))
+            plt.show()
 
-        # Plot ACFs of Residuals
-        fig, axes = plt.subplots(2, 2, figsize=(20, 15), dpi=250)
-        plt.suptitle(season + " AFCs", y=0.99)
-        for y, (ax, res) in enumerate(zip(axes.flatten(), resids)):
-            plot_acf(res, ax=ax, alpha=0.05, lags=168)
-            ax.set_title("Year:" + str(y + 1))
-        plt.show()
+            # Plot ACFs of Residuals
+            fig, axes = plt.subplots(2, 2, figsize=(20, 15), dpi=250)
+            plt.suptitle(season + " AFCs", y=0.99)
+            for y, (ax, res) in enumerate(zip(axes.flatten(), resids)):
+                plot_acf(res, ax=ax, alpha=0.05, lags=168)
+                ax.set_title("Year:" + str(y + 1))
+            plt.show()
 
-        # Plot PACFs of Residuals
-        fig, axes = plt.subplots(2, 2, figsize=(20, 15), dpi=250)
-        plt.suptitle(season + " PAFCs", y=0.99)
-        for y, (ax, res) in enumerate(zip(axes.flatten(), resids)):
-            plot_pacf(res, ax=ax, alpha=0.05, lags=168)
-            ax.set_title("Year:" + str(y + 1))
-        plt.show()
+            # Plot PACFs of Residuals
+            fig, axes = plt.subplots(2, 2, figsize=(20, 15), dpi=250)
+            plt.suptitle(season + " PAFCs", y=0.99)
+            for y, (ax, res) in enumerate(zip(axes.flatten(), resids)):
+                plot_pacf(res, ax=ax, alpha=0.05, lags=168)
+                ax.set_title("Year:" + str(y + 1))
+            plt.show()
 
 
 # Identify the correct SARIMA order for each season
