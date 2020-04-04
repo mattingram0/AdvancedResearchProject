@@ -14,3 +14,5 @@ __pycache__/*
 .bashrc
 .vimrc
 .swp
+
+.idea/workspace.xml
