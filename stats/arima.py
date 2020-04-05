@@ -2,6 +2,7 @@ import statsmodels.api as sm
 import pmdarima as pm
 import numpy as np
 import pandas as pd
+import sys
 
 
 def arima(data, forecast_length, order):
@@ -38,11 +39,21 @@ def arima(data, forecast_length, order):
     # around with the transparams, method (log likelihood etc), solver,
     # and maximum number of iterations as well as the constant
 
-
+# Approximate diffuse initialisation to avoid the LU Decomposition bug. See:
+# https://stackoverflow.com/questions/54136280/sarimax-python-np-linalg-
+# linalg-linalgerror-lu-decomposition-error
+# https://www.statsmodels.org/dev/generated/statsmodels.tsa.holtwinters.
+# ExponentialSmoothing.html
 def sarima(data, forecast_length, order, seasonal_order):
-    fitted_model = sm.tsa.statespace.SARIMAX(
-        data, order=order, seasonal_order=seasonal_order, trend='c'
-    ).fit(disp=-1)
+    try:
+        fitted_model = sm.tsa.statespace.SARIMAX(
+            data, order=order, seasonal_order=seasonal_order, trend='c',
+            initialization='approximate_diffuse'
+        ).fit(disp=-1)
+    except np.linalg.LinAlgError as err:
+        print(err)
+        print("SARIMA Forecast Failed. Exiting.")
+        sys.exit(0)
     prediction = fitted_model.predict(0, len(data) + forecast_length - 1)
     return prediction, fitted_model.params.to_dict()
 
@@ -52,9 +63,9 @@ def auto(data, forecast_length, seasonality):
         data,
         start_p=0, start_q=0, max_p=2, max_q=2,
         start_P=0, start_Q=0, max_Q=2, max_P=2,
-        m=seasonality, max_d=2, max_D=2,
+        m=seasonality, max_d=1, max_D=1, maxiter=25,
         trace=False, suppress_warnings=True, stepwise=True,
-        information_criterion='aicc'
+        information_criterion='aicc', seasonal=True, stationary=True
     )
     fitted = fitted_model.predict_in_sample(start=0, end=(len(data) - 1))
     prediction = fitted_model.predict(forecast_length)

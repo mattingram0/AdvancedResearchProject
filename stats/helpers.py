@@ -1,7 +1,12 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import json
+
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.api import seasonal_decompose
+from os import walk
+
 
 
 # Give training data (must be a multiple of a whole day). Returns
@@ -84,6 +89,38 @@ def split_data(df):
             df.loc["2018-09-01 00:00:00+01:00":"2018-11-30 23:00:00+01:00"]
         ]
     }
+
+
+# Plot the test result forecasts for all the stats models for a given
+# season, year, and test number.
+def plot_results(season, year, test):
+    fig, axes = plt.subplots(2, 1, figsize=(20, 15), dpi=250)
+
+    test_path = "/Users/matt/Projects/AdvancedResearchProject/results/"
+    (_, _, filenames) = next(walk(test_path))
+
+    for file in filenames:
+        # Plot 6 tests on first axes
+        if season in file and ("SES" in file or "Holt" in file or "Damped"
+                               in file or "Comb"):
+            with open(file) as f:
+                all_forecasts = json.load(f)
+
+            forecast = all_forecasts[str(year)][str(1)][str(test)]
+            axes[0].plot(forecast, label=file.split("_")[1])
+
+        # Plot the other 6 tests on the second axes
+        if "season" in file and ("Naive" in file or "ARIMA" in file or
+                                 "Auto" in file):
+            with open(file) as f:
+                all_forecasts = json.load(f)
+
+            forecast = all_forecasts[str(year)][str(1)][str(test)]
+            axes[1].plot(forecast, label=file.split("_")[1])
+
+    axes[0].legend(loc="best")
+    axes[1].legend(loc="best")
+    plt.show()
 
 
 # ***************** Non Used Functions ************************
