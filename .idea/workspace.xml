@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="564df88f-763d-43a5-ba2e-b5cd80214a9e" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/hybrid/hybrid.py" beforeDir="false" afterPath="$PROJECT_DIR$/hybrid/hybrid.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stats/arima.py" beforeDir="false" afterPath="$PROJECT_DIR$/stats/arima.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/average.py" beforeDir="false" afterPath="$PROJECT_DIR$/results/average.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/average_48.py" beforeDir="false" afterPath="$PROJECT_DIR$/results/average_48.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -33,11 +32,11 @@
     <splitter split-orientation="horizontal" split-proportion="0.5">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/main.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-411">
-                  <caret line="817" column="70" selection-start-line="817" selection-start-column="70" selection-end-line="817" selection-end-column="70" />
+                <state relative-caret-position="4694">
+                  <caret line="969" column="24" lean-forward="true" selection-start-line="969" selection-start-column="24" selection-end-line="969" selection-end-column="24" />
                   <folding>
                     <element signature="e#0#19#0" expanded="true" />
                     <element signature="e#2405#2677#0" />
@@ -50,6 +49,39 @@
                     <element signature="e#21764#21995#0" />
                     <element signature="e#22079#26098#0" />
                     <element signature="e#36587#42429#0" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/results/average.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="90">
+                  <caret line="6" column="18" selection-start-line="6" selection-start-column="18" selection-end-line="6" selection-end-column="18" />
+                  <folding>
+                    <element signature="e#0#19#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/results/average_48.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="90">
+                  <caret line="7" column="31" selection-start-line="7" selection-start-column="31" selection-end-line="7" selection-end-column="31" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/results/print_results.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="135">
+                  <caret line="9" column="40" lean-forward="true" selection-start-line="9" selection-start-column="40" selection-end-line="9" selection-end-column="40" />
+                  <folding>
+                    <element signature="e#0#19#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -95,8 +127,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-270">
-                  <caret line="45" column="20" lean-forward="true" selection-start-line="45" selection-start-column="20" selection-end-line="45" selection-end-column="20" />
+                <state relative-caret-position="-490">
+                  <caret line="93" column="45" lean-forward="true" selection-start-line="93" selection-start-column="45" selection-end-line="93" selection-end-column="45" />
                   <folding>
                     <element signature="e#0#18#0" expanded="true" />
                   </folding>
@@ -225,12 +257,12 @@
         <option value="$PROJECT_DIR$/hybrid/es_rnn.py" />
         <option value="$PROJECT_DIR$/ml/helpers.py" />
         <option value="$PROJECT_DIR$/stats/helpers.py" />
-        <option value="$PROJECT_DIR$/results/average.py" />
-        <option value="$PROJECT_DIR$/results/average_48.py" />
         <option value="$PROJECT_DIR$/results/print_results.py" />
         <option value="$PROJECT_DIR$/stats/arima.py" />
         <option value="$PROJECT_DIR$/hybrid/hybrid.py" />
         <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/results/average.py" />
+        <option value="$PROJECT_DIR$/results/average_48.py" />
       </list>
     </option>
   </component>
@@ -607,7 +639,7 @@
       <workItem from="1585142305243" duration="110462000" />
       <workItem from="1585561243572" duration="17685000" />
       <workItem from="1585640787792" duration="2867000" />
-      <workItem from="1585649706616" duration="73619000" />
+      <workItem from="1585649706616" duration="73976000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit. Git setup.">
       <created>1573219288446</created>
@@ -711,7 +743,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="873353000" />
+    <option name="totallyTimeSpent" value="873710000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -741,7 +773,7 @@
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50479233" side_tool="true" weight="0.3253886" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.32435232" />
-      <window_info anchor="bottom" x="9" y="580" width="1398" height="242" id="Python Console" order="12" sideWeight="0.49520767" visible="true" weight="0.09637306" />
+      <window_info anchor="bottom" x="9" y="580" width="1398" height="242" id="Python Console" order="12" sideWeight="0.49520767" visible="true" weight="0.23108809" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -1082,15 +1114,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/results/average_48.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <folding>
-            <element signature="e#1#12#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/stats/helpers.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="80">
@@ -1103,26 +1126,6 @@
             <element signature="e#3965#6409#0" />
             <element signature="e#6527#7714#0" />
             <element signature="e#8286#9468#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/results/average.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" selection-start-line="4" selection-end-line="8" selection-end-column="22" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/results/print_results.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="40" lean-forward="true" selection-start-line="9" selection-start-column="40" selection-end-line="9" selection-end-column="40" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1164,10 +1167,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-490">
+          <caret line="93" column="45" lean-forward="true" selection-start-line="93" selection-start-column="45" selection-end-line="93" selection-end-column="45" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-411">
-          <caret line="817" column="70" selection-start-line="817" selection-start-column="70" selection-end-line="817" selection-end-column="70" />
+        <state relative-caret-position="4694">
+          <caret line="969" column="24" lean-forward="true" selection-start-line="969" selection-start-column="24" selection-end-line="969" selection-end-column="24" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
             <element signature="e#2405#2677#0" />
@@ -1184,12 +1197,29 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
+    <entry file="file://$PROJECT_DIR$/results/print_results.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-270">
-          <caret line="45" column="20" lean-forward="true" selection-start-line="45" selection-start-column="20" selection-end-line="45" selection-end-column="20" />
+        <state relative-caret-position="135">
+          <caret line="9" column="40" lean-forward="true" selection-start-line="9" selection-start-column="40" selection-end-line="9" selection-end-column="40" />
           <folding>
-            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/results/average_48.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="7" column="31" selection-start-line="7" selection-start-column="31" selection-end-line="7" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/results/average.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" column="18" selection-start-line="6" selection-start-column="18" selection-end-line="6" selection-end-column="18" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
