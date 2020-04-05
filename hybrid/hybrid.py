@@ -23,7 +23,7 @@ from hybrid.es_rnn import ES_RNN
 # I've coded it)
 def es_rnn(data, forecast_length, seasonality):
     # Hyperparameters - determined experimentally
-    num_epochs = 1
+    num_epochs = 27
     init_learning_rate = 0.01
     input_size = 1
     hidden_size = 40
