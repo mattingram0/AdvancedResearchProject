@@ -15,7 +15,81 @@ from math import sqrt
 from hybrid.es_rnn import ES_RNN
 
 
-def es_rnn(df):
+# Give the model the training data, the forecast length and the seasonality,
+# and this function trains the model and makes a single prediction
+# Must pass in the training data plus the following forecast_length data.
+# Note that the extra forecast_length of data (i.e the test data) doesn't
+# get used, we just need the data to be the correct length (just the way
+# I've coded it)
+def es_rnn(data, forecast_length, seasonality):
+    # Hyperparameters - determined experimentally
+    num_epochs = 1
+    init_learning_rate = 0.01
+    input_size = 1
+    hidden_size = 40
+    num_layers = 4
+    dilations = [1, 4, 24, 168]
+    level_variability_penalty = 100
+    percentile = 0.49
+    loss_func = pinball_loss
+    grad_clipping = 20
+    auto_lr = False
+    variable_lr = True
+    variable_rates = {7: 5e-3, 14: 1e-3, 22: 3e-4}
+    auto_rate_threshold = 1.005
+    min_epochs_before_change = 2
+    residuals = tuple([[1, 3]])
+    window_size = 336
+    batch_first = True
+    plot = False
+
+    # Split the data
+    train_data = data[:-forecast_length]
+    forecast_data = data[-(forecast_length + window_size):]
+    batch_size = len(train_data) - window_size - forecast_length + 1
+    features = train_data.columns
+
+    # Estimate the seasonal indices
+    _, indices = deseasonalise(train_data["total load actual"], seasonality,
+                               "multiplicative")
+
+    # Create the model
+    lstm = ES_RNN(
+        forecast_length, input_size, batch_size, hidden_size, num_layers,
+        batch_first=batch_first, dilations=dilations, features=features,
+        seasonality_2=seasonality, residuals=residuals,
+        init_seasonality=indices, init_level_smoothing=-0.8,
+        init_seas_smoothing=-0.2
+    ).double()
+
+    # Register gradient clipping function
+    for p in lstm.parameters():
+        p.register_hook(
+            lambda grad: torch.clamp(grad, -grad_clipping, grad_clipping))
+
+    # Set model in training mode
+    lstm.train()
+
+    # Train the model
+    train_model(lstm, train_data, window_size, forecast_length,
+                level_variability_penalty, loss_func, num_epochs,
+                init_learning_rate, percentile, auto_lr, variable_lr,
+                auto_rate_threshold, min_epochs_before_change, plot,
+                variable_rates)
+
+    # Set model in evaluation (prediction) mode
+    lstm.eval()
+
+    # Make ES_RNN Prediction
+    forecast_input = torch.tensor(forecast_data, dtype=torch.double)
+    prediction, _ = lstm.predict(forecast_input, window_size, forecast_length)
+
+    # Return prediction, converted to a series
+    return pd.Series(prediction.squeeze(0).detach().tolist())
+
+
+# General function used to do testing and tweaking
+def run(df):
     # Optionally can supply a year as a command line argument
     year = -1 if len(sys.argv) == 2 else int(sys.argv[2])
 
@@ -90,50 +164,7 @@ def es_rnn(df):
                     init_learning_rate, percentile, auto_lr, variable_lr,
                     auto_rate_threshold, min_epochs_before_change,
                     variable_rates, grad_clipping, write_results, plot, year)
-    # sys.exit(0)
-    #
-    # # Create model
-    # lstm = ES_RNN(
-    #     output_size, input_size, batch_size, hidden_size, num_layers,
-    #     batch_first=True, dilations=dilations, features=train_data.columns,
-    #     seasonality_1=24, seasonality_2=168, residuals=residuals,
-    #     init_seasonality=indices, init_level_smoothing=-0.8
-    # ).double()
-    #
-    #
-    # # for n, p in lstm.named_parameters():
-    # #     print(n, p.shape)
-    # #     print(len(list(lstm.named_parameters())))
-    #
-    # # Train model
-    # lstm.train()
-    # train_model(lstm, train_data, window_size, output_size,
-    #             level_variability_penalty, loss_func, num_epochs,
-    #             init_learning_rate, percentile, auto_lr, variable_lr,
-    #             auto_rate_threshold, min_epochs_before_change,
-    #             plot, variable_rates)
-    #
-    # # Make predictions
-    # lstm.eval()
-    #
-    # valid_data = valid_sets[0]
-    # validation_results, indices = test_model(lstm, valid_data, window_size,
-    #                                  output_size)
-    # print("Validation Average OWA:", np.mean(validation_results))
 
-
-    # Print the seasonality indices for ES_RNN and Classic Decomposition
-    # fig = plt.figure(figsize=(20, 15), dpi=250)
-    # ax = fig.add_subplot(1, 1, 1)
-    # ax.plot(indices, label="Seasonal Decomposition Seasonality")
-    # ax.plot(torch.tensor(lstm.w_seasons).tolist(), label="ES_RNN Seasonality")
-    # ax.legend(loc="best")
-    # plt.show()
-
-
-    # test_data = test_sets[0]
-    # test_results = test_model(lstm, valid_data, window_size, output_size)
-    # print("Test Average OWA:", np.mean(test_results))
 
 # If output_size != 48 then this is broken. Pass in valid data or test
 # data!! (i.e all up to the end of the valid section/test section).
@@ -336,16 +367,11 @@ def train_model(lstm, data, window_size, output_size, lvp, loss_func, num_epochs
     for k, v in parameter_dict.items():
         optimizer_dict[k] = torch.optim.Adam(params=v, lr=init_learning_rate)
 
-    # Plots for debugging:
-    # fig = plt.figure(figsize=(20, 15), dpi=250)
-    # ax = fig.add_subplot(1, 1, 1)
-    # ax.plot(data["total load actual"].to_list())
-    # ax.set_xticks([])
-
     num_epochs_since_change = 0
     rate_changed = False
     prev_loss = 0
     dynamic_learning_rate = init_learning_rate
+
     # Loop through number of epochs amount of times
     for epoch in range(num_epochs):
 
@@ -359,10 +385,6 @@ def train_model(lstm, data, window_size, output_size, lvp, loss_func, num_epochs
 
             # Get the per-time-series optimiser
             optimizer = optimizer_dict[name]
-
-            # if (epoch + 1) % 10 == 0:
-            #     ax.plot(torch.tensor(lstm.levels).tolist(), label=str(epoch
-            #                                                           + 1))
 
             # User defined, fixed, variable learning rates depending on epoch
             if variable_lr and epoch in list(variable_rates.keys()):
@@ -401,21 +423,11 @@ def train_model(lstm, data, window_size, output_size, lvp, loss_func, num_epochs
                         print("Level Smoothing:", torch.sigmoid(p))
                     if n == "total load actual seasonality2 smoothing":
                         print("Seasonality Smoothing:", torch.sigmoid(p))
-                    # if n.startswith("drnn.rnn_layer"):
-                    #     print(n, p)
-
-                    # for i in range(168):
-                    #     if n == "total load actual seasonality2 " + str(i):
-                    #         print("Seasonality Index " + str(i) + ":", p)
 
             prev_loss = loss
 
             if not rate_changed:
                 num_epochs_since_change += 1
-
-    # if plot:
-    #     ax.legend(loc="best")
-    #     plt.show()
 
 
 # This function takes all the data up to the end of the section (i.e up to

@@ -64,7 +64,7 @@ def auto(data, forecast_length, seasonality):
         start_p=0, start_q=0, max_p=2, max_q=2,
         start_P=0, start_Q=0, max_Q=2, max_P=2,
         m=seasonality, max_d=1, max_D=1, maxiter=25,
-        trace=False, suppress_warnings=True, stepwise=True,
+        trace=True, suppress_warnings=False, stepwise=True,
         information_criterion='aicc', seasonal=True, stationary=True
     )
     fitted = fitted_model.predict_in_sample(start=0, end=(len(data) - 1))

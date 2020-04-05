@@ -45,14 +45,16 @@ def load_data(filename, mult_ts):
 
 
 def main():
-    stats_test(int(sys.argv[1]), int(sys.argv[2]))
+    reset_results_files()
+    sys.exit(0)
+    test(int(sys.argv[1]), int(sys.argv[2]))
     # file_path = os.path.abspath(os.path.dirname(__file__))
     # data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
     # df = load_data(data_path, False)
     # df = df.set_index('time').asfreq('H')
     # df.interpolate(inplace=True)
     # identify_arima(df, False)
-    # hybrid.es_rnn(df)
+    # hybrid.run(df)
 
     # ---------------------- LOAD MULTIPLE TIME SERIES ----------------------
 
@@ -696,7 +698,7 @@ def deseason(df):
 
 
 # The method must accept two parameters: season no. (1 - 4) and method no.
-def stats_test(season_no, model_no):
+def test(season_no, model_no):
     # Load data
     file_path = os.path.abspath(os.path.dirname(__file__))
     data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
@@ -717,7 +719,7 @@ def stats_test(season_no, model_no):
 
         2: [naive.naive_2, 'Naive2', True, None, False, 10],
 
-        3: [naive.naive_s, 'NaiveS', False, [24], False, 10],
+        3: [naive.naive_s, 'NaiveS', False, [seasonality], False, 10],
 
         4: [exponential_smoothing.ses, 'SES', True, None, True, 10],
 
@@ -725,19 +727,21 @@ def stats_test(season_no, model_no):
 
         6: [exponential_smoothing.damped, 'Damped', True, None, True, 10],
 
-        7: [exponential_smoothing.holt_winters, 'Holt-Winters', False, [24],
-            True, 10],
+        7: [exponential_smoothing.holt_winters, 'Holt-Winters', False,
+            [seasonality], True, 10],
 
         8: [exponential_smoothing.comb, 'Comb', True, None, False, 10],
 
         9: [arima.arima, 'ARIMA', True, "-- SEE arima_orders --", True, 10],
 
         10: [arima.sarima, 'SARIMA', False,
-             [(2, 0, 1), (2, 0, 1, seasonality)], True, 1],
+             [(2, 0, 1), (2, 0, 1, 24)], True, 1],
 
         11: [arima.auto, 'Auto', False, [24], True, 1],
 
-        12: [theta.theta, 'Theta', True, None, True, 10]
+        12: [theta.theta, 'Theta', True, None, True, 10],
+
+        13: [hybrid.es_rnn, 'ES RNN', False, [seasonality], False, 1]
     }
 
     # Optimum ARIMA Parameters (automatically checked, using the
@@ -792,17 +796,30 @@ def stats_test(season_no, model_no):
         for t in range(8, 1, -1):  # Train times
             # Get training data, deseasonalise if necessary
             train = y[:-(t * 24)]
+
             train_d, indices = helpers.deseasonalise(
                 train, seasonality, "multiplicative"
             )
             if deseasonalise:
                 train = train_d
 
+            # Generate naïve forecast for use in MASE calculation
+            naive_fit_forecast = helpers.reseasonalise(
+                naive.naive_2(train_d, forecast_length),
+                indices,
+                "multiplicative"
+            )
+            naive_forecast = naive_fit_forecast[-forecast_length:]
+
             for r in range(1, num_reps + 1):  # Repetitions
                 # Get test data. Change y[:-0] to y[:None].
                 start = -(t * 24)
                 end = -(t * 24 - forecast_length) if t > 2 else None
                 test = y[start:end]
+
+                # The hybrid model requires extra forecast_length (48) data
+                if model_no == 13:
+                    train = y[:-((t - 2) * 24) if t > 2 else None]
 
                 # Fit model and forecast, with additional params if needed
                 if params is not None:
@@ -822,16 +839,8 @@ def stats_test(season_no, model_no):
                         fit_forecast, indices, "multiplicative"
                     )
 
-                # Generate naïve forecast
-                naive_fit_forecast = helpers.reseasonalise(
-                    naive.naive_2(train_d, forecast_length),
-                    indices,
-                    "multiplicative"
-                )
-
                 # Select only the forecast, not the fitted values
                 forecast = fit_forecast[-forecast_length:]
-                naive_forecast = naive_fit_forecast[-forecast_length:]
 
                 # Loop through the error functions
                 for e_name, e_func in error_pairs:
@@ -957,7 +966,8 @@ def reset_results_files():
     # Results 48 (all seasons)
     res48s_path = os.path.join(file_path, "results/results_48_seasons.txt")
     methods = ["Naive1", "Naive2", "NaiveS", "SES", "Holt", "Damped",
-               "Holt-Winters", "Comb", "ARIMA", "SARIMA", "Auto", "Theta"]
+               "Holt-Winters", "Comb", "ARIMA", "SARIMA", "Auto", "Theta",
+               "ES RNN"]
     res48s = {l: {m: [0, 0, 0, 0] for m in methods} for l in range(1, 49)}
     with open(res48s_path, "w") as f:
         json.dump(res48s, f)
@@ -976,7 +986,7 @@ def reset_results_files():
         json.dump(res1, f)
 
 
-def test(data, seasonality, test_hours, methods, names, multiple):
+def old_test(data, seasonality, test_hours, methods, names, multiple):
     forecast_methods = methods
     forecast_names = names
     # forecast_names = ['naive1', 'naiveS', 'naive2', 'ses', 'holt', 'damped',
