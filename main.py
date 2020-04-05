@@ -45,8 +45,6 @@ def load_data(filename, mult_ts):
 
 
 def main():
-    reset_results_files()
-    sys.exit(0)
     test(int(sys.argv[1]), int(sys.argv[2]))
     # file_path = os.path.abspath(os.path.dirname(__file__))
     # data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")

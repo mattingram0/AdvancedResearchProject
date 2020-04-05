@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="564df88f-763d-43a5-ba2e-b5cd80214a9e" name="Default Changelist" comment="" />
+    <list default="true" id="564df88f-763d-43a5-ba2e-b5cd80214a9e" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,11 +31,11 @@
     <splitter split-orientation="horizontal" split-proportion="0.5">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/main.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="4694">
-                  <caret line="969" column="24" lean-forward="true" selection-start-line="969" selection-start-column="24" selection-end-line="969" selection-end-column="24" />
+                <state relative-caret-position="265">
+                  <caret line="46" column="11" selection-start-line="46" selection-start-column="11" selection-end-line="46" selection-end-column="11" />
                   <folding>
                     <element signature="e#0#19#0" expanded="true" />
                     <element signature="e#2405#2677#0" />
@@ -51,7 +53,7 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/results/average.py">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="90">
@@ -124,8 +126,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="266">
-                  <caret line="140" column="18" selection-start-line="140" selection-start-column="18" selection-end-line="140" selection-end-column="18" />
+                <state relative-caret-position="810">
+                  <caret line="54" lean-forward="true" selection-start-line="54" selection-end-line="54" />
                   <folding>
                     <element signature="e#0#18#0" expanded="true" />
                   </folding>
@@ -256,10 +258,10 @@
         <option value="$PROJECT_DIR$/stats/helpers.py" />
         <option value="$PROJECT_DIR$/results/print_results.py" />
         <option value="$PROJECT_DIR$/stats/arima.py" />
-        <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/results/average.py" />
         <option value="$PROJECT_DIR$/results/average_48.py" />
         <option value="$PROJECT_DIR$/hybrid/hybrid.py" />
+        <option value="$PROJECT_DIR$/main.py" />
       </list>
     </option>
   </component>
@@ -636,7 +638,7 @@
       <workItem from="1585142305243" duration="110462000" />
       <workItem from="1585561243572" duration="17685000" />
       <workItem from="1585640787792" duration="2867000" />
-      <workItem from="1585649706616" duration="74072000" />
+      <workItem from="1585649706616" duration="74840000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit. Git setup.">
       <created>1573219288446</created>
@@ -740,7 +742,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="873806000" />
+    <option name="totallyTimeSpent" value="874574000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1164,26 +1166,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4694">
-          <caret line="969" column="24" lean-forward="true" selection-start-line="969" selection-start-column="24" selection-end-line="969" selection-end-column="24" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-            <element signature="e#2405#2677#0" />
-            <element signature="e#2778#5561#0" />
-            <element signature="e#5645#11969#0" />
-            <element signature="e#12052#13540#0" />
-            <element signature="e#13638#14752#0" />
-            <element signature="e#14872#19002#0" />
-            <element signature="e#18705#21646#0" />
-            <element signature="e#21764#21995#0" />
-            <element signature="e#22079#26098#0" />
-            <element signature="e#36587#42429#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/results/print_results.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
@@ -1213,10 +1195,30 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="266">
-          <caret line="140" column="18" selection-start-line="140" selection-start-column="18" selection-end-line="140" selection-end-column="18" />
+        <state relative-caret-position="810">
+          <caret line="54" lean-forward="true" selection-start-line="54" selection-end-line="54" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="265">
+          <caret line="46" column="11" selection-start-line="46" selection-start-column="11" selection-end-line="46" selection-end-column="11" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+            <element signature="e#2405#2677#0" />
+            <element signature="e#2778#5561#0" />
+            <element signature="e#5645#11969#0" />
+            <element signature="e#12052#13540#0" />
+            <element signature="e#13638#14752#0" />
+            <element signature="e#14872#19002#0" />
+            <element signature="e#18705#21646#0" />
+            <element signature="e#21764#21995#0" />
+            <element signature="e#22079#26098#0" />
+            <element signature="e#36587#42429#0" />
           </folding>
         </state>
       </provider>
