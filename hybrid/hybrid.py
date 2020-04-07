@@ -384,6 +384,11 @@ def train_and_predict(lstm, data, window_size, output_size, lvp, loss_func,
 
         # Loop through each time series
         for name, inputs in input_list.items():
+
+            # TODO - REMOVE WHEN NOT NEEDED
+            if name == "total load forecast":
+                continue
+
             outs, labels, level_var_loss = lstm(
                 inputs, name, window_size, output_size, lvp
             )

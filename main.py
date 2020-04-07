@@ -704,7 +704,8 @@ def test(season_no, model_no):
     file_path = os.path.abspath(os.path.dirname(__file__))
     data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
     df = pd.read_csv(data_path, parse_dates=["time"],
-                     usecols=["time", "total load actual"],
+                     usecols=["time", "total load actual", "total load "
+                                                           "forecast"],
                      infer_datetime_format=True)
     df = df.set_index('time').asfreq('H')
     df.interpolate(inplace=True)
