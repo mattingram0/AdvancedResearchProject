@@ -53,7 +53,7 @@ class ES_RNN(nn.Module):
             # Create the parameters
             if init_level_smoothing:
                 self.level_smoothing_coeffs[f] = torch.nn.Parameter(
-                    torch.tensor(init_level_smoothing, dtype=torch.double),
+                    torch.tensor(init_level_smoothing[f], dtype=torch.double),
                     requires_grad=True)
             else:
                 self.level_smoothing_coeffs[f] = torch.nn.Parameter(
@@ -61,15 +61,20 @@ class ES_RNN(nn.Module):
 
             if init_seas_smoothing:
                 self.seasonality2_smoothing_coeffs[f] = torch.nn.Parameter(
-                    torch.tensor(init_seas_smoothing, dtype=torch.double),
+                    torch.tensor(init_seas_smoothing[f], dtype=torch.double),
                     requires_grad=True)
             else:
                 self.seasonality2_smoothing_coeffs[f] = torch.nn.Parameter(
                     u1.sample(), requires_grad=True)
+
             # self.seasonality1_smoothing_coeffs[f] = torch.nn.Parameter(
             #     u1.sample(), requires_grad=True)
-            self.seasonality2_smoothing_coeffs[f] = torch.nn.Parameter(
-                u1.sample(), requires_grad=True)
+
+            # TODO - THIS LINE BELOW WAS UNCOMMENTED ACCIDENTALLY CAUSING
+            #  THE MANUALLY SET SMOOTHINF COEFF TO BE OVERRIDEN - SEE IF
+            #  THIS WAS CAUSING POOR PERFORMANCE
+            # self.seasonality2_smoothing_coeffs[f] = torch.nn.Parameter(
+            #     u1.sample(), requires_grad=True)
             # self.hourly_seasonality_params[f] = [
             #     torch.nn.Parameter(u2.sample(), requires_grad=True)
             #     for _ in range(seasonality_1)
@@ -79,7 +84,7 @@ class ES_RNN(nn.Module):
                     torch.nn.Parameter(
                         torch.tensor(s, dtype=torch.double), requires_grad=True
                     )
-                    for s in init_seasonality
+                    for s in init_seasonality[f]
                 ]
             else:
                 self.weekly_seasonality_params[f] = [
@@ -97,7 +102,7 @@ class ES_RNN(nn.Module):
 
             # for i, p in enumerate(self.hourly_seasonality_params[f]):
             #     self.register_parameter(f + " seasonality1 " + str(i), p)
-
+            # TODO YOU ARE HERE????/ SEE OUTPUT AND THE 1417??
             for i, p in enumerate(self.weekly_seasonality_params[f]):
                 self.register_parameter(f + " seasonality2 " + str(i), p)
 
