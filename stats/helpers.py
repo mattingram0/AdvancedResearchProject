@@ -114,7 +114,7 @@ def plot_forecasts(df, season, year, test):
         if seas != season:
             continue
 
-        top = ["NaiveS", "ES RNN", "Comb", "Holt", "Naive2", "SES"]
+        top = ["NaiveS", "ES RNN", "Comb", "Holt", "Naive2", "SES", "TSO"]
         bottom = ["Theta", "Damped", "ARIMA", "SARIMA", "Holt-Winters", "Naive1"]
 
         with open(test_path + file) as f:
@@ -137,7 +137,7 @@ def plot_forecasts(df, season, year, test):
 def plot_48_results():
     methods = ["Naive1", "Naive2", "NaiveS", "SES", "Holt", "Damped",
                "Holt-Winters", "Comb", "ARIMA", "SARIMA", "Auto", "Theta",
-               "ES RNN"]
+               "ES RNN", "TSO"]
     res = {m: [0] * 48 for m in methods}
 
     sns.reset_orig()

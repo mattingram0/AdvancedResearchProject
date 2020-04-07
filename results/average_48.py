@@ -3,7 +3,7 @@ import numpy as np
 
 methods = ["Naive1", "Naive2", "NaiveS", "SES", "Holt", "Damped",
            "Holt-Winters", "Comb", "ARIMA", "SARIMA", "Auto", "Theta",
-           "ES RNN"]
+           "ES RNN", "TSO"]
 
 with open('results_48_seasons.txt') as f:
     res48s = json.load(f)

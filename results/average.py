@@ -4,7 +4,7 @@ import numpy as np
 
 methods = ["Naive1", "Naive2", "NaiveS", "SES", "Holt", "Damped",
 		   "Holt-Winters", "Comb", "ARIMA", "SARIMA", "Auto", "Theta",
-		   "ES RNN"]
+		   "ES RNN", "TSO"]
 
 with open('results_1.txt') as f:
 	res = json.load(f)

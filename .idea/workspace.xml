@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="564df88f-763d-43a5-ba2e-b5cd80214a9e" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/average.py" beforeDir="false" afterPath="$PROJECT_DIR$/results/average.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/average_48.py" beforeDir="false" afterPath="$PROJECT_DIR$/results/average_48.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stats/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/stats/helpers.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -32,11 +34,11 @@
     <splitter split-orientation="horizontal" split-proportion="0.47870076">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/main.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="530">
-                  <caret line="862" column="58" lean-forward="true" selection-start-line="862" selection-end-line="863" />
+                <state relative-caret-position="-584">
+                  <caret line="1019" column="29" selection-start-line="1019" selection-start-column="29" selection-end-line="1019" selection-end-column="29" />
                   <folding>
                     <element signature="e#0#19#0" expanded="true" />
                     <element signature="e#2405#2677#0" />
@@ -77,11 +79,11 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/stats/helpers.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="931">
-                  <caret line="122" selection-start-line="122" selection-end-line="122" />
+                <state relative-caret-position="369">
+                  <caret line="116" column="72" selection-start-line="116" selection-start-column="72" selection-end-line="116" selection-end-column="72" />
                   <folding>
                     <element signature="e#0#19#0" expanded="true" />
                   </folding>
@@ -96,7 +98,7 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="89">
+                <state relative-caret-position="188">
                   <caret line="23" column="38" selection-start-line="23" selection-start-column="38" selection-end-line="23" selection-end-column="38" />
                   <folding>
                     <element signature="e#0#18#0" expanded="true" />
@@ -120,7 +122,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>drnn</find>
       <find>init_season</find>
       <find>run</find>
       <find>pinball</find>
@@ -150,6 +151,7 @@
       <find>reset</find>
       <find>train</find>
       <find>train</find>
+      <find>methods =</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -213,15 +215,15 @@
         <option value="$PROJECT_DIR$/ml/drnn.py" />
         <option value="$PROJECT_DIR$/hybrid/es_rnn.py" />
         <option value="$PROJECT_DIR$/results/print_results.py" />
-        <option value="$PROJECT_DIR$/results/average.py" />
-        <option value="$PROJECT_DIR$/results/average_48.py" />
         <option value="$PROJECT_DIR$/stats/naive.py" />
         <option value="$PROJECT_DIR$/ml/helpers.py" />
-        <option value="$PROJECT_DIR$/stats/helpers.py" />
         <option value="$PROJECT_DIR$/stats/exponential_smoothing.py" />
         <option value="$PROJECT_DIR$/hybrid/hybrid.py" />
         <option value="$PROJECT_DIR$/stats/arima.py" />
         <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/results/average.py" />
+        <option value="$PROJECT_DIR$/results/average_48.py" />
+        <option value="$PROJECT_DIR$/stats/helpers.py" />
       </list>
     </option>
   </component>
@@ -598,7 +600,7 @@
       <workItem from="1585142305243" duration="110462000" />
       <workItem from="1585561243572" duration="17685000" />
       <workItem from="1585640787792" duration="2867000" />
-      <workItem from="1585649706616" duration="95248000" />
+      <workItem from="1585649706616" duration="96974000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit. Git setup.">
       <created>1573219288446</created>
@@ -702,7 +704,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="894982000" />
+    <option name="totallyTimeSpent" value="896708000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -732,11 +734,11 @@
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50479233" side_tool="true" weight="0.3253886" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.32435232" />
-      <window_info anchor="bottom" x="9" y="580" width="1398" height="242" id="Python Console" order="12" sideWeight="0.49520767" visible="true" weight="0.031088082" />
+      <window_info active="true" anchor="bottom" x="9" y="580" width="1398" height="242" id="Python Console" order="12" sideWeight="0.49520767" visible="true" weight="0.27046633" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info active="true" anchor="right" x="0" y="22" width="1440" height="878" id="SciView" maximized="true" order="3" sideWeight="0.48853615" type="WINDOWED" visible="true" weight="0.9557522" />
+      <window_info anchor="right" x="0" y="22" width="1440" height="878" id="SciView" maximized="true" order="3" sideWeight="0.48853615" type="WINDOWED" visible="true" weight="0.9557522" />
       <window_info anchor="right" id="Database" order="4" weight="0.11874106" />
       <window_info anchor="right" x="0" y="0" width="310" height="700" id="Documentation" order="5" sideWeight="0.5114638" side_tool="true" weight="0.7839771" />
     </layout>
@@ -1117,12 +1119,33 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stats/helpers.py">
+    <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="931">
-          <caret line="122" selection-start-line="122" selection-end-line="122" />
+        <state relative-caret-position="188">
+          <caret line="23" column="38" selection-start-line="23" selection-start-column="38" selection-end-line="23" selection-end-column="38" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#3062#6037#0" />
+            <element signature="e#5033#5103#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-584">
+          <caret line="1019" column="29" selection-start-line="1019" selection-start-column="29" selection-end-line="1019" selection-end-column="29" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
+            <element signature="e#2405#2677#0" />
+            <element signature="e#2778#5561#0" />
+            <element signature="e#12052#13540#0" />
+            <element signature="e#13638#14752#0" />
+            <element signature="e#14872#19002#0" />
+            <element signature="e#18705#21646#0" />
+            <element signature="e#21764#21995#0" />
+            <element signature="e#22079#26098#0" />
+            <element signature="e#36587#42429#0" />
           </folding>
         </state>
       </provider>
@@ -1147,33 +1170,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
+    <entry file="file://$PROJECT_DIR$/stats/helpers.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="89">
-          <caret line="23" column="38" selection-start-line="23" selection-start-column="38" selection-end-line="23" selection-end-column="38" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#3062#6037#0" />
-            <element signature="e#5033#5103#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="530">
-          <caret line="862" column="58" lean-forward="true" selection-start-line="862" selection-end-line="863" />
+        <state relative-caret-position="369">
+          <caret line="116" column="72" selection-start-line="116" selection-start-column="72" selection-end-line="116" selection-end-column="72" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
-            <element signature="e#2405#2677#0" />
-            <element signature="e#2778#5561#0" />
-            <element signature="e#12052#13540#0" />
-            <element signature="e#13638#14752#0" />
-            <element signature="e#14872#19002#0" />
-            <element signature="e#18705#21646#0" />
-            <element signature="e#21764#21995#0" />
-            <element signature="e#22079#26098#0" />
-            <element signature="e#36587#42429#0" />
           </folding>
         </state>
       </provider>

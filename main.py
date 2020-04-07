@@ -744,7 +744,7 @@ def test(season_no, model_no):
 
         8: [exponential_smoothing.comb, 'Comb', True, None, False, 10],
 
-        9: [arima.arima, 'ARIMA', True, "-- SEE arima_orders --", True, 10],
+        9: [arima.arima, 'ARIMA', True, "-- See arima_orders --", True, 10],
 
         10: [arima.sarima, 'SARIMA', False,
              [(2, 0, 1), (2, 0, 1, 24)], True, 1],
@@ -753,8 +753,9 @@ def test(season_no, model_no):
 
         12: [theta.theta, 'Theta', True, None, True, 10],
 
-        13: [hybrid.es_rnn, 'ES RNN', False, [seasonality, True],
-             False, 1]
+        13: [hybrid.es_rnn, 'ES RNN', False, [seasonality, True], False, 1],
+
+        14: [None, 'TSO', False, None, False, 1]
     }
 
     # Optimum ARIMA Parameters (automatically checked, using the
@@ -818,6 +819,7 @@ def test(season_no, model_no):
             test_end = -(t * 24 - forecast_length) if t > 2 else None
             train_data = y[:train_end]
             test_data = y[train_end:test_end]
+            tso_data = years_df[y_index]["total load forecast"][train_end:test_end]
 
             # Deseasonalise, always required for Naive2
             train_deseas, indices = helpers.deseasonalise(
@@ -861,7 +863,13 @@ def test(season_no, model_no):
                     else:
                         forec_results = model_func(train_data, forecast_length,
                                                    *params)
-                # Fit model and forecast, with additional params if needed
+
+                # Handle the TSO forecast individually (no forecast method)
+                elif model_no == 14:
+                    forec_results = tso_data
+
+                # Handle the statistical models. Fit the model and forecast,
+                # with additional params if needed
                 else:
                     if params is not None:
                         forec_results = model_func(train_data, forecast_length,
@@ -1009,7 +1017,7 @@ def reset_results_files():
     res48s_path = os.path.join(file_path, "results/results_48_seasons.txt")
     methods = ["Naive1", "Naive2", "NaiveS", "SES", "Holt", "Damped",
                "Holt-Winters", "Comb", "ARIMA", "SARIMA", "Auto", "Theta",
-               "ES RNN"]
+               "ES RNN", "TSO"]
     res48s = {l: {m: [0, 0, 0, 0] for m in methods} for l in range(1, 49)}
     with open(res48s_path, "w") as f:
         json.dump(res48s, f)
