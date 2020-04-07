@@ -17,8 +17,15 @@ from hybrid import hybrid
 
 def load_data(filename, mult_ts):
     if mult_ts:
+        col_list = ["generation fossil gas", "generation fossil hard coal",
+                    "generation fossil oil", "price actual",
+                    "generation hydro water reservoir", "generation solar",
+                    "forecast solar day ahead", "total load forecast",
+                    "total load actual", "price day ahead",
+                    "generation hydro run-of-river and poundage"]
         df = pd.read_csv(
-            filename, parse_dates=["time"], infer_datetime_format=True
+            filename, parse_dates=["time"], infer_datetime_format=True,
+            usecols=col_list
         )
 
         # Drop the forecast columns
@@ -40,17 +47,19 @@ def load_data(filename, mult_ts):
     else:
         return pd.read_csv(
             filename, parse_dates=["time"],
-            usecols=["time", "total load actual"], infer_datetime_format=True
+            usecols=["time", "price actual"], infer_datetime_format=True
         )
 
 
 def main():
-    test(int(sys.argv[1]), int(sys.argv[2]))
-    # file_path = os.path.abspath(os.path.dirname(__file__))
-    # data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
-    # df = load_data(data_path, False)
-    # df = df.set_index('time').asfreq('H')
-    # df.interpolate(inplace=True)
+    # test(int(sys.argv[1]), int(sys.argv[2]))
+    file_path = os.path.abspath(os.path.dirname(__file__))
+    data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
+    df = load_data(data_path, False)
+    df = df.set_index('time').asfreq('H')
+    df.interpolate(inplace=True)
+    plot_sample(df)
+    sys.exit(0)
     # helpers.plot_forecasts(df, "Winter", 2, 1)
     # helpers.plot_forecasts(df, "Summer", 1, 1)
     #helpers.plot_48_results()

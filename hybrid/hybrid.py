@@ -88,7 +88,7 @@ def es_rnn(data, forecast_length, seasonality, ensemble):
 
 
 # General function used to do testing and tweaking
-def run(df):
+def run(df, multi_ts):
     # Optionally can supply a year as a command line argument
     year = -1 if len(sys.argv) == 2 else int(sys.argv[2])
 
@@ -162,7 +162,8 @@ def run(df):
                     level_variability_penalty, loss_func, num_epochs,
                     init_learning_rate, percentile, auto_lr, variable_lr,
                     auto_rate_threshold, min_epochs_before_change,
-                    variable_rates, grad_clipping, write_results, plot, year)
+                    variable_rates, grad_clipping, write_results, plot,
+                    year, multi_ts)
 
 
 # If output_size != 48 then this is broken. Pass in valid data or test
@@ -174,7 +175,8 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
                     level_variability_penalty, loss_func, num_epochs,
                     init_learning_rate, percentile, auto_lr, variable_lr,
                     auto_rate_threshold, min_epochs_before_change,
-                    variable_rates, grad_clipping, write_results, plot, year):
+                    variable_rates, grad_clipping, write_results, plot,
+                    year, multi_ts):
 
     es_rnn_predictions = []
     es_rnn_smapes = []
