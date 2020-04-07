@@ -125,6 +125,7 @@ def run(df, multi_ts):
     write_results = False
     plot = True
     ensemble = False
+    skip_lstm = False
 
     # Plot a result #TODO HOW TO PLOT RUN_TEST RESULT FROM HAM
     # test_path = "/Users/matt/Projects/AdvancedResearchProject/test" \
@@ -161,7 +162,7 @@ def run(df, multi_ts):
                     loss_func, num_epochs, init_learning_rate, percentile,
                     auto_lr, variable_lr, auto_rate_threshold,
                     min_epochs_before_change, variable_rates, grad_clipping,
-                    write_results, plot, year, ensemble, multi_ts)
+                    write_results, plot, year, ensemble, multi_ts, skip_lstm)
 
 
 # If output_size != 48 then this is broken. Pass in valid data or test
@@ -173,7 +174,7 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
                     init_learning_rate, percentile, auto_lr, variable_lr,
                     auto_rate_threshold, min_epochs_before_change,
                     variable_rates, grad_clipping, write_results, plot,
-                    year, ensemble, multi_ts):
+                    year, ensemble, multi_ts, skip_lstm):
 
     es_rnn_predictions = []
     es_rnn_smapes = []
@@ -240,7 +241,8 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
                           level_variability_penalty, loss_func, num_epochs,
                           init_learning_rate, percentile, auto_lr, variable_lr,
                           auto_rate_threshold, min_epochs_before_change,
-                          test_data, variable_rates, ensemble, multi_ts)
+                          test_data, variable_rates, ensemble, multi_ts,
+                          skip_lstm)
 
         # Set model into evaluation mode
         lstm.eval()
@@ -354,7 +356,7 @@ def train_and_predict(lstm, data, window_size, output_size, lvp, loss_func,
                       num_epochs, init_learning_rate, percentile, auto_lr,
                       variable_lr, auto_rt, min_epochs_since_change,
                       forecast_input, variable_rates=None, ensemble=False,
-                      multi_ts=False):
+                      multi_ts=False, skip_lstm=False):
     # to make this stochastic gradient descent??? Output the final level and
     # seasonality of the chunk?? Then we could feed this in as the initial
     # seasonality and level. Would we then also need to make sure that the
@@ -409,7 +411,8 @@ def train_and_predict(lstm, data, window_size, output_size, lvp, loss_func,
                 continue
 
             outs, labels, level_var_loss = lstm(
-                inputs, name, window_size, output_size, lvp
+                inputs, name, window_size, output_size, lvp,
+                skip_lstm=skip_lstm
             )
             loss = loss_func(outs, labels, percentile)
             total_loss = loss + level_var_loss

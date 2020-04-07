@@ -223,14 +223,15 @@ class ES_RNN(nn.Module):
             inputs.append(noisy_norm_input.unsqueeze(0))  # Unsqueeze b4 cat
             labels.append(noisy_norm_label.unsqueeze(0))
 
-        inputs = torch.cat(inputs).unsqueeze(2)  # Unsqueeze to correct dim
         labels = torch.cat(labels)
 
         if skip_lstm:
             # Instead of feeding the inputs through the LSTM, skip and input
             # them directly through the tanh layer into the linear layer
+            inputs = torch.cat(inputs)
             out = self.linear_no_lstm(self.tanh_no_lstm(inputs.double()))
         else:
+            inputs = torch.cat(inputs).unsqueeze(2)  # Unsqueeze to correct dim
             # Feed inputs in to Dilated LSTM
             if hidden is None:
                 lstm_out, hidden = self.drnn(inputs.double())
