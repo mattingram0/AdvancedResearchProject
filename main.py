@@ -45,16 +45,14 @@ def load_data(filename, mult_ts):
 
 
 def main():
-    reset_results_files()
-    sys.exit(0)
-    #test(int(sys.argv[1]), int(sys.argv[2]))
-    file_path = os.path.abspath(os.path.dirname(__file__))
-    data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
-    df = load_data(data_path, False)
-    df = df.set_index('time').asfreq('H')
-    df.interpolate(inplace=True)
-    helpers.plot_forecasts(df, "Winter", 2, 1)
-    helpers.plot_forecasts(df, "Summer", 1, 1)
+    test(int(sys.argv[1]), int(sys.argv[2]))
+    # file_path = os.path.abspath(os.path.dirname(__file__))
+    # data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
+    # df = load_data(data_path, False)
+    # df = df.set_index('time').asfreq('H')
+    # df.interpolate(inplace=True)
+    # helpers.plot_forecasts(df, "Winter", 2, 1)
+    # helpers.plot_forecasts(df, "Summer", 1, 1)
     #helpers.plot_48_results()
     # identify_arima(df, False)
     # hybrid.run(df)
@@ -716,9 +714,9 @@ def test(season_no, model_no):
     forecast_length = 48
 
     # For the ES_RNN, for each test, train the model num_ensemble
-    # times and average the predictions. Further, each test output is
-    # actually the ensemble of the predictions from the final 5 epochs. Note
-    # that ensembling increases the testing time considerably.
+    # times and average the predictions. Further, if internal ensembling is
+    # also specified, each prediction from the model will actually be the
+    # average of the predictions from the last 5 epochs
     ensemble = True
     num_ensemble = 3
 
@@ -755,7 +753,7 @@ def test(season_no, model_no):
 
         12: [theta.theta, 'Theta', True, None, True, 10],
 
-        13: [hybrid.es_rnn, 'ES RNN', False, [seasonality, df.columns, False],
+        13: [hybrid.es_rnn, 'ES RNN', False, [seasonality, True],
              False, 1]
     }
 
@@ -855,14 +853,14 @@ def test(season_no, model_no):
                         pred_ensemble = []
                         for i in range(num_ensemble):
                             pred = model_func(train_data, forecast_length,
-                                              *params, ensemble)
+                                              *params)
                             pred_ensemble.append(pred)
 
                         forec_results = pd.Series(np.mean(pred_ensemble,
                                                           axis=0))
                     else:
                         forec_results = model_func(train_data, forecast_length,
-                                                   *params, ensemble)
+                                                   *params)
                 # Fit model and forecast, with additional params if needed
                 else:
                     if params is not None:
