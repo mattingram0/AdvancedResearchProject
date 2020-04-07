@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 import json
 
 from statsmodels.tsa.stattools import adfuller
@@ -93,33 +94,75 @@ def split_data(df):
 
 # Plot the test result forecasts for all the stats models for a given
 # season, year, and test number.
-def plot_results(season, year, test):
+def plot_forecasts(df, season, year, test):
     fig, axes = plt.subplots(2, 1, figsize=(20, 15), dpi=250)
 
     test_path = "/Users/matt/Projects/AdvancedResearchProject/results/"
     (_, _, filenames) = next(walk(test_path))
 
+    actual = split_data(df)[season][year]["total load actual"][-48:].tolist()
+
+    axes[0].plot(actual, label="Actual")
+    axes[1].plot(actual, label="Actual")
+
     for file in filenames:
+        if "forecasts" not in file:
+            continue
+
+        seas, method, _ = file.split("_")
+
+        if seas != season:
+            continue
+
+        top = ["NaiveS", "ES RNN", "Comb", "Holt", "Naive2", "SES"]
+        bottom = ["Theta", "Damped", "ARIMA", "SARIMA", "Holt-Winters", "Naive1"]
+
+        with open(test_path + file) as f:
+            all_forecasts = json.load(f)
+            forecast = all_forecasts[str(year)][str(1)][str(test)]
+
         # Plot 6 tests on first axes
-        if season in file and ("SES" in file or "Holt" in file or "Damped"
-                               in file or "Comb"):
-            with open(file) as f:
-                all_forecasts = json.load(f)
-
-            forecast = all_forecasts[str(year)][str(1)][str(test)]
-            axes[0].plot(forecast, label=file.split("_")[1])
-
-        # Plot the other 6 tests on the second axes
-        if "season" in file and ("Naive" in file or "ARIMA" in file or
-                                 "Auto" in file):
-            with open(file) as f:
-                all_forecasts = json.load(f)
-
-            forecast = all_forecasts[str(year)][str(1)][str(test)]
-            axes[1].plot(forecast, label=file.split("_")[1])
+        if method in top:
+            axes[0].plot(forecast, label=method, marker='o')
+        elif method in bottom:
+            axes[1].plot(forecast, label=method, marker='o')
+        else:
+            pass  # To handle the empty 'Auto' forecasts
 
     axes[0].legend(loc="best")
     axes[1].legend(loc="best")
+    plt.show()
+
+
+def plot_48_results():
+    methods = ["Naive1", "Naive2", "NaiveS", "SES", "Holt", "Damped",
+               "Holt-Winters", "Comb", "ARIMA", "SARIMA", "Auto", "Theta",
+               "ES RNN"]
+    res = {m: [0] * 48 for m in methods}
+
+    sns.reset_orig()
+    clrs = sns.color_palette('husl', n_colors=len(methods))
+
+    with open("/Users/matt/Projects/AdvancedResearchProject/results/"
+              "results_48_sMAPE.txt") as file:
+        res48 = json.load(file)
+
+    # Convert {Lead: {Method: Val, ...}, ...} to {Method: [Vals], ...}
+    for lead, vals in res48.items():
+        for m, owa in vals.items():
+            res[m][int(lead) - 1] = owa
+
+    fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    for i, (m, owas) in enumerate(res.items()):
+        if m == "Naive1" or m == "Holt-Winters" or m == "SARIMA" or m == \
+                "Auto":
+            continue
+        if m != "Theta" and m != "ES RNN" and m != "Naive2" and m != "NaiveS":
+            continue
+        ax.plot(owas, label=m, marker='x')
+
+    ax.legend(loc="best")
+    ax.axvline(x=24, linestyle=":")
     plt.show()
 
 

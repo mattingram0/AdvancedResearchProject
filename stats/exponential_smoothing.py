@@ -29,7 +29,7 @@ def damped(data,  forecast_length):
 def holt_winters(data, forecast_length, seasonality):
     fitted_model = ExponentialSmoothing(
         data, seasonal_periods=seasonality, seasonal="mul"
-    ).fit()
+    ).fit(use_basinhopping=True, remove_bias=True)
     prediction = fitted_model.predict(0, len(data) + forecast_length - 1)
     params = fitted_model.params
     params['initial_seasons'] = params['initial_seasons'].tolist()

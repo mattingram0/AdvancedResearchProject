@@ -39,6 +39,7 @@ def arima(data, forecast_length, order):
     # around with the transparams, method (log likelihood etc), solver,
     # and maximum number of iterations as well as the constant
 
+
 # Approximate diffuse initialisation to avoid the LU Decomposition bug. See:
 # https://stackoverflow.com/questions/54136280/sarimax-python-np-linalg-
 # linalg-linalgerror-lu-decomposition-error
@@ -49,7 +50,7 @@ def sarima(data, forecast_length, order, seasonal_order):
         fitted_model = sm.tsa.statespace.SARIMAX(
             data, order=order, seasonal_order=seasonal_order, trend='c',
             initialization='approximate_diffuse'
-        ).fit(disp=-1)
+        ).fit(disp=-1, method='nm')
     except np.linalg.LinAlgError as err:
         print(err)
         print("SARIMA Forecast Failed. Exiting.")

@@ -45,12 +45,17 @@ def load_data(filename, mult_ts):
 
 
 def main():
-    test(int(sys.argv[1]), int(sys.argv[2]))
-    # file_path = os.path.abspath(os.path.dirname(__file__))
-    # data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
-    # df = load_data(data_path, False)
-    # df = df.set_index('time').asfreq('H')
-    # df.interpolate(inplace=True)
+    reset_results_files()
+    sys.exit(0)
+    #test(int(sys.argv[1]), int(sys.argv[2]))
+    file_path = os.path.abspath(os.path.dirname(__file__))
+    data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
+    df = load_data(data_path, False)
+    df = df.set_index('time').asfreq('H')
+    df.interpolate(inplace=True)
+    helpers.plot_forecasts(df, "Winter", 2, 1)
+    helpers.plot_forecasts(df, "Summer", 1, 1)
+    #helpers.plot_48_results()
     # identify_arima(df, False)
     # hybrid.run(df)
 
@@ -710,6 +715,17 @@ def test(season_no, model_no):
     seasonality = 168
     forecast_length = 48
 
+    # For the ES_RNN, for each test, train the model num_ensemble
+    # times and average the predictions. Further, each test output is
+    # actually the ensemble of the predictions from the final 5 epochs. Note
+    # that ensembling increases the testing time considerably.
+    ensemble = True
+    num_ensemble = 3
+
+    # True = use final week for testing, False = use penultimate week for
+    # validation
+    testing = True
+
     # Model No.: [Function, Name, Deseasonalise?, Additional Parameters,
     # Return Parameters, Number of Repetitions]
     test_dict = {
@@ -739,7 +755,8 @@ def test(season_no, model_no):
 
         12: [theta.theta, 'Theta', True, None, True, 10],
 
-        13: [hybrid.es_rnn, 'ES RNN', False, [seasonality], False, 1]
+        13: [hybrid.es_rnn, 'ES RNN', False, [seasonality, df.columns, False],
+             False, 1]
     }
 
     # Optimum ARIMA Parameters (automatically checked, using the
@@ -759,7 +776,7 @@ def test(season_no, model_no):
     error_pairs = [("sMAPE", errors.sMAPE), ("RMSE", errors.RMSE),
                    ("MASE", errors.MASE), ("MAE", errors.MAE)]
 
-    # Build empty data structures to hol results, naive results, forecasts and
+    # Build empty data structures to hold results, naive results, forecasts and
     # fitted parameters
     results = {e: {r: {y: {t: [0] * forecast_length for t in range(1, 8)
                            } for y in range(1, 5)
@@ -781,51 +798,81 @@ def test(season_no, model_no):
     final_params = {y: [] for y in range(1, 5)}
 
     all_data = helpers.split_data(df)
-    years = all_data[seas_dict[season_no]]
-    years = [years[i]["total load actual"] for i in range(4)]
+    years_df = all_data[seas_dict[season_no]]
 
-    start = timer()
-    for y_index, y in enumerate(years):  # Years
+    # The final 7 days are reserved for final testing
+    if testing:
+        years = [years_df[i]["total load actual"] for i in range(4)]
+    else:
+        years = [years_df[i]["total load actual"][:-7 * 24] for i in range(4)]
+
+    # Loop through the years
+    for y_index, y in enumerate(years):
 
         # Specify correct ARIMA parameters
         if model_no == 9:
             params = arima_orders[season_no][y_index]
 
-        for t in range(8, 1, -1):  # Train times
-            # Get training data, deseasonalise if necessary
-            train = y[:-(t * 24)]
+        # Loop through the week of tests
+        for t in range(8, 1, -1):
+            # Get training and test data. Change y[:-0] to y[:None].
+            train_end = -(t * 24)
+            test_end = -(t * 24 - forecast_length) if t > 2 else None
+            train_data = y[:train_end]
+            test_data = y[train_end:test_end]
 
-            train_d, indices = helpers.deseasonalise(
-                train, seasonality, "multiplicative"
+            # Deseasonalise, always required for Naive2
+            train_deseas, indices = helpers.deseasonalise(
+                train_data, seasonality, "multiplicative"
             )
-            if deseasonalise:
-                train = train_d
 
             # Generate naïve forecast for use in MASE calculation
             naive_fit_forecast = helpers.reseasonalise(
-                naive.naive_2(train_d, forecast_length),
+                naive.naive_2(train_deseas, forecast_length),
                 indices,
                 "multiplicative"
             )
             naive_forecast = naive_fit_forecast[-forecast_length:]
 
-            for r in range(1, num_reps + 1):  # Repetitions
-                # Get test data. Change y[:-0] to y[:None].
-                start = -(t * 24)
-                end = -(t * 24 - forecast_length) if t > 2 else None
-                test = y[start:end]
+            # Use deseasonalised data if needed
+            if deseasonalise:
+                train_data = train_deseas
 
-                # The hybrid model requires extra forecast_length (48) data
+            # Loop through the repetitions
+            for r in range(1, num_reps + 1):
+
+                # Handle the hybrid model individually
                 if model_no == 13:
-                    train = y[:-((t - 2) * 24) if t > 2 else None]
+                    # Hybrid model requires the dataframe and extra data
+                    if testing:
+                        test_end = -((t - 2) * 24) if t > 2 else None
+                    else:
+                        test_end = -((t + 5) * 24)  # Think about it, see notes
+                    train_data = years_df[y_index][:test_end]
 
+                    # Generate ensemble if we are ensembling
+                    if ensemble:
+                        pred_ensemble = []
+                        for i in range(num_ensemble):
+                            pred = model_func(train_data, forecast_length,
+                                              *params, ensemble)
+                            pred_ensemble.append(pred)
+
+                        forec_results = pd.Series(np.mean(pred_ensemble,
+                                                          axis=0))
+                    else:
+                        forec_results = model_func(train_data, forecast_length,
+                                                   *params, ensemble)
                 # Fit model and forecast, with additional params if needed
-                if params is not None:
-                    forec_results = model_func(train, forecast_length, *params)
                 else:
-                    forec_results = model_func(train, forecast_length)
+                    if params is not None:
+                        forec_results = model_func(train_data, forecast_length,
+                                                   *params)
+                    else:
+                        forec_results = model_func(train_data, forecast_length)
 
-                # Split results into fit-forecast and parameters if needed
+                # Split results into fit-forecast and parameters if the
+                # model also returned the values of its fitted parameters
                 if ret_params:
                     fit_forecast, fit_params = forec_results
                 else:
@@ -842,6 +889,7 @@ def test(season_no, model_no):
 
                 # Loop through the error functions
                 for e_name, e_func in error_pairs:
+
                     # Loop through the lead times
                     for l in range(1, forecast_length + 1):
                         if e_name == "MASE":
@@ -852,8 +900,8 @@ def test(season_no, model_no):
                             n_error = e_func(naive_forecast[:l], y[:end],
                                              seasonality, l)
                         else:
-                            error = e_func(forecast[:l], test[:l])
-                            n_error = e_func(naive_forecast[:l], test[:l])
+                            error = e_func(forecast[:l], test_data[:l])
+                            n_error = e_func(naive_forecast[:l], test_data[:l])
 
                         # Save error results for all lead times
                         results[e_name][r][y_index + 1][t - 1][l - 1] = error
@@ -866,8 +914,6 @@ def test(season_no, model_no):
                 # Save model params only for final repetition and train time
                 if r == num_reps and t == 2 and ret_params:
                     final_params[y_index + 1] = fit_params
-            end = timer()
-        print(np.around(end - start, decimals=3), "seconds")
 
     # Calculate OWA for all forecasts
     for r in range(1, num_reps + 1):

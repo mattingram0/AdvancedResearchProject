@@ -21,7 +21,7 @@ from hybrid.es_rnn import ES_RNN
 # Note that the extra forecast_length of data (i.e the test data) doesn't
 # get used, we just need the data to be the correct length (just the way
 # I've coded it)
-def es_rnn(data, forecast_length, seasonality):
+def es_rnn(data, forecast_length, seasonality, ensemble):
     # Hyperparameters - determined experimentally
     num_epochs = 27
     init_learning_rate = 0.01
@@ -46,6 +46,8 @@ def es_rnn(data, forecast_length, seasonality):
     # Split the data
     train_data = data[:-forecast_length]
     forecast_data = data[-(forecast_length + window_size):]
+    forecast_input = torch.tensor(forecast_data["total load actual"],
+                                  dtype=torch.double)
     batch_size = len(train_data) - window_size - forecast_length + 1
     features = train_data.columns
 
@@ -57,7 +59,7 @@ def es_rnn(data, forecast_length, seasonality):
     lstm = ES_RNN(
         forecast_length, input_size, batch_size, hidden_size, num_layers,
         batch_first=batch_first, dilations=dilations, features=features,
-        seasonality_2=seasonality, residuals=residuals,
+        seasonality_1=None, seasonality_2=seasonality, residuals=residuals,
         init_seasonality=indices, init_level_smoothing=-0.8,
         init_seas_smoothing=-0.2
     ).double()
@@ -70,22 +72,19 @@ def es_rnn(data, forecast_length, seasonality):
     # Set model in training mode
     lstm.train()
 
-    # Train the model
-    train_model(lstm, train_data, window_size, forecast_length,
-                level_variability_penalty, loss_func, num_epochs,
-                init_learning_rate, percentile, auto_lr, variable_lr,
-                auto_rate_threshold, min_epochs_before_change, plot,
-                variable_rates)
+    # Train the model, and make a (possibly ensembled) prediction.
+    prediction = train_and_predict(
+        lstm, train_data, window_size, forecast_length,
+        level_variability_penalty, loss_func, num_epochs,
+        init_learning_rate, percentile, auto_lr, variable_lr,
+        auto_rate_threshold, min_epochs_before_change, plot, forecast_input,
+        variable_rates, ensemble)
 
     # Set model in evaluation (prediction) mode
     lstm.eval()
 
-    # Make ES_RNN Prediction
-    forecast_input = torch.tensor(forecast_data, dtype=torch.double)
-    prediction, _ = lstm.predict(forecast_input, window_size, forecast_length)
-
-    # Return prediction, converted to a series
-    return pd.Series(prediction.squeeze(0).detach().tolist())
+    # Return prediction
+    return prediction
 
 
 # General function used to do testing and tweaking
@@ -224,12 +223,13 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
         lstm.train()
 
         print("----- TEST", str(9 - i), "-----")
-        # Train the model
-        train_model(lstm, train_data, window_size, output_size,
+
+        # Train the model.
+        train_and_predict(lstm, train_data, window_size, output_size,
                     level_variability_penalty, loss_func, num_epochs,
                     init_learning_rate, percentile, auto_lr, variable_lr,
-                    auto_rate_threshold, min_epochs_before_change, plot,
-                    variable_rates)
+                    auto_rate_threshold, min_epochs_before_change, test_data,
+                    plot, variable_rates, ensemble=False)
 
         # Set model into evaluation mode
         lstm.eval()
@@ -336,9 +336,15 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
         plot_test(results, window_size, output_size, print_results=True)
 
 
-def train_model(lstm, data, window_size, output_size, lvp, loss_func, num_epochs,
-                init_learning_rate, percentile, auto_lr, variable_lr,
-                auto_rt, min_epochs_since_change, plot, variable_rates=None):
+# This function trains the model, and generates (a) prediction(s). If we
+# pass in ensemble = False, then a single prediction after training is
+# generated. If ensemble = True, the predictions from the final 5 epochs are
+# averaged and returned. If we wish to make use of the extra information
+# that the ES_RNN.predict() function returns, we can call it directly.
+def train_and_predict(lstm, data, window_size, output_size, lvp, loss_func,
+                      num_epochs, init_learning_rate, percentile, auto_lr,
+                      variable_lr, auto_rt, min_epochs_since_change, plot,
+                      forecast_input, variable_rates=None, ensemble=False):
     # to make this stochastic gradient descent??? Output the final level and
     # seasonality of the chunk?? Then we could feed this in as the initial
     # seasonality and level. Would we then also need to make sure that the
@@ -371,6 +377,7 @@ def train_model(lstm, data, window_size, output_size, lvp, loss_func, num_epochs
     rate_changed = False
     prev_loss = 0
     dynamic_learning_rate = init_learning_rate
+    pred_ensemble = []
 
     # Loop through number of epochs amount of times
     for epoch in range(num_epochs):
@@ -426,8 +433,28 @@ def train_model(lstm, data, window_size, output_size, lvp, loss_func, num_epochs
 
             prev_loss = loss
 
+            # If we didn't change the learning rate, make note of this
             if not rate_changed:
                 num_epochs_since_change += 1
+
+        # If we are ensembling, generate the ensemble of forecasts
+        if ensemble and (num_epochs - epoch <= 5):
+            prediction, *_ = lstm.predict(forecast_input, window_size,
+                                          output_size)
+            pred_ensemble.append(prediction.squeeze(0).detach().tolist())
+            pass
+        else:
+            if epoch == num_epochs - 1:
+                prediction, *_ = lstm.predict(forecast_input, window_size,
+                                              output_size)
+                prediction, = pd.Series(
+                    prediction.squeeze(0).detach().tolist()
+                )
+
+    if ensemble:
+        return pd.Series(np.mean(pred_ensemble, axis=0))
+    else:
+        return prediction
 
 
 # This function takes all the data up to the end of the section (i.e up to

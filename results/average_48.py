@@ -17,5 +17,5 @@ for i in range(1, 49):
             np.mean(res48s[str(i)][m]), decimals=3
         ))
 
-with open('results_48.txt') as f:
+with open('results_48.txt', 'w') as f:
     json.dump(res48, f)
