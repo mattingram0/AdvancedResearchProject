@@ -66,7 +66,7 @@ def main():
     # helpers.plot_forecasts(df, "Summer", 1, 1)
     #helpers.plot_48_results()
     # identify_arima(df, False)
-    hybrid.run(df, True)
+    hybrid.run(df, False)
 
     # ---------------------- LOAD MULTIPLE TIME SERIES ----------------------
 

@@ -122,11 +122,11 @@ def run(df, multi_ts):
     window_size = 336
     output_size = 48
     batch_size = len(train_data) - window_size - output_size + 1
-    write_results = True
-    plot = False
+    write_results = False
+    plot = True
     ensemble = False
 
-    # Plot a result TODO - YOU ARE HERE - REMOVE BEFORE MORE TEST
+    # Plot a result #TODO HOW TO PLOT RUN_TEST RESULT FROM HAM
     # test_path = "/Users/matt/Projects/AdvancedResearchProject/test" \
     #             "/ind_winter_year_2.txt"
     # with open(test_path) as f:
@@ -154,6 +154,7 @@ def run(df, multi_ts):
     # to output of 4th layer
 
     data = valid_sets[1]
+
     test_model_week(data, output_size, input_size, batch_size, hidden_size,
                     num_layers, True, dilations, data.columns, 24, 168,
                     residuals, window_size, level_variability_penalty,

@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 from torch.distributions import Normal, Uniform
 from ml import drnn, non_lin
+import sys
 
 
 class ES_RNN(nn.Module):
@@ -120,6 +121,10 @@ class ES_RNN(nn.Module):
         self.tanh = non_lin.Tanh(hidden_size, hidden_size)
         self.linear = nn.Linear(hidden_size, output_size)
 
+        # Used for testing whether the LSTM was actually beneficial
+        self.tanh_no_lstm = non_lin.Tanh(336, 336)
+        self.linear_no_lstm = nn.Linear(336, output_size)
+
     # Call once at the beginning of every epoch
     def init_hidden_states(self):
         self.hidden = (
@@ -132,7 +137,7 @@ class ES_RNN(nn.Module):
 
     # TODO - add Trend as well!! See if improved performance
     def forward(self, x, feature, window_size, output_size, lvp=0,
-                hidden=None, std=0.001):
+                hidden=None, std=0.001, skip_lstm=False):
         # Forward receives the entire sequence x = [seq_len]
 
         # Get the parameters of the current feature
@@ -221,28 +226,32 @@ class ES_RNN(nn.Module):
         inputs = torch.cat(inputs).unsqueeze(2)  # Unsqueeze to correct dim
         labels = torch.cat(labels)
 
-        # Feed inputs in to Dilated LSTM
-        if hidden is None:
-            lstm_out, hidden = self.drnn(inputs.double())
-            h_out = hidden[0][-1]
-            # hidden = (h, c), where h is a list of num_layers items,
-            # where num_layers is the number of layers in the DRNN,
-            # where each item is of shape (1, original_batch_size *
-            # dilation, hidden_size), where dilation is the dilation for the
-            # given layer. Each one of these tensors represents the final
-            # hidden state (i.e the hidden state for t = seq_len, the last
-            # input sequence), for each of the original_batch_size *
-            # dilation inputs into the final layer. Therefore we get h
-            # rather than c by specifying [0], and then get the (1, o_b_s *
-            # dilation, hidden_size) of the final layer by specifying [-1]
-
+        if skip_lstm:
+            # Instead of feeding the inputs through the LSTM, skip and input
+            # them directly through the tanh layer into the linear layer
+            out = self.linear_no_lstm(self.tanh_no_lstm(inputs.double()))
         else:
-            # TODO - this isn't used, but it's wrong
-            lstm_out, h_out = self.drnn(inputs.double(), hidden)
+            # Feed inputs in to Dilated LSTM
+            if hidden is None:
+                lstm_out, hidden = self.drnn(inputs.double())
+                h_out = hidden[0][-1]
+                # hidden = (h, c), where h is a list of num_layers items,
+                # where num_layers is the number of layers in the DRNN,
+                # where each item is of shape (1, original_batch_size *
+                # dilation, hidden_size), where dilation is the dilation for the
+                # given layer. Each one of these tensors represents the final
+                # hidden state (i.e the hidden state for t = seq_len, the last
+                # input sequence), for each of the original_batch_size *
+                # dilation inputs into the final layer. Therefore we get h
+                # rather than c by specifying [0], and then get the (1, o_b_s *
+                # dilation, hidden_size) of the final layer by specifying [-1]
+            else:
+                # TODO - this isn't used, but it's wrong
+                lstm_out, h_out = self.drnn(inputs.double(), hidden)
 
-        # Pass DLSTM output through non-linear and linear layers
-        linear_in = h_out[:, -inputs.size(0):, :].view(-1, self.hidden_size)
-        out = self.linear(self.tanh(linear_in))
+            # Pass DLSTM output through non-linear and linear layers
+            linear_in = h_out[:, -inputs.size(0):, :].view(-1, self.hidden_size)
+            out = self.linear(self.tanh(linear_in))
 
         # Save the level and seasonality values so that we can use them to make
         # predictions
