@@ -11,7 +11,8 @@ from timeit import default_timer as timer
 from math import fabs
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
-from stats import arima, exponential_smoothing, naive, theta, errors, helpers
+from stats import arima, exponential_smoothing, naive, theta, errors
+from stats import helpers
 from hybrid import hybrid
 
 
@@ -53,20 +54,21 @@ def load_data(filename, mult_ts):
 
 
 def main():
-    # test(int(sys.argv[1]), int(sys.argv[2]))
-    file_path = os.path.abspath(os.path.dirname(__file__))
-    data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
-    df = load_data(data_path, True)
-    df = df.set_index('time').asfreq('H')
-    df.replace(0, np.NaN, inplace=True)
-    df.interpolate(inplace=True)
-    # plot_sample(df)
-    # sys.exit(0)
-    # helpers.plot_forecasts(df, "Winter", 2, 1)
-    # helpers.plot_forecasts(df, "Summer", 1, 1)
-    #helpers.plot_48_results()
-    # identify_arima(df, False)
-    hybrid.run(df, False)
+    # helpers.plot_one_test()
+    test(int(sys.argv[1]), int(sys.argv[2]))
+    # file_path = os.path.abspath(os.path.dirname(__file__))
+    # data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
+    # df = load_data(data_path, True)
+    # df = df.set_index('time').asfreq('H')
+    # df.replace(0, np.NaN, inplace=True)
+    # df.interpolate(inplace=True)
+    # # plot_sample(df)
+    # # sys.exit(0)
+    # # helpers.plot_forecasts(df, "Winter", 2, 1)
+    # # helpers.plot_forecasts(df, "Summer", 1, 1)
+    # #helpers.plot_48_results()
+    # # identify_arima(df, False)
+    # hybrid.run(df, False)
 
     # ---------------------- LOAD MULTIPLE TIME SERIES ----------------------
 
@@ -765,7 +767,8 @@ def test(season_no, model_no):
 
         12: [theta.theta, 'Theta', True, None, True, 10],
 
-        13: [hybrid.es_rnn, 'ES RNN', False, [seasonality, True], False, 1],
+        13: [hybrid.es_rnn, 'ES RNN', False, [
+            seasonality, True, False, False], False, 1],
 
         14: [None, 'TSO', False, None, False, 1]
     }
@@ -950,7 +953,7 @@ def test(season_no, model_no):
     for r in range(1, num_reps + 1):
         for y in range(1, 5):
             for t in range(1, 8):
-                all_res.append(results["OWA"][r][y][t][forecast_length - 1])
+                all_res.append(results["sMAPE"][r][y][t][forecast_length - 1])
 
     mean = np.around(np.mean(all_res), decimals=3)
     std = np.around(np.std(all_res), decimals=3)

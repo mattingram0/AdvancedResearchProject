@@ -18,6 +18,14 @@ def plot_all_tests(window_size, output_size):
                 plot_test(json.load(f), window_size, output_size, True)
 
 
+def plot_one_test():
+    window_size = 336
+    output_size = 48
+    test_path = "/Users/matt/Projects/AdvancedResearchProject/test/"
+    with open(test_path) as f:
+        plot_test(json.load(f), window_size, output_size, True)
+
+
 # This function take a single results dictionary (i.e the result from a week
 # long test) and plots each of the 7 tests
 def plot_test(results, window_size, output_size, print_results):

@@ -21,7 +21,7 @@ from hybrid.es_rnn import ES_RNN
 # Note that the extra forecast_length of data (i.e the test data) doesn't
 # get used, we just need the data to be the correct length (just the way
 # I've coded it)
-def es_rnn(data, forecast_length, seasonality, ensemble):
+def es_rnn(data, forecast_length, seasonality, ensemble, multi_ts, skip_lstm):
     # Hyperparameters - determined experimentally
     num_epochs = 27
     init_learning_rate = 0.01
@@ -35,13 +35,12 @@ def es_rnn(data, forecast_length, seasonality, ensemble):
     grad_clipping = 20
     auto_lr = False
     variable_lr = True
-    variable_rates = {7: 5e-3, 14: 1e-3, 22: 3e-4}
+    variable_rates = {7: 5e-3, 18: 1e-3, 22: 3e-4}
     auto_rate_threshold = 1.005
     min_epochs_before_change = 2
     residuals = tuple([[1, 3]])
     window_size = 336
     batch_first = True
-    plot = False
 
     # Split the data
     train_data = data[:-forecast_length]
@@ -51,17 +50,23 @@ def es_rnn(data, forecast_length, seasonality, ensemble):
     batch_size = len(train_data) - window_size - forecast_length + 1
     features = train_data.columns
 
-    # Estimate the seasonal indices
-    _, indices = deseasonalise(train_data["total load actual"], seasonality,
-                               "multiplicative")
+    # Estimate the seasonal indices and inital smoothing levels
+    init_seas = {}
+    init_l_smooth = {}
+    init_s_smooth = {}
+    for c in data.columns:
+        deseas, indic = deseasonalise(train_data[c], 168, "multiplicative")
+        init_seas[c] = indic
+        init_l_smooth[c] = -0.8
+        init_s_smooth[c] = -0.2
 
     # Create the model
     lstm = ES_RNN(
         forecast_length, input_size, batch_size, hidden_size, num_layers,
         batch_first=batch_first, dilations=dilations, features=features,
         seasonality_1=None, seasonality_2=seasonality, residuals=residuals,
-        init_seasonality=indices, init_level_smoothing=-0.8,
-        init_seas_smoothing=-0.2
+        init_seasonality=init_seas, init_level_smoothing=init_l_smooth,
+        init_seas_smoothing=init_s_smooth
     ).double()
 
     # Register gradient clipping function
@@ -78,7 +83,7 @@ def es_rnn(data, forecast_length, seasonality, ensemble):
         level_variability_penalty, loss_func, num_epochs,
         init_learning_rate, percentile, auto_lr, variable_lr,
         auto_rate_threshold, min_epochs_before_change, forecast_input,
-        variable_rates, ensemble)
+        variable_rates, ensemble, multi_ts, skip_lstm)
 
     # Set model in evaluation (prediction) mode
     lstm.eval()
@@ -250,7 +255,7 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
         # Make ES_RNN Prediction
         prediction, actual, out_levels, out_seas, all_levels, all_seasons, \
         rnn_out = lstm.predict(
-            test_data, window_size, output_size
+            test_data, window_size, output_size, skip_lstm=skip_lstm
         )
 
         # [[<- 48 ->],] generated, so remove the dimension
@@ -425,7 +430,12 @@ def train_and_predict(lstm, data, window_size, output_size, lvp, loss_func,
                 for param_group in optimizer.param_groups:
                     param_group['lr'] = variable_rates[epoch]
 
-                if name == "generation fossil gas":
+                # Generation fossil gas is the first time series loaded,
+                # don't need to repeat the message for all time series
+                if multi_ts and name == "generation fossil gas":
+                    print("Changed Learning Rate to: " + str(variable_rates
+                                                             [epoch]))
+                else:
                     print("Changed Learning Rate to: " + str(variable_rates
                                                              [epoch]))
 
@@ -464,13 +474,12 @@ def train_and_predict(lstm, data, window_size, output_size, lvp, loss_func,
         # If we are ensembling, generate the ensemble of forecasts
         if ensemble and (num_epochs - epoch <= 5):
             prediction, *_ = lstm.predict(forecast_input, window_size,
-                                          output_size)
+                                          output_size, skip_lstm=skip_lstm)
             pred_ensemble.append(prediction.squeeze(0).detach().tolist())
-            pass
         else:
             if epoch == num_epochs - 1:
                 prediction, *_ = lstm.predict(forecast_input, window_size,
-                                              output_size)
+                                              output_size, skip_lstm=skip_lstm)
                 prediction, *_ = pd.Series(
                     prediction.squeeze(0).detach().tolist()
                 )

@@ -278,7 +278,8 @@ class ES_RNN(nn.Module):
     # Todo 2. Add the contiguous/non-contiguous functionality. If you pass
     #  in cont=True, you'll get a 1d tensor of contiguous forecasts. If
     #  cont=True, you'll get a 2d tensor of overlapping forecasts.
-    def predict(self, x, window_size, output_size, hidden=None, cont=False):
+    def predict(self, x, window_size, output_size, hidden=None, cont=False,
+                skip_lstm=False):
         # Get the final ES level and seasonality values
         levels = self.levels[:]
         w_seasons = self.w_seasons[:]
@@ -337,33 +338,39 @@ class ES_RNN(nn.Module):
             # Keep track of the actual data too
             actuals.append(label.unsqueeze(0))
 
-        # Turn list of inputs into a vector, then add another dimension (
-        # required for the feature input to the LSTM)
-        inputs = torch.cat(inputs).unsqueeze(2)
-
-        # Feed inputs in to Dilated LSTM
-        if hidden is None:
-            lstm_out, hidden = self.drnn(inputs.double())
-            h_out = hidden[0][-1]
-
+        # Instead of feeding the inputs through the LSTM, skip and input
+        # them directly through the tanh layer into the linear layer
+        if skip_lstm:
+            inputs = torch.cat(inputs)
+            out = self.linear_no_lstm(self.tanh_no_lstm(inputs.double()))
         else:
-            lstm_out, h_out = self.drnn(inputs.double(), hidden)
+            # Turn list of inputs into a vector, then add another dimension (
+            # required for the feature input to the LSTM)
+            inputs = torch.cat(inputs).unsqueeze(2)
 
-        # Pass DLSTM output through linear layer. See piece of paper for why
-        # we take the final 'original batch size' outputs. Don't get
-        # confused by this again, you understand it now!!
-        linear_in = h_out[:, -inputs.size(0):, :].view(-1, self.hidden_size)
+            # Feed inputs in to Dilated LSTM
+            if hidden is None:
+                lstm_out, hidden = self.drnn(inputs.double())
+                h_out = hidden[0][-1]
+
+            else:
+                lstm_out, h_out = self.drnn(inputs.double(), hidden)
+
+            # Pass DLSTM output through linear layer. See piece of paper for why
+            # we take the final 'original batch size' outputs. Don't get
+            # confused by this again, you understand it now!!
+            linear_in = h_out[:, -inputs.size(0):, :].view(-1, self.hidden_size)
+            out = self.linear(self.tanh(linear_in))
 
         # If we have been generating contiguous outputs, then we transform
         # num_input_sequences x 48 output vector into a 1 x (
         # num_input_sequences x 48) vector
         if cont:
-            out = self.linear(self.tanh(linear_in)).view(-1)
+            out = out.view(-1)
             output_wseas = torch.cat(output_wseas).view(-1)
             output_levels = torch.cat(output_levels).view(-1)
             actuals = torch.cat(actuals).view(-1)
         else:
-            out = self.linear(self.tanh(linear_in))
             output_wseas = torch.cat(output_wseas)
             output_levels = torch.cat(output_levels)
             actuals = torch.cat(actuals)
