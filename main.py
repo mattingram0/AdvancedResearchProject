@@ -953,7 +953,7 @@ def test(season_no, model_no):
     for r in range(1, num_reps + 1):
         for y in range(1, 5):
             for t in range(1, 8):
-                all_res.append(results["sMAPE"][r][y][t][forecast_length - 1])
+                all_res.append(results["OWA"][r][y][t][forecast_length - 1])
 
     mean = np.around(np.mean(all_res), decimals=3)
     std = np.around(np.std(all_res), decimals=3)
@@ -975,7 +975,7 @@ def test(season_no, model_no):
         for y in range(1, 5):
             for t in range(1, 8):
                 for l in range(1, forecast_length + 1):
-                    all_res[l].append(results["OWA"][r][y][t][l - 1])
+                    all_res[l].append(results["sMAPE"][r][y][t][l - 1])
 
     for l in all_res.keys():
         all_res[l] = np.around(np.mean(all_res[l]), decimals=3)

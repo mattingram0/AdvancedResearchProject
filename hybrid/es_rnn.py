@@ -119,7 +119,7 @@ class ES_RNN(nn.Module):
         )
 
         self.tanh = non_lin.Tanh(hidden_size, hidden_size)
-        self.linear = nn.Linear(hidden_size, output_size)
+        self.linear = nn.Linear(hidden_size, output_size)cell_type
 
         # Used for testing whether the LSTM was actually beneficial
         self.tanh_no_lstm = non_lin.Tanh(336, 336)
