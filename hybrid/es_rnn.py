@@ -5,7 +5,6 @@ from torch.distributions import Normal, Uniform
 from ml import drnn, non_lin
 import sys
 
-squ
 class ES_RNN(nn.Module):
     def __init__(self, output_size, input_size, batch_size, hidden_size,
                  num_layers, features, seasonality_1, seasonality_2, dropout=0,
