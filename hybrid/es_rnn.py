@@ -5,7 +5,7 @@ from torch.distributions import Normal, Uniform
 from ml import drnn, non_lin
 import sys
 
-
+squ
 class ES_RNN(nn.Module):
     def __init__(self, output_size, input_size, batch_size, hidden_size,
                  num_layers, features, seasonality_1, seasonality_2, dropout=0,
@@ -119,7 +119,7 @@ class ES_RNN(nn.Module):
         )
 
         self.tanh = non_lin.Tanh(hidden_size, hidden_size)
-        self.linear = nn.Linear(hidden_size, output_size)cell_type
+        self.linear = nn.Linear(hidden_size, output_size)
 
         # Used for testing whether the LSTM was actually beneficial
         self.tanh_no_lstm = non_lin.Tanh(336, 336)

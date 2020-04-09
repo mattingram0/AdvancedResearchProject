@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="564df88f-763d-43a5-ba2e-b5cd80214a9e" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/hybrid/es_rnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/hybrid/es_rnn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -35,8 +34,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/main.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="555">
-                  <caret line="977" column="52" selection-start-line="977" selection-start-column="52" selection-end-line="977" selection-end-column="52" />
+                <state relative-caret-position="3555">
+                  <caret line="955" column="41" lean-forward="true" selection-start-line="955" selection-end-line="956" />
                   <folding>
                     <element signature="e#0#19#0" expanded="true" />
                     <element signature="e#41101#46943#0" />
@@ -88,8 +87,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/hybrid/es_rnn.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="884">
-                  <caret line="121" column="66" selection-start-line="121" selection-start-column="66" selection-end-line="121" selection-end-column="66" />
+                <state relative-caret-position="17">
+                  <caret line="121" column="57" selection-start-line="121" selection-start-column="57" selection-end-line="121" selection-end-column="57" />
                   <folding>
                     <element signature="e#50#62#0" expanded="true" />
                   </folding>
@@ -231,8 +230,8 @@
         <option value="$PROJECT_DIR$/ml/helpers.py" />
         <option value="$PROJECT_DIR$/hybrid/hybrid.py" />
         <option value="$PROJECT_DIR$/stats/arima.py" />
-        <option value="$PROJECT_DIR$/hybrid/es_rnn.py" />
         <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/hybrid/es_rnn.py" />
       </list>
     </option>
   </component>
@@ -604,7 +603,7 @@
       <workItem from="1585142305243" duration="110462000" />
       <workItem from="1585561243572" duration="17685000" />
       <workItem from="1585640787792" duration="2867000" />
-      <workItem from="1585649706616" duration="123739000" />
+      <workItem from="1585649706616" duration="123959000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit. Git setup.">
       <created>1573219288446</created>
@@ -708,7 +707,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="923473000" />
+    <option name="totallyTimeSpent" value="923693000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1156,23 +1155,23 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/hybrid/es_rnn.py">
+    <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="884">
-          <caret line="121" column="66" selection-start-line="121" selection-start-column="66" selection-end-line="121" selection-end-column="66" />
+        <state relative-caret-position="3555">
+          <caret line="955" column="41" lean-forward="true" selection-start-line="955" selection-end-line="956" />
           <folding>
-            <element signature="e#50#62#0" expanded="true" />
+            <element signature="e#0#19#0" expanded="true" />
+            <element signature="e#41101#46943#0" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
+    <entry file="file://$PROJECT_DIR$/hybrid/es_rnn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="555">
-          <caret line="977" column="52" selection-start-line="977" selection-start-column="52" selection-end-line="977" selection-end-column="52" />
+        <state relative-caret-position="17">
+          <caret line="121" column="57" selection-start-line="121" selection-start-column="57" selection-end-line="121" selection-end-column="57" />
           <folding>
-            <element signature="e#0#19#0" expanded="true" />
-            <element signature="e#41101#46943#0" />
+            <element signature="e#50#62#0" expanded="true" />
           </folding>
         </state>
       </provider>
