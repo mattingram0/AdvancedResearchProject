@@ -2,11 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="564df88f-763d-43a5-ba2e-b5cd80214a9e" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/hybrid/es_rnn_ex.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/matt.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/matt.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hybrid/es_rnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/hybrid/es_rnn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hybrid/hybrid.py" beforeDir="false" afterPath="$PROJECT_DIR$/hybrid/hybrid.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ml/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/ml/helpers.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -35,11 +33,11 @@
     <splitter split-orientation="horizontal" split-proportion="0.5">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/main.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="350">
-                  <caret line="778" column="36" selection-start-line="778" selection-start-column="36" selection-end-line="778" selection-end-column="36" />
+                <state relative-caret-position="-559">
+                  <caret line="65" column="18" lean-forward="true" selection-start-line="65" selection-start-column="18" selection-end-line="65" selection-end-column="18" />
                   <folding>
                     <element signature="e#0#19#0" expanded="true" />
                     <element signature="e#3602#6385#0" />
@@ -50,6 +48,18 @@
                     <element signature="e#20096#23037#0" />
                     <element signature="e#23155#23386#0" />
                     <marker date="1586707324622" expanded="true" signature="1993:2306" ph="..." />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/hybrid/es_rnn_ex.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="68">
+                  <caret line="209" selection-start-line="209" selection-end-line="209" />
+                  <folding>
+                    <element signature="e#50#62#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -95,11 +105,11 @@
       </split-first>
       <split-second>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/hybrid/es_rnn.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="4035">
-                  <caret line="269" column="29" selection-start-line="269" selection-start-column="29" selection-end-line="269" selection-end-column="29" />
+                <state relative-caret-position="-2625">
+                  <caret line="26" column="34" lean-forward="true" selection-start-line="26" selection-start-column="34" selection-end-line="26" selection-end-column="34" />
                   <folding>
                     <element signature="e#50#62#0" expanded="true" />
                   </folding>
@@ -107,11 +117,20 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/ml/drnn.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="330">
+                  <caret line="23" column="23" lean-forward="true" selection-start-line="23" selection-start-column="23" selection-end-line="23" selection-end-column="23" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="280">
-                  <caret line="102" column="39" lean-forward="true" selection-start-line="102" selection-start-column="39" selection-end-line="102" selection-end-column="39" />
+                <state relative-caret-position="1336">
+                  <caret line="380" column="4" selection-start-line="380" selection-start-column="4" selection-end-line="380" selection-end-column="4" />
                   <folding>
                     <element signature="e#0#18#0" expanded="true" />
                   </folding>
@@ -192,7 +211,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/stats/comb_adjusted.py" />
         <option value="$PROJECT_DIR$/stats/naive2_adjusted.py" />
         <option value="$PROJECT_DIR$/stats/holt_adjusted.py" />
         <option value="$PROJECT_DIR$/stats/naive2.py" />
@@ -241,8 +259,9 @@
         <option value="$PROJECT_DIR$/stats/arima.py" />
         <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/ml/helpers.py" />
-        <option value="$PROJECT_DIR$/hybrid/es_rnn.py" />
         <option value="$PROJECT_DIR$/hybrid/hybrid.py" />
+        <option value="$PROJECT_DIR$/hybrid/es_rnn.py" />
+        <option value="$PROJECT_DIR$/hybrid/es_rnn_ex.py" />
       </list>
     </option>
   </component>
@@ -264,6 +283,11 @@
             <path>
               <item name="AdvancedResearchProject" type="b2602c69:ProjectViewProjectNode" />
               <item name="AdvancedResearchProject" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="AdvancedResearchProject" type="b2602c69:ProjectViewProjectNode" />
+              <item name="AdvancedResearchProject" type="462c0819:PsiDirectoryNode" />
+              <item name="hybrid" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="AdvancedResearchProject" type="b2602c69:ProjectViewProjectNode" />
@@ -616,7 +640,7 @@
       <workItem from="1585640787792" duration="2867000" />
       <workItem from="1585649706616" duration="131134000" />
       <workItem from="1586451125501" duration="16227000" />
-      <workItem from="1586529763785" duration="23045000" />
+      <workItem from="1586529763785" duration="28551000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit. Git setup.">
       <created>1573219288446</created>
@@ -720,7 +744,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="970140000" />
+    <option name="totallyTimeSpent" value="975646000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -751,7 +775,7 @@
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50532484" side_tool="true" weight="0.34300518" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.32435232" />
-      <window_info anchor="bottom" x="9" y="580" width="1398" height="242" id="Python Console" order="12" sideWeight="0.4946752" weight="0.29948187" />
+      <window_info active="true" anchor="bottom" x="9" y="580" width="1398" height="242" id="Python Console" order="12" sideWeight="0.4946752" visible="true" weight="0.33367875" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -868,7 +892,6 @@
     <SUITE FILE_PATH="coverage/AdvancedResearchProject$Pandas.coverage" NAME="Pandas Coverage Results" MODIFIED="1573231911049" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/stats" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/stats/naive2.py" />
     <entry file="file://$PROJECT_DIR$/stats/naive1.py" />
     <entry file="file://$PROJECT_DIR$/stats/holtDamped.py" />
     <entry file="file://$PROJECT_DIR$/stats/holt_adjusted.py" />
@@ -985,13 +1008,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="387">
           <caret line="80" column="34" lean-forward="true" selection-start-line="80" selection-start-column="34" selection-end-line="80" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ml/drnn.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2111">
-          <caret line="71" column="21" selection-start-line="71" selection-start-column="21" selection-end-line="71" selection-end-column="24" />
         </state>
       </provider>
     </entry>
@@ -1166,30 +1182,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/hybrid/es_rnn.py">
+    <entry file="file://$PROJECT_DIR$/ml/drnn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3360">
-          <caret line="224" column="49" selection-start-line="224" selection-start-column="49" selection-end-line="224" selection-end-column="49" />
-          <folding>
-            <element signature="e#50#62#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="280">
-          <caret line="102" column="39" lean-forward="true" selection-start-line="102" selection-start-column="39" selection-end-line="102" selection-end-column="39" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="330">
+          <caret line="23" column="23" lean-forward="true" selection-start-line="23" selection-start-column="23" selection-end-line="23" selection-end-column="23" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="350">
-          <caret line="778" column="36" selection-start-line="778" selection-start-column="36" selection-end-line="778" selection-end-column="36" />
+        <state relative-caret-position="-559">
+          <caret line="65" column="18" lean-forward="true" selection-start-line="65" selection-start-column="18" selection-end-line="65" selection-end-column="18" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
             <element signature="e#3602#6385#0" />
@@ -1200,6 +1203,36 @@
             <element signature="e#20096#23037#0" />
             <element signature="e#23155#23386#0" />
             <marker date="1586707324622" expanded="true" signature="1993:2306" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1336">
+          <caret line="380" column="4" selection-start-line="380" selection-start-column="4" selection-end-line="380" selection-end-column="4" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hybrid/es_rnn.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3360">
+          <caret line="224" column="49" selection-start-line="224" selection-start-column="49" selection-end-line="224" selection-end-column="49" />
+          <folding>
+            <element signature="e#50#62#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hybrid/es_rnn_ex.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="209" selection-start-line="209" selection-end-line="209" />
+          <folding>
+            <element signature="e#50#62#0" expanded="true" />
           </folding>
         </state>
       </provider>

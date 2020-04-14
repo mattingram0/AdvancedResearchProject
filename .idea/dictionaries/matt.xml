@@ -16,6 +16,8 @@
       <w>resample</w>
       <w>reseasonalise</w>
       <w>scaler</w>
+      <w>seasonalise</w>
+      <w>seasonals</w>
       <w>stationarity</w>
       <w>transf</w>
       <w>undifference</w>
