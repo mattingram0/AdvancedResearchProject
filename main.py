@@ -49,24 +49,27 @@ def load_data(filename, mult_ts):
     else:
         return pd.read_csv(
             filename, parse_dates=["time"],
-            usecols=["time", "price actual"], infer_datetime_format=True
+            usecols=["time", "total load actual"], infer_datetime_format=True
         )
 
 
 def main():
+    # helpers.plot_es_comp()
     # helpers.plot_one_test()
     test(int(sys.argv[1]), int(sys.argv[2]))
     # file_path = os.path.abspath(os.path.dirname(__file__))
     # data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
-    # df = load_data(data_path, True)
+    # df = load_data(data_path, False)
     # df = df.set_index('time').asfreq('H')
     # df.replace(0, np.NaN, inplace=True)
     # df.interpolate(inplace=True)
-    # # plot_sample(df)
-    # # sys.exit(0)
+    # deseason(df)
+    # typical_plot(df)
+    # sys.exit(0)
+    # sys.exit(0)
     # # helpers.plot_forecasts(df, "Winter", 2, 1)
     # # helpers.plot_forecasts(df, "Summer", 1, 1)
-    # #helpers.plot_48_results()
+    # # helpers.plot_48_results()
     # # identify_arima(df, False)
     # hybrid.run(df, False)
 
@@ -273,7 +276,7 @@ def plot_sample(df):
     plt.show()
 
     # Plot spring weeks
-    fig, axes = plt.subplots(4, 3, figsize=(12.8, 9.6), dpi=250)
+    fig, axes = plt.subplots(4, 3, figsize=(20, 15), dpi=250)
     for i, (ax, week) in enumerate(zip(axes.flatten(), spring_weeks)):
         if i == 0:
             ax.set_title("March")
@@ -293,7 +296,7 @@ def plot_sample(df):
     plt.show()
 
     # Plot summer weeks
-    fig, axes = plt.subplots(4, 3, figsize=(12.8, 9.6), dpi=250)
+    fig, axes = plt.subplots(4, 3, figsize=(20, 15), dpi=250)
     for i, (ax, week) in enumerate(zip(axes.flatten(), summer_weeks)):
         if i == 0:
             ax.set_title("June")
@@ -313,7 +316,7 @@ def plot_sample(df):
     plt.show()
 
     # Plot autumn weeks
-    fig, axes = plt.subplots(4, 3, figsize=(12.8, 9.6), dpi=250)
+    fig, axes = plt.subplots(4, 3, figsize=(20, 15), dpi=250)
     for i, (ax, week) in enumerate(zip(axes.flatten(), autumn_weeks)):
         if i == 0:
             ax.set_title("September")
@@ -335,7 +338,9 @@ def plot_sample(df):
 
 # Plot an example week from each season, and plot the
 def typical_plot(df):
-    # Typical weeks TODO - REDO AS YEARS ARE WRONG
+    # Typical weeks
+    font = {'size': 20}
+    plt.rc('font', **font)
     seas_dict = {0: "Winter", 1: "Spring", 2: "Summer", 3: "Autumn"}
     years = [df.loc["2015-12-01 00:00:00+01:00":"2016-02-29 23:00:00+01:00"],
              df.loc["2015-03-01 00:00:00+01:00":"2015-05-31 23:00:00+01:00"],
@@ -372,41 +377,59 @@ def typical_plot(df):
 
 # Plot an exaple test/training data split, for two train periods
 def train_test_split(df):
-    fig, axes = plt.subplots(2, 1, figsize=(20, 15), dpi=250)
+    font = {'size': 20}
+    plt.rc('font', **font)
+    fig, axes = plt.subplots(3, 1, figsize=(20, 15), dpi=250)
     axes[0].plot(
+        df.loc["2015-01-01 00:00:00+01:00":"2015-02-14 23:00:00+01:00"],
+        label="Training"
+    )
+    axes[0].plot(
+        df.loc["2015-02-15 00:00:00+01:00":"2015-02-21 23:00:00+01:00"],
+        label="Validation", color="C2"
+    )
+    axes[0].plot(
+        df.loc["2015-02-22 00:00:00+01:00":"2015-02-28 23:00:00+01:00"],
+        label="Test", color="C1"
+    )
+
+    axes[1].plot(
         df.loc["2015-01-01 00:00:00+01:00":"2015-02-20 23:00:00+01:00"],
         label="Test 1 - Training"
     )
-    axes[0].plot(
+    axes[1].plot(
         df.loc["2015-02-21 00:00:00+01:00":"2015-02-22 23:00:00+01:00"],
         label="Test 1 - Test"
     )
-    axes[0].plot(
+    axes[1].plot(
         df.loc["2015-02-23 00:00:00+01:00":"2015-02-28 23:00:00+01:00"],
         label="Test 1 - Unused",
         color="#7f7f7f"
     )
 
-    axes[1].plot(
+    axes[2].plot(
         df.loc["2015-01-01 00:00:00+01:00":"2015-02-24 23:00:00+01:00"],
         label="Test 5 - Training"
     )
-    axes[1].plot(
+    axes[2].plot(
         df.loc["2015-02-25 00:00:00+01:00":"2015-02-26 23:00:00+01:00"],
         label="Test 5 - Test"
     )
-    axes[1].plot(
+    axes[2].plot(
         df.loc["2015-02-27 00:00:00+01:00":"2015-02-28 23:00:00+01:00"],
         label="Test 5 - Unused",
         color="#7f7f7f"
     )
 
-    axes[0].set_title("Year 1 - Winter - Test 1")
-    axes[1].set_title("Year 1 - Winter - Test 5")
+    axes[0].set_title("Year 1 - Winter - Training/Validation/Test Split")
+    axes[1].set_title("Year 1 - Winter - Test 1")
+    axes[2].set_title("Year 1 - Winter - Test 5")
     axes[0].set_xticks([])
     axes[1].set_xticks([])
+    axes[2].set_xticks([])
     axes[0].legend(loc="best")
     axes[1].legend(loc="best")
+    axes[2].legend(loc="best")
     plt.show()
 
 
@@ -624,7 +647,9 @@ def deseason(df):
     )
 
     # Create figure
-    fig = plt.figure(figsize=(12.8, 9.6), dpi=250)
+    font = {'size': 20}
+    plt.rc('font', **font)
+    fig = plt.figure(figsize=(20, 15), dpi=250)
     gs = fig.add_gridspec(2, 2)
     ax_1 = fig.add_subplot(gs[0, :])
     ax_2 = fig.add_subplot(gs[1, 0])
@@ -697,9 +722,9 @@ def deseason(df):
     ax_1.set_xticks([])
     ax_1.set_title("Year 1 - Winter - Actual")
     ax_2.set_xticks([])
-    ax_2.set_title("Year 1 - Winter - Hourly Seasonality Removed")
+    ax_2.set_title("Hourly Seasonality Removed")
     ax_3.set_xticks([])
-    ax_3.set_title("Year 1 - Winter - Weekly Seasonality Removed")
+    ax_3.set_title("Weekly Seasonality Removed")
     plt.show()
 
     # Plot the ACF and PACF of the deseasonalised data

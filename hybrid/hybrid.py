@@ -6,7 +6,7 @@ import sys
 import os
 import json
 
-from ml.helpers import pinball_loss, plot_test
+from ml.helpers import pinball_loss, plot_test, plot_es_comp, plot_gen_forecast
 from stats.helpers import split_data, deseasonalise, reseasonalise
 from stats.errors import sMAPE, MASE, OWA
 from stats.naive import naive_2
@@ -85,8 +85,29 @@ def es_rnn(data, forecast_length, seasonality, ensemble, multi_ts, skip_lstm):
         auto_rate_threshold, min_epochs_before_change, forecast_input,
         variable_rates, ensemble, multi_ts, skip_lstm)
 
+    plot_es_comp(train_data["total load actual"].tolist(), lstm.w_seasons,
+                 lstm.levels)
+
     # Set model in evaluation (prediction) mode
     lstm.eval()
+
+    results = lstm.predict(forecast_input, window_size, 48)
+    pred, act, out_level, out_seas, all_levels, all_seas, lstm_out, inputs = results
+    # print(type(forecast_input), forecast_input.size())
+    # print(type(pred), pred.size())
+    # print(type(act), act.size())
+    # print(type(out_level), out_level.size())
+    # print(type(out_seas), out_seas.size())
+    # print(type(all_levels), len(all_levels))
+    # print(type(all_seas), len(all_seas))
+    # print(type(lstm_out), lstm_out.size())
+    # print(type(inputs), inputs.size())
+
+    plot_gen_forecast(forecast_input.tolist(), act.squeeze().tolist(),
+                      all_seas, out_seas.squeeze().tolist(), all_levels,
+                      out_level.squeeze().tolist(), inputs.view(-1).tolist(),
+                      lstm_out.squeeze().tolist(), pred.squeeze().tolist())
+    sys.exit(0)
 
     # Return prediction
     return prediction
@@ -480,9 +501,7 @@ def train_and_predict(lstm, data, window_size, output_size, lvp, loss_func,
             if epoch == num_epochs - 1:
                 prediction, *_ = lstm.predict(forecast_input, window_size,
                                               output_size, skip_lstm=skip_lstm)
-                prediction, *_ = pd.Series(
-                    prediction.squeeze(0).detach().tolist()
-                )
+                prediction = pd.Series(prediction.squeeze(0).detach().tolist())
 
     if ensemble:
         return pd.Series(np.mean(pred_ensemble, axis=0))

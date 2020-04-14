@@ -2,7 +2,7 @@
 import torch
 import torch.nn as nn
 from torch.distributions import Normal, Uniform
-from ml import drnn, non_lin
+from ml import drnn, non_lin, helpers
 import sys
 
 class ES_RNN(nn.Module):
@@ -124,6 +124,9 @@ class ES_RNN(nn.Module):
         self.tanh_no_lstm = non_lin.Tanh(336, 336)
         self.linear_no_lstm = nn.Linear(336, output_size)
 
+        # TODO REMOVE
+        self.counter = 0
+
     # Call once at the beginning of every epoch
     def init_hidden_states(self):
         self.hidden = (
@@ -137,6 +140,8 @@ class ES_RNN(nn.Module):
     # TODO - add Trend as well!! See if improved performance
     def forward(self, x, feature, window_size, output_size, lvp=0,
                 hidden=None, std=0.001, skip_lstm=False):
+        self.counter += 1
+
         # Forward receives the entire sequence x = [seq_len]
 
         # Get the parameters of the current feature
@@ -222,6 +227,11 @@ class ES_RNN(nn.Module):
             inputs.append(noisy_norm_input.unsqueeze(0))  # Unsqueeze b4 cat
             labels.append(noisy_norm_label.unsqueeze(0))
 
+            # Used for one of the plotting functions, ignore
+            if i == 7 * 24 * 4:
+                j = i
+                data_subset = x[i - (7 * 24): i + (3 * 7 * 24)]
+
         labels = torch.cat(labels)
 
         if skip_lstm:
@@ -252,6 +262,13 @@ class ES_RNN(nn.Module):
             # Pass DLSTM output through non-linear and linear layers
             linear_in = h_out[:, -inputs.size(0):, :].view(-1, self.hidden_size)
             out = self.linear(self.tanh(linear_in))
+
+        # Used for one of the plotting functions, ignore
+        rnn_in = inputs[j]
+        data_out = labels[j]
+        rnn_out = out[j]
+        if self.counter == 25:
+            helpers.plot_sliding_window(data_subset, rnn_in, data_out, rnn_out)
 
         # Save the level and seasonality values so that we can use them to make
         # predictions
@@ -385,5 +402,6 @@ class ES_RNN(nn.Module):
             output_wseas,   # 48 hour seasonality
             levels,         # Levels for all of x
             w_seasons,      # Seasonality for all x
-            torch.exp(out)            # Output from LSTM
+            out,            # Output from LSTM
+            inputs  # TODO MAKE SURE TO REMOVE!!!
         )

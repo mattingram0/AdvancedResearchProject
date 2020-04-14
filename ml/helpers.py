@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 import json
+from math import sin
 
 from os import walk
 
@@ -24,6 +25,204 @@ def plot_one_test():
     test_path = "/Users/matt/Projects/AdvancedResearchProject/test/"
     with open(test_path) as f:
         plot_test(json.load(f), window_size, output_size, True)
+
+
+def plot_sliding_window(data_subset, rnn_in, data_out, out):
+    font = {'size': 20}
+    plt.rc('font', **font)
+    fig, axes = plt.subplots(2, 1, figsize=(20, 15), dpi=250)
+
+    for ax in axes:
+        ax.set_xticks([])
+
+    # Plot the input data
+    axes[0].plot(data_subset.tolist(), label="Actual Data: " + r'$x_t$')
+
+    # Add the sliding windows
+    axes[0].plot([168, 504, 504, 168, 168],
+                 [20000, 20000, 39500, 39500, 20000],
+                 linestyle="--", label="Input Window", color="C1")
+    axes[0].plot([504, 552, 552, 504, 504],
+                [20000, 20000, 39500, 39500, 20000],
+                linestyle="--", label="Output Window", color="C2")
+    axes[0].legend(loc="upper left")
+
+    axes[1].plot([i for i in range(336)], rnn_in.squeeze().tolist(),
+                 label="dLSTM Input: " + r'$y_t$', color="C1")
+    axes[1].plot([i for i in range(336, 384)], out.tolist(),
+                 label="dLSTM Output: " + r'$\hat{y_t}$', color="C3")
+    axes[1].plot([i for i in range(336, 384)], data_out.tolist(),
+                 label="Actual Output: " + r'$y_t$', color="C2")
+    axes[1].legend(loc="upper left")
+    axes[0].set_xticks([])
+    axes[1].set_xticks([])
+    plt.show()
+
+
+def plot_gen_forecast(input, output, seas_in, seas_out, level_in, level_out,
+                      lstm_in, lstm_out, pred):
+
+    # Set the font size
+    font = {'size': 20}
+    plt.rc('font', **font)
+    fig, axes = plt.subplots(4, 1, figsize=(20, 15), dpi=250)
+    for ax in axes:
+        ax.set_xticks([])
+
+    # Plot Actual Data:
+    axes[0].plot([i for i in range(384)], input,
+                 label="Actual Input: " + r'$x_t$')
+    axes[0].plot([i for i in range(336, 384)], output,
+                 label="Actual Output: " + r'$x_t$', color="C2")
+    axes[0].plot([i for i in range(336, 384)], pred,
+                 label="Forecast: " + r'$\hat{x_t}$', color="C1")
+    axes[0].axvline(336, color="C5", linestyle="--")
+
+    # Plot levels
+    axes[1].plot([i for i in range(384)], level_in,
+                 label="Input Level: " + r'$l_t$')
+    axes[1].plot([i for i in range(336, 384)], level_out,
+                 label="Extrapolated Output Level: " + r'$\hat{l_t}$')
+    axes[1].axvline(336, color="C5", linestyle="--")
+
+    # Plot seasonality
+    axes[2].plot([i for i in range(384)], seas_in,
+                 label="Input Seasonality: " + r'$s_t$')
+    axes[2].plot([i for i in range(336, 384)], seas_out,
+                 label="Repeated Output Seasonality: " + r'$\hat{s_t}$')
+    axes[2].axvline(336, color="C5", linestyle="--")
+    axes[2].plot([168, 216, 216, 168, 168], [2.05, 2.05, 3.3, 3.3, 2.05],
+                 color="C1", linestyle="--")
+
+    # Plot RNN
+    axes[3].plot([i for i in range(336)], lstm_in,
+                 label="dLSTM Input: " + r'$y_t$')
+    axes[3].plot([i for i in range(336, 384)], lstm_out,
+                 label="dLSTM Output: " + r'$\hat{y_t}$')
+    axes[3].axvline(336, color="C5", linestyle="--")
+
+    for ax in axes:
+        ax.legend(loc="upper left")
+
+    # Plot
+    plt.show()
+
+
+def plot_es_comp(data, seasonality, levels):
+    # Create figure
+    font = {'size': 20}
+    plt.rc('font', **font)
+
+    fig = plt.figure(figsize=(20, 15), dpi=250)
+
+    # Grid of 4 rows by 5 columns
+    gs = fig.add_gridspec(3, 5)
+    for i in range(3):
+        # In each column: before break occupies 3/5, after 2/5
+        ax_1 = fig.add_subplot(gs[i, :3])
+        ax_2 = fig.add_subplot(gs[i, 3:])
+        ax_1.set_xticks([])
+        ax_2.set_xticks([])
+        if i == 2:
+            # Remove right spline of first axis
+            ax_1.spines['right'].set_visible(False)
+
+            # Remove left spline, label and ticks of the second axis
+            ax_2.spines['left'].set_visible(False)
+            ax_2.tick_params(axis='y', which='both', left=False, right=False,
+                             labelleft=False)
+
+            # Ensure limits go to ends of x axis
+            ax_1.set_xlim(0, 504)
+            ax_2.set_xlim(504, 840)
+
+            # Add dashed line with tick at end of initial seasonality
+            ax_1.axvline(168, color="black", linestyle='--')
+            ax_1.set_xticks(list(ax_1.get_xticks()) + [168])
+            ax_1.set_xlim(0, 504)  # Need to do this
+
+            # Add the diagonal line breaks. So painful
+            d = .005
+            kwargs = dict(transform=ax_1.transAxes, color='k', clip_on=False,
+                          linewidth=1)
+            ax_1.plot((1 - d + 0.004, 1 + d - 0.003),
+                      (1 - d - 0.003, 1 + d + 0.003),
+                      **kwargs)
+            ax_1.plot((1 - d + 0.004, 1 + d - 0.003),
+                      (-d - 0.003, d + + 0.003),
+                      **kwargs)
+
+            kwargs.update(transform=ax_2.transAxes)
+            ax_2.plot((-d + 0.003, d - 0.003), (1 - d - 0.003, 1 + d + 0.003),
+                      **kwargs)
+            ax_2.plot((-d + 0.003, d - 0.003), (-d - 0.003, d + 0.003),
+                      **kwargs)
+
+            ax_1.plot([i for i in range(168)], seasonality[:168],
+                      label="Initial Seasonality Parameters: " +
+                            r'$s_1, s_2, ..., s_{168}$', color="C2")
+            ax_1.plot([i for i in range(168, 504)],
+                              seasonality[168:504],
+                              color="C1")
+            ax_2.plot([i for i in range(504, 840)], seasonality[-336:],
+                      color="C1",
+                      label="Seasonality: " + r'$s_{t+168} = \gamma \frac{'
+                                              r'x_t}{l_{t-1}} + (1 - '
+                                              r'\gamma)s_t$')
+
+            ax_1.legend(loc="upper left")
+            ax_2.legend(loc="upper right")
+            # Create two legends for readability
+            # first_legend = ax_1.legend(handles=[init], loc='upper left')
+            # ax_1.add_artist(first_legend)
+            # ax_1.legend(handles=[seas], loc='upper right')
+        else:
+            # Hacky. Left spine (with ticks) at 0, right spine at the left
+            ax_1.spines['right'].set_position(('data', -168))
+            ax_1.spines['left'].set_position('zero')
+
+            # Remove left spline, label and ticks of the second axis
+            ax_2.spines['left'].set_visible(False)
+            ax_2.tick_params(axis='y', which='both', left=False, right=False,
+                             labelleft=False)
+
+            # Ensure limits go to ends of x axis
+            ax_1.set_xlim(-168, 336)
+            ax_2.set_xlim(336, 672)
+
+            # Add the diagonal line breaks. So painful
+            d = .005
+            kwargs = dict(transform=ax_1.transAxes, color='k', clip_on=False,
+                          linewidth=1)
+            ax_1.plot((1 - d + 0.004, 1 + d - 0.003),
+                      (1 - d - 0.003, 1 + d + 0.003),
+                      **kwargs)
+            ax_1.plot((1 - d + 0.004, 1 + d - 0.003),
+                      (-d - 0.003, d + + 0.003),
+                      **kwargs)
+
+            kwargs.update(transform=ax_2.transAxes)
+            ax_2.plot((-d + 0.003, d - 0.003), (1 - d - 0.003, 1 + d + 0.003),
+                      **kwargs)
+            ax_2.plot((-d + 0.003, d - 0.003), (-d - 0.003, d + 0.003),
+                      **kwargs)
+
+            if i == 0:
+                ax_1.plot([i for i in range(336)], data[:336])
+                ax_2.plot([i for i in range(336, 672)], data[-336:],
+                          label="Actual Data: " + r'$x_t$')
+            else:
+                ax_1.plot([i for i in range(336)], levels[:336], color="C3")
+                ax_2.plot([i for i in range(336, 672)], levels[-336:],
+                          color="C3",
+                          label="Level: " +
+                                r'$l_t = \alpha \frac{x_t}{s_t} + (1 - '
+                                r'\alpha)l_{t-1}$'
+                          )
+            ax_2.legend(loc="upper right")
+
+    # Show the plots
+    plt.show()
 
 
 # This function take a single results dictionary (i.e the result from a week
