@@ -13,6 +13,7 @@ from stats.naive import naive_2
 from math import sqrt
 
 from hybrid.es_rnn import ES_RNN
+from hybrid.es_rnn_ex import ES_RNN_EX
 
 
 # Give the model the training data, the forecast length and the seasonality,
@@ -23,8 +24,8 @@ from hybrid.es_rnn import ES_RNN
 # I've coded it)
 def es_rnn(data, forecast_length, seasonality, ensemble, multi_ts, skip_lstm):
     # Hyperparameters - determined experimentally
-    num_epochs = 27
-    init_learning_rate = 0.01
+    num_epochs = 30
+    init_learning_rate = 0.002
     input_size = 1
     hidden_size = 40
     num_layers = 4
@@ -35,7 +36,7 @@ def es_rnn(data, forecast_length, seasonality, ensemble, multi_ts, skip_lstm):
     grad_clipping = 20
     auto_lr = False
     variable_lr = True
-    variable_rates = {7: 5e-3, 18: 1e-3, 22: 3e-4}
+    variable_rates = {15: 1e-3, 30: 5e-4, 35: 3e-4}
     auto_rate_threshold = 1.005
     min_epochs_before_change = 2
     residuals = tuple([[1, 3]])
@@ -85,14 +86,14 @@ def es_rnn(data, forecast_length, seasonality, ensemble, multi_ts, skip_lstm):
         auto_rate_threshold, min_epochs_before_change, forecast_input,
         variable_rates, ensemble, multi_ts, skip_lstm)
 
-    plot_es_comp(train_data["total load actual"].tolist(), lstm.w_seasons,
-                 lstm.levels)
-
-    # Set model in evaluation (prediction) mode
-    lstm.eval()
-
-    results = lstm.predict(forecast_input, window_size, 48)
-    pred, act, out_level, out_seas, all_levels, all_seas, lstm_out, inputs = results
+    # plot_es_comp(train_data["total load actual"].tolist(), lstm.w_seasons,
+    #              lstm.levels)
+    #
+    # # Set model in evaluation (prediction) mode
+    # lstm.eval()
+    #
+    # results = lstm.predict(forecast_input, window_size, 48)
+    # pred, act, out_level, out_seas, all_levels, all_seas, lstm_out = results
     # print(type(forecast_input), forecast_input.size())
     # print(type(pred), pred.size())
     # print(type(act), act.size())
@@ -103,20 +104,20 @@ def es_rnn(data, forecast_length, seasonality, ensemble, multi_ts, skip_lstm):
     # print(type(lstm_out), lstm_out.size())
     # print(type(inputs), inputs.size())
 
-    plot_gen_forecast(forecast_input.tolist(), act.squeeze().tolist(),
-                      all_seas, out_seas.squeeze().tolist(), all_levels,
-                      out_level.squeeze().tolist(), inputs.view(-1).tolist(),
-                      lstm_out.squeeze().tolist(), pred.squeeze().tolist())
-    sys.exit(0)
+    # plot_gen_forecast(forecast_input.tolist(), act.squeeze().tolist(),
+    #                   all_seas, out_seas.squeeze().tolist(), all_levels,
+    #                   out_level.squeeze().tolist(), inputs.view(-1).tolist(),
+    #                   lstm_out.squeeze().tolist(), pred.squeeze().tolist())
 
     # Return prediction
     return prediction
 
 
 # General function used to do testing and tweaking
-def run(df, multi_ts):
+def run(df, multi_ts, ex):
     # Optionally can supply a year as a command line argument
-    year = -1 if len(sys.argv) == 2 else int(sys.argv[2])
+    year = -1 if len(sys.argv) < 3 else int(sys.argv[2])
+    season = -1 if len(sys.argv) < 4 else int(sys.argv[3])
 
     # all_data = {Season: [Year1, ...]}
     all_data = split_data(df)
@@ -143,15 +144,8 @@ def run(df, multi_ts):
         all_data["Autumn"][year if year >= 0 else 2]
     ]
 
-    # For now, just use one of the training sets
-    train_data = training_sets[0]
-    window_size = 336
-    output_size = 48
-    batch_size = len(train_data) - window_size - output_size + 1
-    write_results = False
-    plot = True
-    ensemble = False
-    skip_lstm = False
+    # Default to summer if no month provided in the input arguments
+    data = valid_sets[season if season >= 0 else 2]
 
     # Plot a result #TODO HOW TO PLOT RUN_TEST RESULT FROM HAM
     # test_path = "/Users/matt/Projects/AdvancedResearchProject/test" \
@@ -160,48 +154,56 @@ def run(df, multi_ts):
     #     plot_test(json.load(f), window_size, output_size, True)
     # sys.exit(0)
 
+    # For now, just use one of the training sets
+    window_size = 336
+    output_size = 48
+    write_results = True
+    plot = False
+    ensemble = False
+    skip_lstm = False
+    init_params = True
 
     # Training parameters
-    num_epochs = 27
-    init_learning_rate = 0.01
-    input_size = 1
+    num_epochs = 50
+    init_learning_rate = 0.1
+    input_size = 4
     hidden_size = 40
     num_layers = 4
     dilations = [1, 4, 24, 168]
-    level_variability_penalty = 100
+    level_variability_penalty = 80
     percentile = 0.49
     loss_func = pinball_loss
     grad_clipping = 20
     auto_lr = False  # Automatically adjust learning rates
-    variable_lr = True  # Use list of epoch/rate pairs
+    variable_lr = False  # Use list of epoch/rate pairs
     variable_rates = {7: 5e-3, 18: 1e-3, 22: 3e-4}
+
     auto_rate_threshold = 1.005  # If loss(x - 1) < 1.005 * loss(x) reduce rate
     min_epochs_before_change = 2
     residuals = tuple([[1, 3]])  # Residual connection from output of 2nd layer
     # to output of 4th layer
 
-    data = valid_sets[1]
-
-    test_model_week(data, output_size, input_size, batch_size, hidden_size,
+    test_model_week(data, output_size, input_size, hidden_size,
                     num_layers, True, dilations, data.columns, 24, 168,
                     residuals, window_size, level_variability_penalty,
                     loss_func, num_epochs, init_learning_rate, percentile,
                     auto_lr, variable_lr, auto_rate_threshold,
                     min_epochs_before_change, variable_rates, grad_clipping,
-                    write_results, plot, year, ensemble, multi_ts, skip_lstm)
+                    write_results, plot, year, season, ensemble, multi_ts,
+                    skip_lstm, ex, init_params)
 
 
 # If output_size != 48 then this is broken. Pass in valid data or test
 # data!! (i.e all up to the end of the valid section/test section).
-def test_model_week(data, output_size, input_size, batch_size, hidden_size,
+def test_model_week(data, output_size, input_size, hidden_size,
                     num_layers, batch_first, dilations, features, seasonality1,
                     seasonality2, residuals, window_size,
                     level_variability_penalty, loss_func, num_epochs,
                     init_learning_rate, percentile, auto_lr, variable_lr,
                     auto_rate_threshold, min_epochs_before_change,
                     variable_rates, grad_clipping, write_results, plot,
-                    year, ensemble, multi_ts, skip_lstm):
-
+                    year, season, ensemble, multi_ts, skip_lstm, ex,
+                    init_params):
     es_rnn_predictions = []
     es_rnn_smapes = []
     es_rnn_mases = []
@@ -214,43 +216,63 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
 
     results = {i: {} for i in range(1, 8)}
 
-    for i in range(8, 1, -1):
+    for i in range(3, 1, -1):
         # Figure out start and end points of the data
         end_train = -(i * 24)
         start_test = -(i * 24 + window_size)
         end_test = -(i * 24 - output_size) if i != 2 else None
 
         train_data = data[:end_train]
-        test_data = torch.tensor(
-            data["total load actual"][start_test:end_test],
-            dtype=torch.double
-        )
         mase_data = data["total load actual"][:end_test]
 
-        # Determine initial parameter values. Can probably improved the
-        # inital smoothing coefficients to be time series specific
-        init_seas = {}
-        init_l_smooth = {}
-        init_s_smooth = {}
-        for c in data.columns:
-            deseas, indic = deseasonalise(train_data[c], 168, "multiplicative")
-            init_seas[c] = indic
-            init_l_smooth[c] = -0.8
-            init_s_smooth[c] = -0.2
+        if init_params:
+            # Determine initial parameter values. Can probably improved the
+            # inital smoothing coefficients to be time series specific
+            init_seas = {}
+            init_l_smooth = {}
+            init_s_smooth = {}
+            for c in data.columns:
+                deseas, indic = deseasonalise(train_data["total load actual"],
+                                              168, "multiplicative")
+                init_seas[c] = indic
+                init_l_smooth[c] = -2
+                init_s_smooth[c] = -1
 
-            if c == "total load actual":
-                train_deseas = deseas
-                indices = indic
+                if c == "total load actual":
+                    train_deseas = deseas
+                    indices = indic
+        else:
+            deseas, indic = deseasonalise(train_data["total load actual"],
+                                          168, "multiplicative")
+            train_deseas = deseas
+            indices = indic
+            init_seas = None
+            init_l_smooth = None
+            init_s_smooth = None
+
+        # Batch size properly calculated here, as training data size changes
+        batch_size = len(train_data["total load actual"]) - window_size - \
+                     output_size + 1
 
         # Create a fresh model
-        lstm = ES_RNN(
-            output_size, input_size, batch_size, hidden_size, num_layers,
-            batch_first=batch_first, dilations=dilations, features=features,
-            seasonality_1=seasonality1, seasonality_2=seasonality2,
-            residuals=residuals, init_seasonality=init_seas,
-            init_level_smoothing=init_l_smooth,
-            init_seas_smoothing=init_s_smooth
-        ).double()
+        if ex:
+            lstm = ES_RNN_EX(
+                output_size, input_size, batch_size, hidden_size,
+                num_layers, features, seasonality2, batch_first=batch_first,
+                dilations=dilations, residuals=residuals,
+                init_seasonality=init_seas, init_level_smoothing=init_l_smooth,
+                init_seas_smoothing=init_s_smooth
+            ).double()
+        else:
+            lstm = ES_RNN(
+                output_size, input_size, batch_size, hidden_size, num_layers,
+                batch_first=batch_first, dilations=dilations,
+                features=features,
+                seasonality_1=seasonality1, seasonality_2=seasonality2,
+                residuals=residuals, init_seasonality=init_seas,
+                init_level_smoothing=init_l_smooth,
+                init_seas_smoothing=init_s_smooth
+            ).double()
 
         # Register gradient clipping function
         for p in lstm.parameters():
@@ -262,22 +284,50 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
 
         print("----- TEST", str(9 - i), "-----")
 
-        # Train the model.
-        train_and_predict(lstm, train_data, window_size, output_size,
-                          level_variability_penalty, loss_func, num_epochs,
-                          init_learning_rate, percentile, auto_lr, variable_lr,
-                          auto_rate_threshold, min_epochs_before_change,
-                          test_data, variable_rates, ensemble, multi_ts,
-                          skip_lstm)
+        # Train the model. Discard prediction here (used in proper function)
+        if ex:
+            test_data = data[start_test:end_test]
+            _, losses = train_and_predict_ex(lstm, data, window_size,
+                                             output_size,
+                                             level_variability_penalty,
+                                             loss_func,
+                                             num_epochs, init_learning_rate,
+                                             percentile,
+                                             auto_lr, variable_lr,
+                                             auto_rate_threshold,
+                                             min_epochs_before_change,
+                                             test_data,
+                                             variable_rates, ensemble)
+        else:
+            test_data = torch.tensor(
+                data["total load actual"][start_test:end_test],
+                dtype=torch.double
+            )
+            _, losses = train_and_predict(lstm, train_data, window_size,
+                                          output_size,
+                                          level_variability_penalty,
+                                          loss_func, num_epochs,
+                                          init_learning_rate, percentile,
+                                          auto_lr, variable_lr,
+                                          auto_rate_threshold,
+                                          min_epochs_before_change,
+                                          test_data, variable_rates, ensemble,
+                                          multi_ts,
+                                          skip_lstm)
 
         # Set model into evaluation mode
         lstm.eval()
 
         # Make ES_RNN Prediction
         prediction, actual, out_levels, out_seas, all_levels, all_seasons, \
-        rnn_out = lstm.predict(
-            test_data, window_size, output_size, skip_lstm=skip_lstm
-        )
+        rnn_out = lstm.predict(test_data, window_size, output_size)
+
+        # Convert to correct form for results saving
+        if ex:
+            test_data = torch.tensor(
+                data["total load actual"][start_test:end_test],
+                dtype=torch.double
+            )
 
         # [[<- 48 ->],] generated, so remove the dimension
         prediction = pd.Series(prediction.squeeze(0).detach().tolist())
@@ -322,7 +372,7 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
         print("OWA", owa)
         print("")
 
-        # Note results (NCC)
+        # Save all results
         results[9 - i]["test_data"] = test_data.tolist()
         results[9 - i]["ESRNN_prediction"] = prediction.to_list()
         results[9 - i]["Naive2_prediction"] = naive_prediction.to_list()
@@ -334,9 +384,20 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
         results[9 - i]["level_smoothing"] = float(
             lstm.level_smoothing_coeffs["total load actual"].data
         )
-        results[9 - i]["seasonality_smoothing"] = float(
-            lstm.seasonality2_smoothing_coeffs["total load actual"].data
-        )
+
+        if ex:
+            results[9 - i]["seasonality_smoothing"] = float(
+                lstm.seasonality_smoothing_coeffs["total load actual"].data
+            )
+        else:
+            results[9 - i]["seasonality_smoothing"] = float(
+                lstm.seasonality2_smoothing_coeffs["total load actual"].data
+            )
+
+        results[9 - i]["losses"] = losses
+
+        sys.stderr.flush()
+        sys.stdout.flush()
 
     # Print final results
     owas_np = np.array(owas)
@@ -350,6 +411,9 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
     print("Avg. Improvement:", avg_improve)
     print("Avg. Decline:", avg_decline)
 
+    sys.stderr.flush()
+    sys.stdout.flush()
+
     # Make note of final results
     results["overall"] = {
         "avg_owa": avg_owa,
@@ -360,17 +424,132 @@ def test_model_week(data, output_size, input_size, batch_size, hidden_size,
 
     # Write results (NCC)
     if write_results:
-        # res_path = os.path.join("/Users/matt/", str(sys.argv[1]))
-        filename = str(sys.argv[1]) + ".txt" if year == -1 else str(
-            sys.argv[1]) + "_year_" + str(year) + ".txt"
+        season_dict = {0: "_winter", 1: "_spring", 2: "_summer", 3: "_autumn"}
+        name = sys.argv[1]
+        if len(sys.argv) == 2:
+            filename = name + ".txt"
+        elif len(sys.argv) == 3:
+            filename = name + "_year_" + str(year) + ".txt"
+        elif len(sys.argv) == 4:
+            filename = name + "_year_" + str(year) + season_dict[season] + ".txt"
+        else:
+            filename = "test.txt"
+
         res_path = os.path.join(
-            "/ddn/home/gkxx72/AdvancedResearchProject/run/", filename)
-        # res_path = "/Users/matt/test.txt"
+            "/Users/matt/Projects/AdvancedResearchProject/test/",
+            filename
+        )
+
+        # res_path = os.path.join(
+        #     "/ddn/home/gkxx72/AdvancedResearchProject/run/test_res/",
+        #     filename
+        # )
+
         with open(res_path, "w") as res:
             json.dump(results, res)
 
     if plot:
         plot_test(results, window_size, output_size, print_results=True)
+
+
+def train_and_predict_ex(lstm, data, window_size, output_size, lvp,
+                         loss_func, num_epochs, init_learning_rate,
+                         percentile, auto_lr, variable_lr, auto_rt,
+                         min_epochs_since_change, forecast_input,
+                         variable_rates=None, ensemble=False):
+    parameter_dict = {c: [] for c in data.columns}
+
+    # Create a dictionary of time_series -> parameters
+    for n, p in lstm.named_parameters():
+        # Handle the time-series specific parameters
+        for c in data.columns:
+            if n.startswith(c):
+                parameter_dict[c].append(p)
+
+        # Handle the global parameters
+        if n.startswith("drnn.rnn_layer") or n.startswith(
+                "linear") or n.startswith("tanh"):
+            for c in data.columns:
+                parameter_dict[c].append(p)
+
+    # Create a dictionary of time_series -> optimiser(parameters)
+    optimizer_dict = {}
+    for k, v in parameter_dict.items():
+        optimizer_dict[k] = torch.optim.Adam(params=v, lr=init_learning_rate)
+
+    num_epochs_since_change = 0
+    rate_changed = False
+    prev_loss = 0
+    dynamic_learning_rate = init_learning_rate
+    losses = {f: {l: [] for l in ["RNN", "LVP", "Total"]} for f in
+              data.columns}
+    pred_ensemble = []
+
+    # Loop through number of epochs amount of times
+    for epoch in range(num_epochs):
+        print("Epoch:", epoch)
+        outs, labels, level_var_losses = lstm(data, window_size, output_size,
+                                              lvp)
+        loss = loss_func(outs, labels, percentile)
+
+        for f in lstm.features:
+            optimizer = optimizer_dict[f]
+            total_loss = loss + level_var_losses[f]
+            optimizer.zero_grad()
+            total_loss.backward(retain_graph=True)
+            optimizer.step()
+
+            # Save losses
+            losses[f]["RNN"].append(loss.item())
+            losses[f]["LVP"].append(level_var_losses[f].item())
+            losses[f]["Total"].append(total_loss.item())
+
+            # Print loss information
+            print("%s: LVP - %1.5f, Loss - %1.5f Total Loss "
+                  "- %1.5f" % (f, level_var_losses[f].item(), loss.item(),
+                               total_loss.item()))
+            # User defined, fixed, variable learning rates depending on epoch
+            if variable_lr and epoch in list(variable_rates.keys()):
+                for param_group in optimizer.param_groups:
+                    param_group['lr'] = variable_rates[epoch]
+
+                    print("Changed Learning Rate to:",
+                          str(variable_rates[epoch]))
+
+            # Automatically changed learning rates depending loss ratio
+            if auto_lr and num_epochs_since_change >= min_epochs_since_change:
+                if prev_loss < auto_rt * loss:
+                    dynamic_learning_rate /= sqrt(10)
+                    print("Loss Ratio:", prev_loss / loss)
+                    print("Changed Learning Rate to:", dynamic_learning_rate)
+
+                    for param_group in optimizer.param_groups:
+                        param_group['lr'] = dynamic_learning_rate
+
+            prev_loss = loss
+
+        # If we didn't change the learning rate, make note of this
+        if not rate_changed:
+            num_epochs_since_change += 1
+
+        # If we are ensembling, generate the ensemble of forecasts
+        if ensemble and (num_epochs - epoch <= 5):
+            prediction, *_ = lstm.predict(forecast_input, window_size,
+                                          output_size)
+            pred_ensemble.append(prediction.squeeze(0).detach().tolist())
+        else:
+            if epoch == num_epochs - 1:
+                prediction, *_ = lstm.predict(forecast_input, window_size,
+                                              output_size)
+                prediction = pd.Series(prediction.squeeze(0).detach().tolist())
+
+        sys.stderr.flush()
+        sys.stdout.flush()
+
+    if ensemble:
+        return pd.Series(np.mean(pred_ensemble, axis=0)), losses
+    else:
+        return prediction, losses
 
 
 # This function trains the model, and generates (a) prediction(s). If we
@@ -402,7 +581,8 @@ def train_and_predict(lstm, data, window_size, output_size, lvp, loss_func,
                 parameter_dict[c].append(p)
 
         # Handle the global parameters
-        if n.startswith("drnn.rnn_layer") or n.startswith("linear") or n.startswith("tanh"):
+        if n.startswith("drnn.rnn_layer") or n.startswith(
+                "linear") or n.startswith("tanh"):
             for c in data.columns:
                 parameter_dict[c].append(p)
 
@@ -416,6 +596,8 @@ def train_and_predict(lstm, data, window_size, output_size, lvp, loss_func,
     prev_loss = 0
     dynamic_learning_rate = init_learning_rate
     pred_ensemble = []
+    losses = {f: {l: [] for l in ["RNN", "LVP", "Total"]} for f in
+              data.columns}
 
     # Print params
     # for n, p in lstm.named_parameters():
@@ -446,6 +628,11 @@ def train_and_predict(lstm, data, window_size, output_size, lvp, loss_func,
             # Get the per-time-series optimiser
             optimizer = optimizer_dict[name]
 
+            # Save losses
+            losses[name]["RNN"].append(loss.item())
+            losses[name]["LVP"].append(level_var_loss.item())
+            losses[name]["Total"].append(total_loss.item())
+
             # User defined, fixed, variable learning rates depending on epoch
             if variable_lr and epoch in list(variable_rates.keys()):
                 for param_group in optimizer.param_groups:
@@ -464,7 +651,7 @@ def train_and_predict(lstm, data, window_size, output_size, lvp, loss_func,
             if auto_lr and num_epochs_since_change >= min_epochs_since_change:
                 if prev_loss < auto_rt * loss:
                     dynamic_learning_rate /= sqrt(10)
-                    print("Loss Ratio:", prev_loss/loss)
+                    print("Loss Ratio:", prev_loss / loss)
                     print("Changed Learning Rate to:", dynamic_learning_rate)
 
                     for param_group in optimizer.param_groups:
@@ -476,15 +663,15 @@ def train_and_predict(lstm, data, window_size, output_size, lvp, loss_func,
 
             print("Name: %s: Epoch %d: LVP - %1.5f, Loss - %1.5f Total Loss "
                   "- %1.5f" % (name, epoch, level_var_loss.item(), loss.item(),
-                 total_loss.item()))
+                               total_loss.item()))
 
             # if name == "total load actual":
-                # Check if parameters are updating:
-                # for n, p in lstm.named_parameters():
-                #     if n == "total load actual level smoothing":
-                #         print("Level Smoothing:", torch.sigmoid(p))
-                #     if n == "total load actual seasonality2 smoothing":
-                #         print("Seasonality Smoothing:", torch.sigmoid(p))
+            # Check if parameters are updating:
+            # for n, p in lstm.named_parameters():
+            #     if n == "total load actual level smoothing":
+            #         print("Level Smoothing:", torch.sigmoid(p))
+            #     if n == "total load actual seasonality2 smoothing":
+            #         print("Seasonality Smoothing:", torch.sigmoid(p))
 
             prev_loss = loss
 
@@ -503,10 +690,13 @@ def train_and_predict(lstm, data, window_size, output_size, lvp, loss_func,
                                               output_size, skip_lstm=skip_lstm)
                 prediction = pd.Series(prediction.squeeze(0).detach().tolist())
 
+        sys.stderr.flush()
+        sys.stdout.flush()
+
     if ensemble:
-        return pd.Series(np.mean(pred_ensemble, axis=0))
+        return pd.Series(np.mean(pred_ensemble, axis=0)), losses
     else:
-        return prediction
+        return prediction, losses
 
 
 # This function takes all the data up to the end of the section (i.e up to

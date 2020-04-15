@@ -18,12 +18,15 @@ from hybrid import hybrid
 
 def load_data(filename, mult_ts):
     if mult_ts:
-        col_list = ["time", "generation fossil gas", "price actual",
-                    "generation fossil hard coal", "total load forecast",
-                    "generation fossil oil", "total load actual",
-                    "generation hydro water reservoir", "generation solar",
-                    "forecast solar day ahead", "price day ahead",
-                    "generation hydro run-of-river and poundage"]
+        # TODO REMEMBER TO CHANGE BACK
+        # col_list = ["time", "generation fossil gas", "price actual",
+        #             "generation fossil hard coal", "total load forecast",
+        #             "generation fossil oil", "total load actual",
+        #             "generation hydro water reservoir", "generation solar",
+        #             "forecast solar day ahead", "price day ahead",
+        #             "generation hydro run-of-river and poundage"]
+        col_list = ["time", "total load actual", "generation fossil gas",
+                    "generation fossil hard coal", "generation fossil oil"]
         return pd.read_csv(
             filename, parse_dates=["time"], infer_datetime_format=True,
             usecols=col_list
@@ -56,13 +59,13 @@ def load_data(filename, mult_ts):
 def main():
     # helpers.plot_es_comp()
     # helpers.plot_one_test()
-    test(int(sys.argv[1]), int(sys.argv[2]))
-    # file_path = os.path.abspath(os.path.dirname(__file__))
-    # data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
-    # df = load_data(data_path, False)
-    # df = df.set_index('time').asfreq('H')
-    # df.replace(0, np.NaN, inplace=True)
-    # df.interpolate(inplace=True)
+    # test(int(sys.argv[1]), int(sys.argv[2]))
+    file_path = os.path.abspath(os.path.dirname(__file__))
+    data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
+    df = load_data(data_path, True)
+    df = df.set_index('time').asfreq('H')
+    df.replace(0, np.NaN, inplace=True)
+    df.interpolate(inplace=True)
     # deseason(df)
     # typical_plot(df)
     # sys.exit(0)
@@ -71,7 +74,7 @@ def main():
     # # helpers.plot_forecasts(df, "Summer", 1, 1)
     # # helpers.plot_48_results()
     # # identify_arima(df, False)
-    # hybrid.run(df, False)
+    hybrid.run(df, False, True)
 
     # ---------------------- LOAD MULTIPLE TIME SERIES ----------------------
 

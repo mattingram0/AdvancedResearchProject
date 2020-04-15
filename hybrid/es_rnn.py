@@ -67,18 +67,6 @@ class ES_RNN(nn.Module):
                 self.seasonality2_smoothing_coeffs[f] = torch.nn.Parameter(
                     u1.sample(), requires_grad=True)
 
-            # self.seasonality1_smoothing_coeffs[f] = torch.nn.Parameter(
-            #     u1.sample(), requires_grad=True)
-
-            # TODO - THIS LINE BELOW WAS UNCOMMENTED ACCIDENTALLY CAUSING
-            #  THE MANUALLY SET SMOOTHINF COEFF TO BE OVERRIDEN - SEE IF
-            #  THIS WAS CAUSING POOR PERFORMANCE
-            # self.seasonality2_smoothing_coeffs[f] = torch.nn.Parameter(
-            #     u1.sample(), requires_grad=True)
-            # self.hourly_seasonality_params[f] = [
-            #     torch.nn.Parameter(u2.sample(), requires_grad=True)
-            #     for _ in range(seasonality_1)
-            # ]
             if init_seasonality:
                 self.weekly_seasonality_params[f] = [
                     torch.nn.Parameter(
@@ -402,6 +390,5 @@ class ES_RNN(nn.Module):
             output_wseas,   # 48 hour seasonality
             levels,         # Levels for all of x
             w_seasons,      # Seasonality for all x
-            out,            # Output from LSTM
-            inputs  # TODO MAKE SURE TO REMOVE!!!
+            torch.exp(out),            # Output from LSTM
         )

@@ -96,20 +96,23 @@ class ES_RNN_EX(nn.Module):
         self.tanh = non_lin.Tanh(hidden_size, hidden_size)
         self.linear = nn.Linear(hidden_size, output_size)
 
-    def forward(self, x, window_size, output_size, lvp=0, std=0.001):
+    def forward(self, data, window_size, output_size, lvp=0, std=0.001):
         all_levels = {}
         all_seasonals = {}
+        all_inputs = []
+        labels = []
         level_var_losses = {}
 
-        # Fit the ES model to every feature
         for f in self.features:
+            # Get the data for the current features
+            x = torch.tensor(data[f], dtype=torch.double)
+
             # Get the parameters of the current feature
             alpha = torch.sigmoid(self.level_smoothing_coeffs[f])
             gamma = torch.sigmoid(self.seasonality_smoothing_coeffs[f])
 
             # Create lists holding the ES values
-            seasonals = [torch.exp(p)
-                           for p in self.init_seasonality_params[f]]
+            seasonals = [torch.exp(p) for p in self.init_seasonality_params[f]]
 
             # Handle initial values
             levels = [x[0] / (seasonals[0])]
@@ -117,6 +120,8 @@ class ES_RNN_EX(nn.Module):
 
             # List to hold the log differences in the levels to calculate LVP
             log_level_diffs = []
+
+            # Fit the ES model to the feature
 
             # Double seasonality ES-style smoothing formulae
             for i in range(1, len(x[1:]) + 1):
@@ -147,22 +152,15 @@ class ES_RNN_EX(nn.Module):
             all_levels[f] = levels
             all_seasonals[f] = seasonals
 
-        # Create sliding window inputs into the RNN
-        all_inputs = []
-        labels = []
+            # Gaussian noise generator
+            n = Normal(torch.tensor([0.0]), torch.tensor([std]))
 
-        # Gaussian noise generator
-        n = Normal(torch.tensor([0.0]), torch.tensor([std]))
-
-        for f in self.features:
-            levels = all_levels[f]
-            seasonals = all_seasonals[f]
-            data = x[f]
             inputs = []
 
-            for i in range(len(data) - window_size - output_size + 1):
+            # Sliding window method to create inputs for this feature
+            for i in range(len(x) - window_size - output_size + 1):
                 # Create input for each feature
-                inp = data[i: i + window_size]
+                inp = x[i: i + window_size]
 
                 # Get the level/seasonality values
                 level = levels[i + window_size]
@@ -181,7 +179,7 @@ class ES_RNN_EX(nn.Module):
                 # Create label:
                 if f == "total load actual":
                     # Get output
-                    label = data[i + window_size: i + window_size + output_size]
+                    label = x[i + window_size: i + window_size + output_size]
 
                     # Get corresponding seasonality
                     seas_label = torch.tensor(
@@ -195,8 +193,11 @@ class ES_RNN_EX(nn.Module):
                     # Save label. Unsqueeze before concat
                     labels.append(norm_label.unsqueeze(0))
 
+            # Concatenate all the inputs for this feature into one tensor,
+            # then append to the list of all the inputs for all the features
             all_inputs.append(torch.cat(inputs).unsqueeze(2))
 
+        # Concatenate the tensor from each feature into a single tensor
         labels = torch.cat(labels, dim=0)
         inputs = torch.cat(all_inputs, dim=2)
 
@@ -215,129 +216,86 @@ class ES_RNN_EX(nn.Module):
         # Return model out, actual out, Level variability loss
         return out, labels, level_var_losses
 
-    # Assume that the training data used finished at the end of a season,
-    # and that validation/testing data begins at the beginning of the next
-    # new season. We feed in the last window_size values from the training
-    # data set, plus any extra, to generate forecasts.
+    # Stripped down version. Assumes x = [<window-size|<out size>].
+    def predict(self, data, window_size, output_size):
+        all_inputs = []
 
-    # The data we input for prediction must finish at the end of the
-    # training data, be continuous and be of length window_size. If we pass in
-    # data that extends into the test, then the final seasonality values are
-    # repeated, along with the final length. We ca neither specify to make
-    # contiguous forecasts, or we can specify to make overlapping forecasts.
-    #
-    # Todo 1. Ensure that the seasonality is correctly handled in this way
-    # Todo 2. Add the contiguous/non-contiguous functionality. If you pass
-    #  in cont=True, you'll get a 1d tensor of contiguous forecasts. If
-    #  cont=True, you'll get a 2d tensor of overlapping forecasts.
-    def predict(self, x, window_size, output_size, hidden=None, cont=False,
-                skip_lstm=False):
-        # Get the final ES level and seasonality values
-        levels = self.levels[:]
-        w_seasons = self.w_seasons[:]
+        # Return the levels and seasonality corresponding to all x, and the
+        # actual values corresponding to the output values
+        out_actuals = []
 
-        # Replicate final seasonality and level values. Remember that we have
-        # self.seasonality_2 extra values from the forward function! See
-        # piece of paper for data breakdown if you forget/get confused!
-        # Get the final seasonality values
-        start = len(w_seasons) - self.seasonality_2
+        for f in self.features:
+            x = torch.tensor(data[f], dtype=torch.double)
 
-        for i in range(len(x) - window_size):
-            w_seasons.append(w_seasons[start + (i % self.seasonality_2)])
+            #  Get the final ES level and seasonality values
+            levels = self.levels[f][:]
+            seasonals = self.seasonals[f][:]
 
-        levels.extend([levels[-1] for _ in range(len(x) - window_size)])
+            # Replicate level and seasonality values
+            start = len(seasonals) - self.seasonality
 
-        # Get only the final levels and seasonality values that we need
-        levels = levels[-len(x):]
-        w_seasons = w_seasons[-len(x):]
+            for i in range(len(x) - window_size):
+                seasonals.append(seasonals[start + (i % self.seasonality)])
 
-        inputs = []
-        actuals = []
-        output_levels = []
-        output_wseas = []
+            levels.extend([levels[-1] for _ in range(len(x) - window_size)])
 
-        # If we want contiguous output, we need to skip by output size (=
-        # two days). If not, we just move forward one day
-        step_size = output_size if cont else 24
+            # Get only the final levels and seasonality values that we need
+            levels = levels[-len(x):]
+            seasonals = seasonals[-len(x):]
+            inputs = []
 
-        for i in range(0, len(x) - window_size - output_size + 1, step_size):
-            # Get the input/label windows of data
-            inp = x[i: i + window_size]
-            label = x[i + window_size: i + window_size + output_size]
+            for i in range(0, len(x) - window_size - output_size + 1, 24):
+                # Get the input/label windows of data
+                inp = x[i: i + window_size]
+                label = x[i + window_size: i + window_size + output_size]
 
-            # Get the level/seasonality values
-            level = levels[i + window_size]
+                # Get the level/seasonality values
+                level = levels[i + window_size]
 
-            w_seas_in = torch.tensor(
-                w_seasons[i: i + window_size], dtype=torch.double
-            )
+                seas_in = torch.tensor(
+                    seasonals[i: i + window_size], dtype=torch.double
+                )
 
-            w_seas_out = torch.tensor(
-                w_seasons[i + window_size: i + window_size + output_size],
-                dtype=torch.double
-            )
+                seas_out = torch.tensor(
+                    seasonals[i + window_size: i + window_size + output_size],
+                    dtype=torch.double
+                )
 
-            # De-seasonalise/de-level the input/values
-            norm_input = torch.log(inp / (level * w_seas_in))
-            inputs.append(norm_input.unsqueeze(0))
+                # De-seasonalise/de-level the input/values
+                norm_input = torch.log(inp / (level * seas_in))
+                inputs.append(norm_input.unsqueeze(0))
 
-            # Add the output levels/seasonality to the output vectors,
-            # to be used for reseasoning/relevelling the data
-            output_wseas.append(w_seas_out.unsqueeze(0))
-            output_levels.append(torch.tensor([level for _ in range(
-                output_size)], dtype=torch.double).unsqueeze(0))
+                if f == "total load actual":
+                    out_levels = torch.tensor(
+                        [level for _ in range(output_size)],
+                        dtype=torch.double
+                    )
+                    out_seas = seas_out
+                    out_actuals = label
 
-            # Keep track of the actual data too
-            actuals.append(label.unsqueeze(0))
+            all_inputs.append(torch.cat(inputs).unsqueeze(2))
 
-        # Instead of feeding the inputs through the LSTM, skip and input
-        # them directly through the tanh layer into the linear layer
-        if skip_lstm:
-            inputs = torch.cat(inputs)
-            out = self.linear_no_lstm(self.tanh_no_lstm(inputs.double()))
-        else:
-            # Turn list of inputs into a vector, then add another dimension (
-            # required for the feature input to the LSTM)
-            inputs = torch.cat(inputs).unsqueeze(2)
+        # Convert into tensor
+        inputs = torch.cat(all_inputs, dim=2)
 
-            # Feed inputs in to Dilated LSTM
-            if hidden is None:
-                lstm_out, hidden = self.drnn(inputs.double())
-                h_out = hidden[0][-1]
+        # Input into LSTM
+        _, hidden = self.drnn(inputs.double())
+        lstm_out = hidden[0][-1]
 
-            else:
-                lstm_out, h_out = self.drnn(inputs.double(), hidden)
-
-            # Pass DLSTM output through linear layer. See piece of paper for why
-            # we take the final 'original batch size' outputs. Don't get
-            # confused by this again, you understand it now!!
-            linear_in = h_out[:, -inputs.size(0):, :].view(-1, self.hidden_size)
-            out = self.linear(self.tanh(linear_in))
-
-        # If we have been generating contiguous outputs, then we transform
-        # num_input_sequences x 48 output vector into a 1 x (
-        # num_input_sequences x 48) vector
-        if cont:
-            out = out.view(-1)
-            output_wseas = torch.cat(output_wseas).view(-1)
-            output_levels = torch.cat(output_levels).view(-1)
-            actuals = torch.cat(actuals).view(-1)
-        else:
-            output_wseas = torch.cat(output_wseas)
-            output_levels = torch.cat(output_levels)
-            actuals = torch.cat(actuals)
+        # Pass DLSTM output through tanh and linear layers
+        linear_in = lstm_out[:, -inputs.size(0):, :].view(-1, self.hidden_size)
+        out = self.linear(self.tanh(linear_in))
 
         # Unsquash the output, and re-add the final level and seasonality
-        pred = torch.exp(out) * output_levels * output_wseas
+        pred = torch.exp(out) * out_levels * out_seas
 
         # Return the prediction, and also the final seasonalities and levels
         return (
             pred,           # 48 hour prediction
-            actuals,        # 48 hour actual
-            output_levels,  # 48 hour levels
-            output_wseas,   # 48 hour seasonality
+            out_actuals,    # 48 hour actual
+            out_levels,     # 48 hour levels
+            out_seas,       # 48 hour seasonality
             levels,         # Levels for all of x
-            w_seasons,      # Seasonality for all x
-            out,            # Output from LSTM
-            inputs  # TODO MAKE SURE TO REMOVE!!!
+            seasonals,      # Seasonality for all x
+            torch.exp(out),            # Output from LSTM
         )
