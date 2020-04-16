@@ -167,8 +167,8 @@ def run(df, multi_ts, ex):
     # num_epochs = 50
     #     # init_learning_rate = 0.1
 
-    num_epochs = int(sys.argv[5])
-    init_learning_rate = int(sys.argv[6])
+    num_epochs = int(sys.argv[4])
+    init_learning_rate = float(sys.argv[5])
     input_size = 4
     hidden_size = 40
     num_layers = 4
@@ -219,7 +219,7 @@ def test_model_week(data, output_size, input_size, hidden_size,
 
     results = {i: {} for i in range(1, 8)}
 
-    for i in range(3, 1, -1):
+    for i in range(2, 1, -1):
         # Figure out start and end points of the data
         end_train = -(i * 24)
         start_test = -(i * 24 + window_size)
@@ -434,7 +434,12 @@ def test_model_week(data, output_size, input_size, hidden_size,
         elif len(sys.argv) == 3:
             filename = name + "_year_" + str(year) + ".txt"
         elif len(sys.argv) == 4:
-            filename = name + "_year_" + str(year) + season_dict[season] + ".txt"
+            s = season_dict[season]
+            filename = name + "_year_" + str(year) + s + ".txt"
+        elif len(sys.argv) == 6:
+            s = season_dict[season]
+            lr = str(init_learning_rate).split(".")[1]
+            filename = name + "_year_" + str(year) + s + "_" + lr + ".txt"
         else:
             filename = "test.txt"
 
