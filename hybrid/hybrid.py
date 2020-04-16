@@ -164,8 +164,11 @@ def run(df, multi_ts, ex):
     init_params = True
 
     # Training parameters
-    num_epochs = 50
-    init_learning_rate = 0.1
+    # num_epochs = 50
+    #     # init_learning_rate = 0.1
+
+    num_epochs = int(sys.argv[5])
+    init_learning_rate = int(sys.argv[6])
     input_size = 4
     hidden_size = 40
     num_layers = 4
@@ -435,15 +438,15 @@ def test_model_week(data, output_size, input_size, hidden_size,
         else:
             filename = "test.txt"
 
-        res_path = os.path.join(
-            "/Users/matt/Projects/AdvancedResearchProject/test/",
-            filename
-        )
-
         # res_path = os.path.join(
-        #     "/ddn/home/gkxx72/AdvancedResearchProject/run/test_res/",
+        #     "/Users/matt/Projects/AdvancedResearchProject/test/",
         #     filename
         # )
+
+        res_path = os.path.join(
+            "/ddn/home/gkxx72/AdvancedResearchProject/run/main_res/",
+            filename
+        )
 
         with open(res_path, "w") as res:
             json.dump(results, res)
