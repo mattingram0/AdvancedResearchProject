@@ -3,8 +3,154 @@ import matplotlib.pyplot as plt
 import torch
 import json
 from math import sin
-
 from os import walk
+
+
+def plot_lr():
+    init = True
+
+    init_fp = "/Users/matt/Projects/AdvancedResearchProject/test" \
+              "/lr_test_init_year_1_summer_0001.txt"
+    ninit_fp = "/Users/matt/Projects/AdvancedResearchProject/test" \
+               "/lr_test_ninit_year_1_summer_0001.txt"
+
+    # file_name = "/Users/matt/Projects/AdvancedResearchProject/test" \
+    #     "/final_test_year_1_summer_01.txt"
+    # local_labels = [0.01 for _ in range(10)] + [0.005 for _ in range(10)] + [
+    #     0.001 for _ in range(10)] + [0.0005 for _ in range(5)]
+    # global_labels = [0.005 for _ in range(10)] + [0.001 for _ in range(10)] + [
+    #     0.0005 for _ in range(10)] + [0.0001 for _ in range(5)]
+    # x = [i for i in range(0, 35, 2)]
+
+    with open(init_fp if init else ninit_fp) as f:
+        results = json.load(f)
+
+    lr = [0.0001 * i for i in range(1, 10) for _ in range(3)] + \
+         [0.001 * i for i in range(1, 10) for _ in range(3)] + \
+         [0.01 * i for i in range(1, 10) for _ in range(3)] + \
+         [0.1 * i for i in range(1, 10) for _ in range(3)]
+    labels = [np.round(lr[i], decimals=4) for i in range(0, len(lr), 5)]
+    x = [i for i in range(0, len(lr), 5)]
+
+    # ---------- PLOT ALL EPOCHS (LRs) ----------
+    font = {'size': 20}
+    plt.rc('font', **font)
+    fig = plt.figure(figsize=(20, 15), dpi=250)
+    plt.suptitle("Initialised" if init else "Uninitialised")
+    gs = fig.add_gridspec(3, 2)
+    ax_1 = fig.add_subplot(gs[0, :])
+    ax_2 = fig.add_subplot(gs[1, 0])
+    ax_3 = fig.add_subplot(gs[1, 1])
+    ax_4 = fig.add_subplot(gs[2, 0])
+    ax_5 = fig.add_subplot(gs[2, 1])
+    axes = [ax_2, ax_3, ax_4, ax_5]
+
+    losses = results["7"]["losses"]
+    rnn = losses["total load actual"]["RNN"]
+
+    ax_1.plot(rnn, label="RNN Losses")
+    ax_1.legend(loc="best")
+    ax_1.set_xticks(x)
+    ax_1.set_xticklabels(labels, rotation=45)
+
+    for i, k in enumerate(losses.keys()):
+        lvp = losses[k]["LVP"]
+        axes[i].set_xticks(x)
+        axes[i].set_xticklabels(labels, rotation=45)
+        axes[i].plot(lvp, label=k + " LVP")
+        axes[i].legend(loc="best")
+
+    plt.show()
+
+    # ---------- PLOT ONLY FIRST 90 EPOCHS (LRs) ----------
+    font = {'size': 20}
+    plt.rc('font', **font)
+    fig = plt.figure(figsize=(20, 15), dpi=250)
+    plt.suptitle("Initialised" if init else "Uninitialised")
+    gs = fig.add_gridspec(3, 2)
+    ax_1 = fig.add_subplot(gs[0, :])
+    ax_2 = fig.add_subplot(gs[1, 0])
+    ax_3 = fig.add_subplot(gs[1, 1])
+    ax_4 = fig.add_subplot(gs[2, 0])
+    ax_5 = fig.add_subplot(gs[2, 1])
+    axes = [ax_2, ax_3, ax_4, ax_5]
+
+    losses = results["7"]["losses"]
+    rnn = losses["total load actual"]["RNN"]
+
+    ax_1.set_xticks(x)
+    ax_1.set_xticklabels(labels, rotation=45)
+    ax_1.plot(rnn[:95], label="RNN Losses")
+    ax_1.legend(loc="best")
+
+    for i, k in enumerate(losses.keys()):
+        lvp = losses[k]["LVP"]
+        axes[i].set_xticks(x)
+        axes[i].set_xticklabels(labels, rotation=45)
+        axes[i].plot(lvp[:95], label=k + " LVP")
+        axes[i].legend(loc="best")
+
+    plt.show()
+
+    # ---------- PLOT ONLY FIRST 80 EPOCHS (LRs) ----------
+    font = {'size': 20}
+    plt.rc('font', **font)
+    fig = plt.figure(figsize=(20, 15), dpi=250)
+    plt.suptitle("Initialised" if init else "Uninitialised")
+    gs = fig.add_gridspec(3, 2)
+    ax_1 = fig.add_subplot(gs[0, :])
+    ax_2 = fig.add_subplot(gs[1, 0])
+    ax_3 = fig.add_subplot(gs[1, 1])
+    ax_4 = fig.add_subplot(gs[2, 0])
+    ax_5 = fig.add_subplot(gs[2, 1])
+    axes = [ax_2, ax_3, ax_4, ax_5]
+
+    losses = results["7"]["losses"]
+    rnn = losses["total load actual"]["RNN"]
+
+    ax_1.set_xticks(x)
+    ax_1.set_xticklabels(labels, rotation=45)
+    ax_1.plot(rnn[:80], label="RNN Losses")
+    ax_1.legend(loc="best")
+
+    for i, k in enumerate(losses.keys()):
+        lvp = losses[k]["LVP"]
+        axes[i].set_xticks(x)
+        axes[i].set_xticklabels(labels, rotation=45)
+        axes[i].plot(lvp[:80], label=k + " LVP")
+        axes[i].legend(loc="best")
+
+    plt.show()
+
+    # ---------- PLOT ONLY FIRST 70 EPOCHS (LRs) ----------
+    font = {'size': 20}
+    plt.rc('font', **font)
+    fig = plt.figure(figsize=(20, 15), dpi=250)
+    plt.suptitle("Initialised" if init else "Uninitialised")
+    gs = fig.add_gridspec(3, 2)
+    ax_1 = fig.add_subplot(gs[0, :])
+    ax_2 = fig.add_subplot(gs[1, 0])
+    ax_3 = fig.add_subplot(gs[1, 1])
+    ax_4 = fig.add_subplot(gs[2, 0])
+    ax_5 = fig.add_subplot(gs[2, 1])
+    axes = [ax_2, ax_3, ax_4, ax_5]
+
+    losses = results["7"]["losses"]
+    rnn = losses["total load actual"]["RNN"]
+
+    ax_1.set_xticks(x)
+    ax_1.set_xticklabels(labels, rotation=45)
+    ax_1.plot(rnn[:70], label="RNN Losses")
+    ax_1.legend(loc="best")
+
+    for i, k in enumerate(losses.keys()):
+        lvp = losses[k]["LVP"]
+        axes[i].set_xticks(x)
+        axes[i].set_xticklabels(labels, rotation=45)
+        axes[i].plot(lvp[:70], label=k + " LVP")
+        axes[i].legend(loc="best")
+
+    plt.show()
 
 
 # This func will loop through a directory and plot the results for every

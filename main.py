@@ -12,7 +12,7 @@ from math import fabs
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from stats import arima, exponential_smoothing, naive, theta, errors
-from stats import helpers
+from ml import helpers  # TODO MAKE SURE TO CHANGE BACK TO STATS WHEN
 from hybrid import hybrid
 
 
@@ -74,8 +74,12 @@ def main():
     # # helpers.plot_forecasts(df, "Summer", 1, 1)
     # # helpers.plot_48_results()
     # # identify_arima(df, False)
+
+    # helpers.plot_lr()
+    # sys.exit(0)
     # run(df, multi_ts, ex)
     hybrid.run(df, False, True)
+    # helpers.plot_lr()
 
     # ---------------------- LOAD MULTIPLE TIME SERIES ----------------------
 

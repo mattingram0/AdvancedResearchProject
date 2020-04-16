@@ -158,7 +158,7 @@ def run(df, multi_ts, ex):
     window_size = 336
     output_size = 48
     write_results = True
-    plot = False
+    plot = True
     ensemble = False
     skip_lstm = False
     init_params = True
@@ -167,8 +167,9 @@ def run(df, multi_ts, ex):
     # num_epochs = 50
     #     # init_learning_rate = 0.1
 
-    num_epochs = int(sys.argv[4])
-    init_learning_rate = float(sys.argv[5])
+    num_epochs = 35
+    local_init_lr = 0.01
+    global_init_lr = 0.005
     input_size = 4
     hidden_size = 40
     num_layers = 4
@@ -178,8 +179,11 @@ def run(df, multi_ts, ex):
     loss_func = pinball_loss
     grad_clipping = 20
     auto_lr = False  # Automatically adjust learning rates
-    variable_lr = False  # Use list of epoch/rate pairs
-    variable_rates = {7: 5e-3, 18: 1e-3, 22: 3e-4}
+    variable_lr = True  # Use list of epoch/rate pairs
+    global_rates = {10: 1e-3, 20: 5e-4, 30: 1e-4}
+    local_rates = {10: 5e-3, 20: 1e-3, 30: 5e-4}
+
+    # TODO - FOR THE MULTI TS YOU NEED TO FIX THE LOCAL AND GLOBAL RATES STUFF
 
     auto_rate_threshold = 1.005  # If loss(x - 1) < 1.005 * loss(x) reduce rate
     min_epochs_before_change = 2
@@ -189,11 +193,11 @@ def run(df, multi_ts, ex):
     test_model_week(data, output_size, input_size, hidden_size,
                     num_layers, True, dilations, data.columns, 24, 168,
                     residuals, window_size, level_variability_penalty,
-                    loss_func, num_epochs, init_learning_rate, percentile,
-                    auto_lr, variable_lr, auto_rate_threshold,
-                    min_epochs_before_change, variable_rates, grad_clipping,
-                    write_results, plot, year, season, ensemble, multi_ts,
-                    skip_lstm, ex, init_params)
+                    loss_func, num_epochs, local_init_lr, global_init_lr,
+                    percentile, auto_lr, variable_lr, auto_rate_threshold,
+                    min_epochs_before_change, local_rates, global_rates,
+                    grad_clipping, write_results, plot, year, season,
+                    ensemble, multi_ts, skip_lstm, ex, init_params)
 
 
 # If output_size != 48 then this is broken. Pass in valid data or test
@@ -202,10 +206,10 @@ def test_model_week(data, output_size, input_size, hidden_size,
                     num_layers, batch_first, dilations, features, seasonality1,
                     seasonality2, residuals, window_size,
                     level_variability_penalty, loss_func, num_epochs,
-                    init_learning_rate, percentile, auto_lr, variable_lr,
-                    auto_rate_threshold, min_epochs_before_change,
-                    variable_rates, grad_clipping, write_results, plot,
-                    year, season, ensemble, multi_ts, skip_lstm, ex,
+                    local_init_lr, global_init_lr, percentile, auto_lr,
+                    variable_lr, auto_rate_threshold, min_epochs_before_change,
+                    local_rates, global_rates, grad_clipping, write_results,
+                    plot, year, season, ensemble, multi_ts, skip_lstm, ex,
                     init_params):
     es_rnn_predictions = []
     es_rnn_smapes = []
@@ -219,7 +223,7 @@ def test_model_week(data, output_size, input_size, hidden_size,
 
     results = {i: {} for i in range(1, 8)}
 
-    for i in range(2, 1, -1):
+    for i in range(8, 1, -1):
         # Figure out start and end points of the data
         end_train = -(i * 24)
         start_test = -(i * 24 + window_size)
@@ -294,13 +298,15 @@ def test_model_week(data, output_size, input_size, hidden_size,
                                              output_size,
                                              level_variability_penalty,
                                              loss_func,
-                                             num_epochs, init_learning_rate,
+                                             num_epochs, local_init_lr,
+                                             global_init_lr,
                                              percentile,
                                              auto_lr, variable_lr,
                                              auto_rate_threshold,
                                              min_epochs_before_change,
-                                             test_data,
-                                             variable_rates, ensemble)
+                                             test_data, local_rates,
+                                             global_rates,
+                                             ensemble)
         else:
             test_data = torch.tensor(
                 data["total load actual"][start_test:end_test],
@@ -310,11 +316,11 @@ def test_model_week(data, output_size, input_size, hidden_size,
                                           output_size,
                                           level_variability_penalty,
                                           loss_func, num_epochs,
-                                          init_learning_rate, percentile,
+                                          local_init_lr, percentile,
                                           auto_lr, variable_lr,
                                           auto_rate_threshold,
                                           min_epochs_before_change,
-                                          test_data, variable_rates, ensemble,
+                                          test_data, local_rates, ensemble,
                                           multi_ts,
                                           skip_lstm)
 
@@ -438,7 +444,7 @@ def test_model_week(data, output_size, input_size, hidden_size,
             filename = name + "_year_" + str(year) + s + ".txt"
         elif len(sys.argv) == 6:
             s = season_dict[season]
-            lr = str(init_learning_rate).split(".")[1]
+            lr = str(local_init_lr).split(".")[1]
             filename = name + "_year_" + str(year) + s + "_" + lr + ".txt"
         else:
             filename = "test.txt"
@@ -449,7 +455,7 @@ def test_model_week(data, output_size, input_size, hidden_size,
         # )
 
         res_path = os.path.join(
-            "/ddn/home/gkxx72/AdvancedResearchProject/run/main_res/",
+            "/ddn/home/gkxx72/AdvancedResearchProject/run/test_res/",
             filename
         )
 
@@ -461,11 +467,12 @@ def test_model_week(data, output_size, input_size, hidden_size,
 
 
 def train_and_predict_ex(lstm, data, window_size, output_size, lvp,
-                         loss_func, num_epochs, init_learning_rate,
+                         loss_func, num_epochs, local_init_lr, global_init_lr,
                          percentile, auto_lr, variable_lr, auto_rt,
                          min_epochs_since_change, forecast_input,
-                         variable_rates=None, ensemble=False):
+                         local_rates, global_rates, ensemble=False):
     parameter_dict = {c: [] for c in data.columns}
+    parameter_dict["global"] = []
 
     # Create a dictionary of time_series -> parameters
     for n, p in lstm.named_parameters():
@@ -477,18 +484,20 @@ def train_and_predict_ex(lstm, data, window_size, output_size, lvp,
         # Handle the global parameters
         if n.startswith("drnn.rnn_layer") or n.startswith(
                 "linear") or n.startswith("tanh"):
-            for c in data.columns:
-                parameter_dict[c].append(p)
+            parameter_dict["global"].append(p)
 
     # Create a dictionary of time_series -> optimiser(parameters)
     optimizer_dict = {}
     for k, v in parameter_dict.items():
-        optimizer_dict[k] = torch.optim.Adam(params=v, lr=init_learning_rate)
+        if k == "global":
+            optimizer_dict[k] = torch.optim.Adam(params=v, lr=global_init_lr)
+        else:
+            optimizer_dict[k] = torch.optim.Adam(params=v, lr=local_init_lr)
 
     num_epochs_since_change = 0
     rate_changed = False
     prev_loss = 0
-    dynamic_learning_rate = init_learning_rate
+    dynamic_learning_rate = local_init_lr
     losses = {f: {l: [] for l in ["RNN", "LVP", "Total"]} for f in
               data.columns}
     pred_ensemble = []
@@ -496,16 +505,26 @@ def train_and_predict_ex(lstm, data, window_size, output_size, lvp,
     # Loop through number of epochs amount of times
     for epoch in range(num_epochs):
         print("Epoch:", epoch)
-        outs, labels, level_var_losses = lstm(data, window_size, output_size,
-                                              lvp)
+        outs, labels, level_var_losses = lstm(
+            data, window_size, output_size, lvp
+        )
         loss = loss_func(outs, labels, percentile)
+        global_optimizer = optimizer_dict["global"]
 
         for f in lstm.features:
-            optimizer = optimizer_dict[f]
+            # Calculate the total loss
             total_loss = loss + level_var_losses[f]
-            optimizer.zero_grad()
+
+            # Update the local parameters - updated only once per epoch
+            local_optimizer = optimizer_dict[f]
+            local_optimizer.zero_grad()
             total_loss.backward(retain_graph=True)
-            optimizer.step()
+            local_optimizer.step()
+
+            # Update the global parameters - updated for every feature
+            global_optimizer.zero_grad()
+            total_loss.backward(retain_graph=True)
+            global_optimizer.step()
 
             # Save losses
             losses[f]["RNN"].append(loss.item())
@@ -516,25 +535,41 @@ def train_and_predict_ex(lstm, data, window_size, output_size, lvp,
             print("%s: LVP - %1.5f, Loss - %1.5f Total Loss "
                   "- %1.5f" % (f, level_var_losses[f].item(), loss.item(),
                                total_loss.item()))
-            # User defined, fixed, variable learning rates depending on epoch
-            if variable_lr and epoch in list(variable_rates.keys()):
-                for param_group in optimizer.param_groups:
-                    param_group['lr'] = variable_rates[epoch]
+            # Update local optimizer learning rates if using variable lrs
+            if variable_lr and epoch in list(local_rates.keys()):
+                for param_group in local_optimizer.param_groups:
+                    param_group['lr'] = local_rates[epoch]
 
                     print("Changed Learning Rate to:",
-                          str(variable_rates[epoch]))
+                          str(local_rates[epoch]))
 
-            # Automatically changed learning rates depending loss ratio
+            # Update local optimizer lr if using automatic learning rates
             if auto_lr and num_epochs_since_change >= min_epochs_since_change:
                 if prev_loss < auto_rt * loss:
                     dynamic_learning_rate /= sqrt(10)
                     print("Loss Ratio:", prev_loss / loss)
                     print("Changed Learning Rate to:", dynamic_learning_rate)
 
-                    for param_group in optimizer.param_groups:
+                    for param_group in local_optimizer.param_groups:
                         param_group['lr'] = dynamic_learning_rate
 
             prev_loss = loss
+
+        # Update global optimizer if using variable learning rates
+        if variable_lr and epoch in list(global_rates.keys()):
+            for param_group in global_optimizer.param_groups:
+                param_group['lr'] = global_rates[epoch]
+
+        # Update local optimizer if using automatic learning rates
+        if auto_lr and num_epochs_since_change >= min_epochs_since_change:
+            if prev_loss < auto_rt * loss:
+                dynamic_learning_rate /= sqrt(10)
+                print("Loss Ratio:", prev_loss / loss)
+                print("Changed Learning Rate to:",
+                      dynamic_learning_rate)
+
+                for param_group in global_optimizer.param_groups:
+                    param_group['lr'] = dynamic_learning_rate
 
         # If we didn't change the learning rate, make note of this
         if not rate_changed:
