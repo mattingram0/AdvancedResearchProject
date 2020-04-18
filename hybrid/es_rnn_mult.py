@@ -5,7 +5,7 @@ from torch.distributions import Normal, Uniform
 from ml import drnn, non_lin, helpers
 
 
-class ES_RNN_EX(nn.Module):
+class ES_RNN_MULT(nn.Module):
     def __init__(self, output_size, input_size, batch_size, hidden_size,
                  num_layers, features, seasonality, dropout=0,
                  cell_type='LSTM', batch_first=False, dilations=None,

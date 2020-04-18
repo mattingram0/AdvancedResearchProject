@@ -13,7 +13,7 @@ from stats.naive import naive_2
 from math import sqrt
 
 from hybrid.es_rnn import ES_RNN
-from hybrid.es_rnn_ex import ES_RNN_EX
+from hybrid.es_rnn_mult import ES_RNN_MULT
 
 
 # Give the model the training data, the forecast length and the seasonality,
@@ -147,21 +147,23 @@ def run(df, multi_ts, ex):
     # Default to summer if no month provided in the input arguments
     data = valid_sets[season if season >= 0 else 2]
 
-    # Plot a result #TODO HOW TO PLOT RUN_TEST RESULT FROM HAM
-    # test_path = "/Users/matt/Projects/AdvancedResearchProject/test" \
-    #             "/ind_winter_year_2.txt"
-    # with open(test_path) as f:
-    #     plot_test(json.load(f), window_size, output_size, True)
-    # sys.exit(0)
-
     # For now, just use one of the training sets
     window_size = 336
     output_size = 48
-    write_results = True
-    plot = True
+    plot = False
     ensemble = False
     skip_lstm = False
     init_params = True
+    write_results = True
+    # res_base = "/Users/matt/Projects/AdvancedResearchProject/test/"
+    res_base = "/ddn/home/gkxx72/AdvancedResearchProject/run/test_res/"
+
+    # Plot a result #TODO HOW TO PLOT RUN_TEST RESULT FROM HAM
+    # test_path = "/Users/matt/Projects/AdvancedResearchProject/test" \
+    #             "/sym_max_year_3_summer.txt"
+    # with open(test_path) as f:
+    #     plot_test(json.load(f), window_size, output_size, True)
+    # sys.exit(0)
 
     # Training parameters
     # num_epochs = 50
@@ -197,7 +199,7 @@ def run(df, multi_ts, ex):
                     percentile, auto_lr, variable_lr, auto_rate_threshold,
                     min_epochs_before_change, local_rates, global_rates,
                     grad_clipping, write_results, plot, year, season,
-                    ensemble, multi_ts, skip_lstm, ex, init_params)
+                    ensemble, multi_ts, skip_lstm, ex, init_params, res_base)
 
 
 # If output_size != 48 then this is broken. Pass in valid data or test
@@ -210,7 +212,7 @@ def test_model_week(data, output_size, input_size, hidden_size,
                     variable_lr, auto_rate_threshold, min_epochs_before_change,
                     local_rates, global_rates, grad_clipping, write_results,
                     plot, year, season, ensemble, multi_ts, skip_lstm, ex,
-                    init_params):
+                    init_params, res_base):
     es_rnn_predictions = []
     es_rnn_smapes = []
     es_rnn_mases = []
@@ -239,8 +241,8 @@ def test_model_week(data, output_size, input_size, hidden_size,
             init_l_smooth = {}
             init_s_smooth = {}
             for c in data.columns:
-                deseas, indic = deseasonalise(train_data["total load actual"],
-                                              168, "multiplicative")
+                deseas, indic = deseasonalise(train_data[c], 168,
+                                              "multiplicative")
                 init_seas[c] = indic
                 init_l_smooth[c] = -2
                 init_s_smooth[c] = -1
@@ -263,7 +265,7 @@ def test_model_week(data, output_size, input_size, hidden_size,
 
         # Create a fresh model
         if ex:
-            lstm = ES_RNN_EX(
+            lstm = ES_RNN_MULT(
                 output_size, input_size, batch_size, hidden_size,
                 num_layers, features, seasonality2, batch_first=batch_first,
                 dilations=dilations, residuals=residuals,
@@ -294,7 +296,7 @@ def test_model_week(data, output_size, input_size, hidden_size,
         # Train the model. Discard prediction here (used in proper function)
         if ex:
             test_data = data[start_test:end_test]
-            _, losses = train_and_predict_ex(lstm, data, window_size,
+            _, losses = train_and_predict_ex(lstm, train_data, window_size,
                                              output_size,
                                              level_variability_penalty,
                                              loss_func,
@@ -449,15 +451,7 @@ def test_model_week(data, output_size, input_size, hidden_size,
         else:
             filename = "test.txt"
 
-        # res_path = os.path.join(
-        #     "/Users/matt/Projects/AdvancedResearchProject/test/",
-        #     filename
-        # )
-
-        res_path = os.path.join(
-            "/ddn/home/gkxx72/AdvancedResearchProject/run/test_res/",
-            filename
-        )
+        res_path = os.path.join(res_base, filename)
 
         with open(res_path, "w") as res:
             json.dump(results, res)

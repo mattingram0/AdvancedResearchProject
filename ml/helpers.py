@@ -375,6 +375,9 @@ def plot_es_comp(data, seasonality, levels):
 # long test) and plots each of the 7 tests
 def plot_test(results, window_size, output_size, print_results):
     print(results)
+    font = {'size': 20}
+    plt.rc('font', **font)
+
     for day in results.keys():
         if day == "overall":
             if print_results:
@@ -383,8 +386,8 @@ def plot_test(results, window_size, output_size, print_results):
                 print("No. Improved:", results[day]["num_improved"])
                 print("Avg. Improvement:", results[day]["avg_improvement"])
                 print("Avg. Decline:", results[day]["avg_decline"])
-        elif day not in [7]:
-            continue
+        # elif day not in [7, 6, 5]:
+        #     continue
         else:
             # Note results (NCC)
             test_data = results[day]["test_data"]
@@ -397,6 +400,7 @@ def plot_test(results, window_size, output_size, print_results):
             rnn_out = results[day]["rnn_out"]
             lev_smooth = results[day]["level_smoothing"]
             seas_smooth = results[day]["seasonality_smoothing"]
+            # losses = results[day]["losses"]
 
             fig, axes = plt.subplots(4, 1, figsize=(20, 15), dpi=250)
             axes[0].plot(test_data, label="Actual Data")
@@ -436,6 +440,39 @@ def plot_test(results, window_size, output_size, print_results):
             axes[3].legend(loc="best")
 
             plt.show()
+
+            local_labels = [0.01 for _ in range(10)] + [0.005 for _ in range(10)] + [
+                0.001 for _ in range(10)] + [0.0005 for _ in range(5)]
+            global_labels = [0.005 for _ in range(10)] + [0.001 for _ in range(10)] + [
+                0.0005 for _ in range(10)] + [0.0001 for _ in range(5)]
+            x = [i for i in range(0, 35)]
+
+            # ---------- PLOT ALL EPOCHS (LRs) ----------
+            # fig = plt.figure(figsize=(20, 15), dpi=250)
+            # plt.suptitle("Losses")
+            # gs = fig.add_gridspec(3, 2)
+            # ax_1 = fig.add_subplot(gs[0, :])
+            # ax_2 = fig.add_subplot(gs[1, 0])
+            # ax_3 = fig.add_subplot(gs[1, 1])
+            # ax_4 = fig.add_subplot(gs[2, 0])
+            # ax_5 = fig.add_subplot(gs[2, 1])
+            # axes = [ax_2, ax_3, ax_4, ax_5]
+            #
+            # rnn = losses["total load actual"]["RNN"]
+            #
+            # ax_1.plot(rnn, label="RNN Losses")
+            # ax_1.legend(loc="best")
+            # ax_1.set_xticks(x)
+            # ax_1.set_xticklabels(global_labels, rotation=45)
+            #
+            # for i, k in enumerate(losses.keys()):
+            #     lvp = losses[k]["LVP"]
+            #     axes[i].set_xticks(x)
+            #     axes[i].set_xticklabels(local_labels, rotation=45)
+            #     axes[i].plot(lvp, label=k + " LVP")
+            #     axes[i].legend(loc="best")
+            #
+            # plt.show()
 
 
 def create_pairs(data, train_hours, valid_hours, test_hours,
