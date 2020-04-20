@@ -468,28 +468,21 @@ def train_and_predict_i(lstm, data, window_size, output_size, lvp,
                         percentile, auto_lr, variable_lr, auto_rt,
                         min_epochs_since_change, forecast_input,
                         local_rates, global_rates, ensemble, weather):
-    parameter_dict = {c: [] for c in lstm.demand_features}
-    parameter_dict["global"] = []
 
-    # Create a dictionary of time_series -> parameters
+    local_params = []
+    global_params = []
+
     for n, p in lstm.named_parameters():
-        # Handle the time-series specific parameters
-        for f in lstm.demand_features:
-            if n.startswith(f):
-                parameter_dict[f].append(p)
-
-        # Handle the global parameters
         if n.startswith("drnn.rnn_layer") or n.startswith(
                 "linear") or n.startswith("tanh"):
-            parameter_dict["global"].append(p)
-
-    # Create a dictionary of time_series -> optimiser(parameters)
-    optimizer_dict = {}
-    for k, v in parameter_dict.items():
-        if k == "global":
-            optimizer_dict[k] = torch.optim.Adam(params=v, lr=global_init_lr)
+            global_params.append(p)  # Handle the global parameters
         else:
-            optimizer_dict[k] = torch.optim.Adam(params=v, lr=local_init_lr)
+            local_params.append(p)  # Handle the time-series specific params
+
+
+    local_optimizer = torch.optim.Adam(params=local_params, lr=local_init_lr)
+    global_optimizer = torch.optim.Adam(params=global_params,
+                                        lr=global_init_lr)
 
     num_epochs_since_change = 0
     rate_changed = False
@@ -499,6 +492,8 @@ def train_and_predict_i(lstm, data, window_size, output_size, lvp,
               lstm.demand_features}
     pred_ensemble = []
 
+
+    # TODO NEED TO CHECK ALL OF THIS WORKS
     # Loop through number of epochs amount of times
     for epoch in range(num_epochs):
         print("Epoch:", epoch)
@@ -506,67 +501,65 @@ def train_and_predict_i(lstm, data, window_size, output_size, lvp,
             data, window_size, output_size, weather, lvp
         )
         loss = loss_func(outs, labels, percentile)
-        global_optimizer = optimizer_dict["global"]
+        rnn_loss = loss.item()
 
         for f in lstm.demand_features:
             # Calculate the total loss
-            total_loss = loss + level_var_losses[f]
-
-            # Update the local parameters - updated only once per epoch
-            local_optimizer = optimizer_dict[f]
-            local_optimizer.zero_grad()
-            total_loss.backward(retain_graph=True)
-            local_optimizer.step()
-
-            # Update the global parameters - updated for every feature
-            global_optimizer.zero_grad()
-            total_loss.backward(retain_graph=True)
-            global_optimizer.step()
+            loss += level_var_losses[f]
 
             # Save losses
-            losses[f]["RNN"].append(loss.item())
+            losses[f]["RNN"].append(rnn_loss)
             losses[f]["LVP"].append(level_var_losses[f].item())
-            losses[f]["Total"].append(total_loss.item())
+            losses[f]["Total"].append(loss.item())
 
             # Print loss information
-            print("%s: LVP - %1.5f, Loss - %1.5f Total Loss "
-                  "- %1.5f" % (f, level_var_losses[f].item(), loss.item(),
-                               total_loss.item()))
-            # Update local optimizer learning rates if using variable lrs
-            if variable_lr and epoch in list(local_rates.keys()):
+            print("%s: LVP - %1.5f, RNN Loss - %1.5f Total Loss "
+                  "- %1.5f" % (f, level_var_losses[f].item(), rnn_loss,
+                               loss.item()))
+
+        # Update the parameters, local and global
+        local_optimizer.zero_grad()
+        global_optimizer.zero_grad()
+        loss.backward()
+        local_optimizer.step()
+        global_optimizer.step()
+
+        # Update local optimizer learning rates if using variable lrs
+        if variable_lr:
+            if epoch in list(local_rates.keys()):
                 for param_group in local_optimizer.param_groups:
                     param_group['lr'] = local_rates[epoch]
 
-                    print("Changed Learning Rate to:",
-                          str(local_rates[epoch]))
+                print("Changed Local Learning Rate to:",
+                    str(local_rates[epoch]))
 
-            # Update local optimizer lr if using automatic learning rates
-            if auto_lr and num_epochs_since_change >= min_epochs_since_change:
-                if prev_loss < auto_rt * loss:
-                    dynamic_learning_rate /= sqrt(10)
-                    print("Loss Ratio:", prev_loss / loss)
-                    print("Changed Learning Rate to:", dynamic_learning_rate)
+            if epoch in list(global_rates.keys()):
+                for param_group in global_optimizer.param_groups:
+                    param_group['lr'] = global_rates[epoch]
 
-                    for param_group in local_optimizer.param_groups:
-                        param_group['lr'] = dynamic_learning_rate
+                print("Changed Global Learning Rate to:",
+                      str(global_rates[epoch]))
 
-            prev_loss = loss
-
-        # Update global optimizer if using variable learning rates
-        if variable_lr and epoch in list(global_rates.keys()):
-            for param_group in global_optimizer.param_groups:
-                param_group['lr'] = global_rates[epoch]
-
-        # Update local optimizer if using automatic learning rates
+        # Update local optimizer lr if using automatic learning rates
         if auto_lr and num_epochs_since_change >= min_epochs_since_change:
             if prev_loss < auto_rt * loss:
                 dynamic_learning_rate /= sqrt(10)
+                rate_changed = True
+                num_epochs_since_change = 0
                 print("Loss Ratio:", prev_loss / loss)
-                print("Changed Learning Rate to:",
-                      dynamic_learning_rate)
+                print("Changed Learning Rate to:", dynamic_learning_rate)
+
+                for param_group in local_optimizer.param_groups:
+                    param_group['lr'] = dynamic_learning_rate
 
                 for param_group in global_optimizer.param_groups:
                     param_group['lr'] = dynamic_learning_rate
+            else:
+                rate_changed = False
+        else:
+            rate_changed = False
+
+        prev_loss = loss.item()
 
         # If we didn't change the learning rate, make note of this
         if not rate_changed:

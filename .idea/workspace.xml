@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="564df88f-763d-43a5-ba2e-b5cd80214a9e" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/hybrid/es_rnn_i.py" beforeDir="false" afterPath="$PROJECT_DIR$/hybrid/es_rnn_i.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hybrid/es_rnn_s.py" beforeDir="false" afterPath="$PROJECT_DIR$/hybrid/es_rnn_s.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/hybrid/hybrid.py" beforeDir="false" afterPath="$PROJECT_DIR$/hybrid/hybrid.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ml/ml_helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/ml/ml_helpers.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -64,8 +60,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="528">
-                  <caret line="497" column="66" lean-forward="true" selection-start-line="497" selection-start-column="66" selection-end-line="497" selection-end-column="66" />
+                <state relative-caret-position="676">
+                  <caret line="588" column="61" selection-start-line="588" selection-start-column="61" selection-end-line="588" selection-end-column="61" />
                   <folding>
                     <element signature="e#0#18#0" expanded="true" />
                   </folding>
@@ -562,7 +558,7 @@
       <workItem from="1585649706616" duration="131134000" />
       <workItem from="1586451125501" duration="16227000" />
       <workItem from="1586529763785" duration="99012000" />
-      <workItem from="1587204860278" duration="57976000" />
+      <workItem from="1587204860278" duration="59311000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit. Git setup.">
       <created>1573219288446</created>
@@ -666,7 +662,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="1104083000" />
+    <option name="totallyTimeSpent" value="1105418000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1165,8 +1161,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="528">
-          <caret line="497" column="66" lean-forward="true" selection-start-line="497" selection-start-column="66" selection-end-line="497" selection-end-column="66" />
+        <state relative-caret-position="676">
+          <caret line="588" column="61" selection-start-line="588" selection-start-column="61" selection-end-line="588" selection-end-column="61" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
