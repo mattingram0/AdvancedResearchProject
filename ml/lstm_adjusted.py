@@ -4,11 +4,11 @@ import torch
 import torch.nn as nn
 import matplotlib.pyplot as plt
 
-from stats import helpers
+from stats import stats_helpers
 
 
 def forecast(data, train_hours, test_hours, in_place):
-    helpers.indices_adjust(
+    stats_helpers.indices_adjust(
         data, len(data) - test_hours, test_hours, "multiplicative"
     )
 

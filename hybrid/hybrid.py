@@ -6,8 +6,8 @@ import sys
 import os
 import json
 
-from ml.helpers import pinball_loss, plot_test, plot_es_comp, plot_gen_forecast
-from stats.helpers import split_data, deseasonalise, reseasonalise
+from ml.ml_helpers import pinball_loss, plot_test, plot_es_comp, plot_gen_forecast
+from stats.stats_helpers import split_data, deseasonalise, reseasonalise
 from stats.errors import sMAPE, MASE, OWA
 from stats.naive import naive_2
 from math import sqrt
@@ -114,13 +114,13 @@ def es_rnn(data, forecast_length, seasonality, ensemble, multi_ts, skip_lstm):
 
 
 # General function used to do testing and tweaking
-def run(df, multi_ts, ex):
+def run(demand_df, weather_df):
     # Optionally can supply a year as a command line argument
     year = -1 if len(sys.argv) < 3 else int(sys.argv[2])
     season = -1 if len(sys.argv) < 4 else int(sys.argv[3])
 
     # all_data = {Season: [Year1, ...]}
-    all_data = split_data(df)
+    all_data = split_data(demand_df)
 
     # Each year = [<- 12 week Train -> | <- 1 week Val. -> | <- 1 week Test ->]
     training_sets = [
@@ -154,9 +154,13 @@ def run(df, multi_ts, ex):
     ensemble = False
     skip_lstm = False
     init_params = True
-    write_results = True
-    # res_base = "/Users/matt/Projects/AdvancedResearchProject/test/"
-    res_base = "/ddn/home/gkxx72/AdvancedResearchProject/run/test_res/"
+    write_results = False
+    res_base = "/Users/matt/Projects/AdvancedResearchProject/test/"
+    multi_ts = False  # Use the multiple time series version of the model
+    multi_feat = True  # Use the multiple feature version of the model
+    weather = True  # Include weather data in the model
+
+    # res_base = "/ddn/home/gkxx72/AdvancedResearchProject/run/test_res/"
 
     # Plot a result #TODO HOW TO PLOT RUN_TEST RESULT FROM HAM
     # test_path = "/Users/matt/Projects/AdvancedResearchProject/test" \
@@ -169,10 +173,10 @@ def run(df, multi_ts, ex):
     # num_epochs = 50
     #     # init_learning_rate = 0.1
 
-    num_epochs = 35
+    num_epochs = 5
     local_init_lr = 0.01
     global_init_lr = 0.005
-    input_size = 4
+    input_size = 9
     hidden_size = 40
     num_layers = 4
     dilations = [1, 4, 24, 168]
@@ -199,7 +203,8 @@ def run(df, multi_ts, ex):
                     percentile, auto_lr, variable_lr, auto_rate_threshold,
                     min_epochs_before_change, local_rates, global_rates,
                     grad_clipping, write_results, plot, year, season,
-                    ensemble, multi_ts, skip_lstm, ex, init_params, res_base)
+                    ensemble, multi_ts, skip_lstm, multi_feat, init_params,
+                    res_base)
 
 
 # If output_size != 48 then this is broken. Pass in valid data or test
@@ -225,7 +230,7 @@ def test_model_week(data, output_size, input_size, hidden_size,
 
     results = {i: {} for i in range(1, 8)}
 
-    for i in range(8, 1, -1):
+    for i in range(2, 1, -1):
         # Figure out start and end points of the data
         end_train = -(i * 24)
         start_test = -(i * 24 + window_size)

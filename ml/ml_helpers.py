@@ -1,9 +1,202 @@
 import numpy as np
+from numpy.polynomial.polynomial import polyfit
 import matplotlib.pyplot as plt
+import pandas as pd
 import torch
 import json
-from math import sin
+from math import sin, exp
 from os import walk
+
+
+def weather_analysis():
+    weather_file = "/Users/matt/Projects/AdvancedResearchProject/data/spain/" \
+                   "weather_features.csv"
+    demand_file = "/Users/matt/Projects/AdvancedResearchProject/data/spain/" \
+             "energy_dataset.csv"
+    weather_list = ["dt_iso", "city_name", "temp", "humidity", "wind_speed"]
+    demand_list = ["time", "total load actual"]
+    weather = pd.read_csv(weather_file, parse_dates=["dt_iso"],
+                     infer_datetime_format=True,
+                     usecols=weather_list)
+    demand = pd.read_csv(demand_file, parse_dates=["time"],
+                          infer_datetime_format=True,
+                          usecols=demand_list)
+
+    # Remove duplicates in the weather data
+    weather = weather.drop_duplicates(["dt_iso", "city_name"])
+
+    # Replace 0s to NaNs and interpolate the missing values in demand data
+    demand.replace(0, np.NaN, inplace=True)
+    demand.interpolate(inplace=True)
+
+    # Reference temperature (C) for latent enthalpy calculation
+    ref_temp = 25.6
+
+    # Calculate the HD and CD for all
+    weather["HD"] = weather["temp"].apply(
+        lambda x: 288.65 - x if x < 288.65 else 0
+    )
+    weather["CD"] = weather["temp"].apply(
+        lambda x: x - 296.5 if x > 296.5 else 0
+    )
+    weather["LE"] = weather.apply(
+        lambda row: latent_enthalpy(row, ref_temp), axis=1
+    )
+
+    # Average weather across all cities
+    avg_weather = weather.groupby(["dt_iso"]).mean()
+
+    # Individual city weather data
+    val = weather[weather["city_name"] == "Valencia"]
+    mad = weather[weather["city_name"] == "Madrid"]
+    bar = weather[weather["city_name"] == " Barcelona"]
+    sev = weather[weather["city_name"] == "Seville"]
+    bil = weather[weather["city_name"] == "Bilbao"]
+    cities = [val, mad] #, bar, sev, bil]
+    city_color_map = {"Valencia": "C1", "Madrid": "C2", "Barcelona": "C3",
+                      "Seville": "C4", "Bilbao": "C5"}
+
+    # Plot of average temperature v total load actual
+    fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    ax.scatter(avg_weather["temp"], demand["total load actual"])
+    ax.set_title("Average: Demand against Temperature")
+    b, m, m2 = polyfit(avg_weather["temp"], demand["total load actual"], 2)
+    x = np.arange(
+        np.floor(avg_weather["temp"].min()),
+        np.ceil(avg_weather["temp"].max()) + 1
+    )
+    ax.plot(x, b + m * x + m2 * x**2, color="#fc8403")
+    plt.show()
+
+    fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    ax.scatter(avg_weather["HD"], demand["total load actual"])
+    ax.set_title("Average: Demand against Heating Degree")
+    b, m = polyfit(avg_weather["HD"], demand["total load actual"], 1)
+    x = np.arange(np.ceil(avg_weather["HD"].max()) + 1)
+    ax.plot(x, b + m * x, color="#fc8403")
+    plt.show()
+
+    fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    ax.scatter(avg_weather["CD"], demand["total load actual"])
+    ax.set_title("Average: Demand against Cooling Degree")
+    b, m = polyfit(avg_weather["CD"], demand["total load actual"], 1)
+    x = np.arange(np.ceil(avg_weather["CD"].max()) + 1)
+    ax.plot(x, b + m * x, color="#fc8403")
+    plt.show()
+
+    fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    ax.scatter(avg_weather["LE"], demand["total load actual"])
+    ax.set_title("Average: Demand against Latent Enthalpy")
+    b, m = polyfit(avg_weather["LE"], demand["total load actual"], 1)
+    x = np.arange(np.ceil(avg_weather["LE"].max()) + 1)
+    ax.plot(x, b + m * x, color="#fc8403")
+    plt.show()
+
+    # TODO CHECK WORKS Notes: replace values over 2500 with mean
+    # Not worth including
+    # avg_weather.loc[avg_weather["pressure"] > 2500, "pressure"] = \
+    #     avg_weather["pressure"].mean()
+    # avg_weather.loc[avg_weather["pressure"] < 950, "pressure"] = \
+    #     avg_weather["pressure"].mean()
+    # fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    # ax.scatter(avg_weather["pressure"], demand["total load actual"])
+    # ax.set_title("Average: Demand against Pressure")
+    # b, m = polyfit(avg_weather["pressure"], demand["total load actual"], 1)
+    # x = np.arange(np.floor(avg_weather["pressure"].min()), np.ceil(
+    #     avg_weather["pressure"].max()) + 1)
+    # ax.plot(x, b + m * x, color="#fc8403")
+    # plt.show()
+
+    fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    ax.scatter(avg_weather["humidity"], demand["total load actual"])
+    ax.set_title("Average: Demand against Humidity")
+    b, m = polyfit(avg_weather["humidity"], demand["total load actual"], 1)
+    x = np.arange(
+        np.floor(avg_weather["humidity"].min()),
+        np.ceil(avg_weather["humidity"].max()) + 1
+    )
+    ax.plot(x, b + m * x, color="#fc8403")
+    plt.show()
+
+    # Set one value over 20 to the mean. Seems to be worth including
+    avg_weather.loc[avg_weather["wind_speed"] > 20, "wind_speed"] = \
+        avg_weather["wind_speed"].mean()
+    fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    ax.scatter(avg_weather["wind_speed"], demand["total load actual"])
+    ax.set_title("Average: Demand against Wind Speed")
+    b, m = polyfit(avg_weather["wind_speed"], demand["total load actual"], 1)
+    x = np.arange(np.ceil(avg_weather["wind_speed"].max()) + 1)
+    ax.plot(x, b + m * x, color="#fc8403")
+    plt.show()
+
+    # Of little use
+    # fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    # ax.scatter(avg_weather["rain_1h"], demand["total load actual"])
+    # ax.set_title("Average: Demand against Rain 1h")
+    # b, m = polyfit(avg_weather["rain_1h"], demand["total load actual"], 1)
+    # x = np.arange(np.ceil(avg_weather["rain_1h"].max()) + 1)
+    # ax.plot(x, b + m * x, color="#fc8403")
+    # plt.show()
+
+    # Remove the one value of 0.4 and replot to see the trend. Probably of
+    # little use
+    # avg_weather.loc[avg_weather["rain_3h"] > 0.35, "rain_3h"] = \
+    #     avg_weather["rain_3h"].mean()
+    # fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    # ax.scatter(avg_weather["rain_3h"], demand["total load actual"])
+    # ax.set_title("Average: Demand against Rain 3h")
+    # b, m = polyfit(avg_weather["rain_3h"], demand["total load actual"], 1)
+    # # x = np.arange(np.ceil(avg_weather["rain_3h"].max()) + 1)
+    # x = np.linspace(0, 0.05, 20)
+    # ax.plot(x, b + m * x, color="#fc8403")
+    # plt.show()
+
+    # So little snow that this is of little value
+    # fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    # ax.scatter(avg_weather["snow_3h"], demand["total load actual"])
+    # ax.set_title("Average: Demand against Snow 3h")
+    # b, m = polyfit(avg_weather["snow_3h"], demand["total load actual"], 1)
+    # x = np.arange(np.ceil(avg_weather["snow_3h"].max()) + 1)
+    # ax.plot(x, b + m * x, color="#fc8403")
+    # plt.show()
+
+    # Little point in using, no correlation really
+    # fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    # ax.scatter(avg_weather["clouds_all"], demand["total load actual"])
+    # ax.set_title("Average: Demand against Cloud Cover")
+    # b, m = polyfit(avg_weather["clouds_all"], demand["total load actual"], 1)
+    # x = np.arange(np.ceil(avg_weather["clouds_all"].max()) + 1)
+    # ax.plot(x, b + m * x, color="#fc8403")
+    # plt.show()
+
+    # Plots of temperature v total load actual for each city
+    # for c in cities:
+    #     c = c.set_index('dt_iso').asfreq('H')
+    #     name = c.iloc[0]["city_name"].strip()
+    #     color = city_color_map[name]
+    #
+    #     fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    #     ax.scatter(c["temp"], demand["total load actual"], color=color)
+    #     ax.set_title(name + ": Demand against Temperature")
+    #     plt.show()
+    #
+    #     fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    #     ax.scatter(c["HD"], demand["total load actual"], color=color)
+    #     ax.set_title(name + ": Demand against Heating Degree")
+    #     plt.show()
+    #
+    #     fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    #     ax.scatter(c["CD"], demand["total load actual"], color=color)
+    #     ax.set_title(name + ": Demand against Cooling Degree")
+    #     plt.show()
+    #
+    #     fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    #     ax.scatter(c["LE"], demand["total load actual"], color=color)
+    #     ax.set_title(name + ": Demand against Latent Enthalpy")
+    #     b, m = polyfit(c["LE"], demand["total load actual"], 1)
+    #     x = np.arange(np.ceil(c["LE"].max()) + 1)
+    #     ax.plot(x, b + m * x, color="#fc8403")
+    #     plt.show()
 
 
 def plot_lr():
@@ -152,6 +345,68 @@ def plot_lr():
 
     plt.show()
 
+
+# Convert hPa to Pa
+def hpa_to_pa(p):
+    return 100 * p
+
+
+# Convert kelvin to celcius
+def k_to_c(t):
+    return t - 273.15
+
+
+# Convert celcius to kelvin
+def c_to_k(t):
+    return t + 273.15
+
+
+# Calculate an approximation for the saturation vapor pressure for moist air
+# using the Arden Buck equation (more optimised than the Goff-Gratch
+# equation for -80C to 50C).
+# Input: Temperature t in Celcius (C)
+# Output: Saturation vapor pressire in Pascals (Pa)
+# See: https://en.wikipedia.org/wiki/Arden_Buck_equation
+def arden_buck(t):
+    return 611.21 * exp((18.678 - t/234.5) * (t/(257.14 + t))) if t > 0 else\
+        611.15 * exp((23.036 - t/333.7) * (t/(279.82 + t)))
+
+
+# Calculate an approximation for the specific enthalpy using the above Arden
+# Buck equation for the saturation vapor pressure for moist air. The formula is:
+# h = Cpa * t + x * [Cpw * t + Hwe], where Cpa, Cpw and Hwe are constants, and
+# x = 0.62198 * pw(t) / (pa - pw(t)) is the humidity ratio per mass, where:
+# pa is the current pressure in Pascals, and
+# pw(t) = r * ps(t) is the partial pressure of water vapor in moist air, where:
+# r = relative humidity of the air (decimal), and
+# ps(t) = saturation vapor pressure for the given temperature t, found using
+# the arden_buck formula.
+# See:
+# https://www.engineeringtoolbox.com/enthalpy-moist-air-d_683.html
+# https://www.engineeringtoolbox.com/water-vapor-saturation-pressure-air-d_689.html
+# https://www.chegg.com/homework-help/determine-partial-pressure-water-vapor-moist-air-following-c-chapter-10-problem-3p-solution-9781305534094-exc
+# Note that the formula given in this paper: https://www.sciencedirect.com/science/article/pii/S0378778815303492#eq0005
+# is incorrect
+# Used: https://www.psychrometric-calculator.com/humidairweb.aspx to check
+# my implementation
+# Input: Temperature in C, pressure in Pa, relative humidity ([0, 1])
+# Output: Specific enthalpy in kilojoules per kilogram of dry hair (kJ/kg)
+def specific_enthalpy(t, p, r):
+    return 1.006 * t + (((0.62198 * r * arden_buck(t)) / (p - (r * arden_buck(
+        t)))) * (2501 + (1.84 * t)))
+
+
+# Receive a row of weather data (must include temperature, pressure and
+# relative humidity) and calculate the latent enthalpy as defined in:
+# https://ieeexplore.ieee.org/document/1525139
+def latent_enthalpy(row, ref_temp):
+    t = k_to_c(row["temp"])
+    p = hpa_to_pa(row["pressure"])
+    r = row["humidity"] / 100
+    q = specific_enthalpy(t, p, r)
+    qb = specific_enthalpy(ref_temp, p, r)
+
+    return q - qb if t > ref_temp and q - qb > 0 else 0
 
 # This func will loop through a directory and plot the results for every
 # results file it finds in there, by calling plot_tests()

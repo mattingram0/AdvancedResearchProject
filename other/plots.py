@@ -6,7 +6,7 @@ from scipy import signal
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from statsmodels.tsa.seasonal import seasonal_decompose
 
-from stats.helpers import decomp_adjust, difference, seasonally_difference, \
+from stats.stats_helpers import decomp_adjust, difference, seasonally_difference, \
     double_difference, indices_adjust
 
 

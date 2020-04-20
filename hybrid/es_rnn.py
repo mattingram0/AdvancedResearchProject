@@ -2,7 +2,7 @@
 import torch
 import torch.nn as nn
 from torch.distributions import Normal, Uniform
-from ml import drnn, non_lin, helpers
+from ml import drnn, non_lin, ml_helpers
 import sys
 
 class ES_RNN(nn.Module):
@@ -256,7 +256,7 @@ class ES_RNN(nn.Module):
         data_out = labels[j]
         rnn_out = out[j]
         if self.counter == 25:
-            helpers.plot_sliding_window(data_subset, rnn_in, data_out, rnn_out)
+            ml_helpers.plot_sliding_window(data_subset, rnn_in, data_out, rnn_out)
 
         # Save the level and seasonality values so that we can use them to make
         # predictions

@@ -3,7 +3,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import statsmodels.api as sm
 
-import os.path, json, sys
+import os.path
+import json
+import sys
 
 from pandas.plotting import register_matplotlib_converters
 from functools import reduce
@@ -11,75 +13,21 @@ from timeit import default_timer as timer
 from math import fabs
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
-from stats import arima, exponential_smoothing, naive, theta, errors
-from ml import helpers  # TODO MAKE SURE TO CHANGE BACK TO STATS WHEN
+from stats import arima, exponential_smoothing, naive, theta, errors, stats_helpers
+from sklearn.preprocessing import MinMaxScaler
+from ml import ml_helpers
 from hybrid import hybrid
-
-
-def load_data(filename, mult_ts):
-    if mult_ts:
-        # TODO REMEMBER TO CHANGE BACK
-        # col_list = ["time", "generation fossil gas", "price actual",
-        #             "generation fossil hard coal", "total load forecast",
-        #             "generation fossil oil", "total load actual",
-        #             "generation hydro water reservoir", "generation solar",
-        #             "forecast solar day ahead", "price day ahead",
-        #             "generation hydro run-of-river and poundage"]
-        col_list = ["time", "total load actual", "generation fossil gas",
-                    "generation fossil hard coal", "generation fossil oil"]
-        return pd.read_csv(
-            filename, parse_dates=["time"], infer_datetime_format=True,
-            usecols=col_list
-        )
-
-        # # Drop the forecast columns
-        # df.drop(
-        #     columns=["forecast solar day ahead",
-        #              "forecast wind offshore eday ahead",
-        #              "forecast wind onshore day ahead",
-        #              "total load forecast",
-        #              "price day ahead"],
-        #     inplace=True
-        # )
-        #
-        # df = df[["time", "total load actual", "price actual"]]
-        #
-        # # Drop the columns whose values are all either 0 or missing
-        # return df.loc[:, (pd.isna(df) == (df == 0)).any(axis=0)]
-
-
-
-    else:
-        return pd.read_csv(
-            filename, parse_dates=["time"],
-            usecols=["time", "total load actual"], infer_datetime_format=True
-        )
+from numpy.polynomial.polynomial import polyfit
 
 
 def main():
-    # helpers.plot_es_comp()
-    # helpers.plot_one_test()
+    demand_df = load_demand_data(True)
+    weather_df = load_weather_data()
     # test(int(sys.argv[1]), int(sys.argv[2]))
-    file_path = os.path.abspath(os.path.dirname(__file__))
-    data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
-    df = load_data(data_path, True)
-    df = df.set_index('time').asfreq('H')
-    df.replace(0, np.NaN, inplace=True)
-    df.interpolate(inplace=True)
-    # deseason(df)
-    # typical_plot(df)
-    # sys.exit(0)
-    # sys.exit(0)
-    # # helpers.plot_forecasts(df, "Winter", 2, 1)
-    # # helpers.plot_forecasts(df, "Summer", 1, 1)
-    # # helpers.plot_48_results()
-    # # identify_arima(df, False)
+    # plot_sample(df["price actual"])
+    # helpers.weather_analysis()
 
-    # helpers.plot_lr()
-    # sys.exit(0)
-    # run(df, multi_ts, ex)
-    hybrid.run(df, False, True)
-    # helpers.plot_lr()
+    # hybrid.run(demand_df, weather_df)
 
     # ---------------------- LOAD MULTIPLE TIME SERIES ----------------------
 
@@ -97,13 +45,91 @@ def main():
     # )
 
 
+def load_demand_data(multi_ts):
+    base = os.path.abspath(os.path.dirname(__file__))
+    filename = os.path.join(base, "data/spain/energy_dataset.csv")
+
+    # TODO REMEMBER TO CHANGE BACK
+    # col_list = ["time", "generation fossil gas",
+    #             "generation fossil hard coal",
+    #             "generation fossil oil",
+    #             "generation hydro run-of-river and poundage",
+    #             "generation hydro water reservoir", "generation solar",
+    #             "forecast solar day ahead", "total load forecast",
+    #              "total load actual", "price day ahead", "price actual",
+    #             ]
+    # col_list = ["time", "total load actual", "generation fossil gas",
+    #             "generation fossil hard coal", "generation fossil oil"]
+    if multi_ts:
+        col_list = ["time", "generation fossil gas",
+                    "generation fossil hard coal",
+                    "generation fossil oil",
+                    "generation hydro run-of-river and poundage",
+                    "generation hydro water reservoir", "total load forecast",
+                    "total load actual", "price day ahead", "price actual",
+                    ]
+    else:
+        col_list = ["time", "total load actual"]
+
+    df = pd.read_csv(filename, parse_dates=["time"],
+                     infer_datetime_format=True, usecols=col_list)
+    df = df.set_index('time').asfreq('H')
+    df.replace(0, np.NaN, inplace=True)
+    df.interpolate(inplace=True)
+
+    return df
+
+
+def load_weather_data():
+    base = os.path.abspath(os.path.dirname(__file__))
+    filename = os.path.join(base, "data/spain/weather_features.csv")
+    weather_cols = ["dt_iso", "city_name", "temp", "humidity", "wind_speed",
+                    "pressure"]
+    weather_df = pd.read_csv(filename, parse_dates=["dt_iso"],
+                          infer_datetime_format=True,
+                          usecols=weather_cols)
+
+    # Remove duplicates in the weather data
+    weather_df = weather_df.drop_duplicates(["dt_iso", "city_name"])
+
+    # Reference temperature (C) for latent enthalpy calculation
+    hd_ref = ml_helpers.c_to_k(15.5)
+    cd_ref = ml_helpers.c_to_k(23.5)
+    le_ref = 25.6
+
+    # Calculate the HD and CD for all
+    weather_df["heating_degree"] = weather_df["temp"].apply(
+        lambda x: hd_ref - x if x < hd_ref else 0
+    )
+    weather_df["cooling_degree"] = weather_df["temp"].apply(
+        lambda x: x - cd_ref if x > cd_ref else 0
+    )
+    weather_df["latent_enthalpy"] = weather_df.apply(
+        lambda row: ml_helpers.latent_enthalpy(row, le_ref), axis=1
+    )
+
+    # Drop the pressure column, only required to calculate latent_enthalpy
+    weather_df.drop(["pressure"], axis=1, inplace=True)
+
+    # Average weather across all cities
+    avg_weather_df = weather_df.groupby(["dt_iso"]).mean()
+
+    # Normalise all values into the correct range
+    scaler = MinMaxScaler((-1, 1))
+    avg_scaled_df = pd.DataFrame(scaler.fit_transform(avg_weather_df),
+                                 columns=avg_weather_df.columns,
+                                 index=avg_weather_df.index)
+
+    return avg_scaled_df
+
+
 # Finds the closest number higher than the desired batch size bs which
 # divides the number of training examples
 def calc_batch_size(n, bs):
     factors = list(set(
         reduce(
             list.__add__,
-            ([i, n//i] for i in range(1, int(n**0.5) + 1) if n % i == 0)
+            ([i, n // i] for i in range(1, int(n ** 0.5) + 1) if n % i == 0)
         )
     ))
     return factors[np.argmin([fabs(v - bs) if v >= bs else sys.maxsize for v
@@ -112,7 +138,7 @@ def calc_batch_size(n, bs):
 
 # Plot actual and deseasonalised data, ACF, PACF for all season in all years
 def analyse(df):
-    all_data = helpers.split_data(df)
+    all_data = stats_helpers.split_data(df)
 
     for season in ["Winter", "Spring", "Summer", "Autumn"]:
         years = all_data[season]
@@ -120,7 +146,7 @@ def analyse(df):
         fig, axes = plt.subplots(2, 2, figsize=(20, 15), dpi=250)
         plt.suptitle(season + " - Data", y=0.99)
         for i, (year, ax) in enumerate(zip(years, axes.flatten())):
-            deseason, ind, = helpers.deseasonalise(
+            deseason, ind, = stats_helpers.deseasonalise(
                 year["total load actual"], 168, "multiplicative"
             )
 
@@ -137,10 +163,10 @@ def analyse(df):
             print("Critical values: ")
             for k, v in adf[4].items():
                 print("\t{}: {:.4f} (The data is {}stationary with {}% "
-                    "confidence)".format(
-                        k, v, "not " if v < adf[0] else "",
-                        100 - int(k[
-                                  :-1])))
+                      "confidence)".format(
+                    k, v, "not " if v < adf[0] else "",
+                    100 - int(k[
+                              :-1])))
             print()
         print()
         plt.show()
@@ -165,7 +191,7 @@ def analyse(df):
         fig, axes = plt.subplots(2, 2, figsize=(20, 15), dpi=250)
         plt.suptitle(season + " - ACFs (Deseasonalised)", y=0.99)
         for i, (year, ax) in enumerate(zip(years, axes.flatten())):
-            deseason, _ = helpers.deseasonalise(
+            deseason, _ = stats_helpers.deseasonalise(
                 year["total load actual"], 168, "multiplicative"
             )
             plot_acf(deseason, ax=ax, alpha=0.05, lags=168)
@@ -176,7 +202,7 @@ def analyse(df):
         fig, axes = plt.subplots(2, 2, figsize=(20, 15), dpi=250)
         plt.suptitle(season + " - PACFs (Deseasonalised)", y=0.99)
         for i, (year, ax) in enumerate(zip(years, axes.flatten())):
-            deseason, _ = helpers.deseasonalise(
+            deseason, _ = stats_helpers.deseasonalise(
                 year["total load actual"], 168, "multiplicative"
             )
             plot_pacf(deseason, ax=ax, alpha=0.05, lags=168)
@@ -265,7 +291,7 @@ def plot_sample(df):
     ]
 
     # Plot winter weeks
-    fig, axes = plt.subplots(4, 3, figsize=(12.8, 9.6), dpi=250)
+    fig, axes = plt.subplots(4, 3, figsize=(20, 15), dpi=250)
     axes.flatten()[0].set_ylabel("Year 1")
     for i, (ax, week) in enumerate(zip(axes.flatten()[1:], winter_weeks)):
         if i == 2:
@@ -446,7 +472,7 @@ def identify_arima(df, plot):
     # Optionally pass in a season as command line argument. If we do so,
     # only that season
     seas_in = -1 if len(sys.argv) == 1 else str(sys.argv[1])
-    all_data = helpers.split_data(df)
+    all_data = stats_helpers.split_data(df)
 
     for season in ["Winter", "Spring", "Summer", "Autumn"]:
         # If we passed in our own season, then skip all other seasons
@@ -459,7 +485,7 @@ def identify_arima(df, plot):
 
         for yn, y in enumerate(years):
 
-            y, ind = helpers.deseasonalise(y, 168, "multiplicative")
+            y, ind = stats_helpers.deseasonalise(y, 168, "multiplicative")
             best_order = [1, 0, 0]
             best_const = True
             fitted_model = sm.tsa.ARIMA(y[:-48], order=best_order).fit(disp=-1)
@@ -558,7 +584,7 @@ def identify_arima(df, plot):
 
 # Identify the correct SARIMA order for each season
 def identify_sarima(df):
-    all_data = helpers.split_data(df)
+    all_data = stats_helpers.split_data(df)
 
     for season in ["Winter", "Spring", "Summer", "Autumn"]:
         years = all_data[season]
@@ -569,7 +595,7 @@ def identify_sarima(df):
 
         for yn, y in enumerate(years):
             start = timer()
-            y, ind = helpers.deseasonalise(y, 168, "multiplicative")
+            y, ind = stats_helpers.deseasonalise(y, 168, "multiplicative")
             best_order = [2, 0, 1]
             best_seasonal_order = [2, 0, 1, 168]
             best_const_trend = 'n'
@@ -647,10 +673,10 @@ def gen_new_orders(order, seasonal_order):
 # Plot the deseasonalised data for 24- and 168-seasonality
 def deseason(df):
     year = df.loc["2015-01-01 00:00:00+01:00":"2015-02-28 23:00:00+01:00"]
-    year_24, _ = helpers.deseasonalise(
+    year_24, _ = stats_helpers.deseasonalise(
         year["total load actual"], 24, "multiplicative"
     )
-    year_168, _ = helpers.deseasonalise(
+    year_168, _ = stats_helpers.deseasonalise(
         year["total load actual"], 168, "multiplicative"
     )
 
@@ -844,7 +870,7 @@ def test(season_no, model_no):
 
     final_params = {y: [] for y in range(1, 5)}
 
-    all_data = helpers.split_data(df)
+    all_data = stats_helpers.split_data(df)
     years_df = all_data[seas_dict[season_no]]
 
     # The final 7 days are reserved for final testing
@@ -867,15 +893,16 @@ def test(season_no, model_no):
             test_end = -(t * 24 - forecast_length) if t > 2 else None
             train_data = y[:train_end]
             test_data = y[train_end:test_end]
-            tso_data = years_df[y_index]["total load forecast"][train_end:test_end]
+            tso_data = years_df[y_index]["total load forecast"][
+                       train_end:test_end]
 
             # Deseasonalise, always required for Naive2
-            train_deseas, indices = helpers.deseasonalise(
+            train_deseas, indices = stats_helpers.deseasonalise(
                 train_data, seasonality, "multiplicative"
             )
 
             # Generate naïve forecast for use in MASE calculation
-            naive_fit_forecast = helpers.reseasonalise(
+            naive_fit_forecast = stats_helpers.reseasonalise(
                 naive.naive_2(train_deseas, forecast_length),
                 indices,
                 "multiplicative"
@@ -934,7 +961,7 @@ def test(season_no, model_no):
 
                 # Reseasonalise if necessary
                 if deseasonalise:
-                    fit_forecast = helpers.reseasonalise(
+                    fit_forecast = stats_helpers.reseasonalise(
                         fit_forecast, indices, "multiplicative"
                     )
 
@@ -1106,7 +1133,7 @@ def old_test(data, seasonality, test_hours, methods, names, multiple):
             # Loop through the entire time series
             for o in range(len(data) - train_hours - test_hours + 1):
                 data_subset = data[o: o + train_hours + test_hours]
-                helpers.indices_adjust(
+                stats_helpers.indices_adjust(
                     data_subset, train_hours, test_hours, "multiplicative"
                 )
 
@@ -1170,7 +1197,7 @@ def old_test(data, seasonality, test_hours, methods, names, multiple):
             # Loop through the entire time series
             for o in range(len(data) - train_hours - test_hours + 1):
                 data_subset = data[o: o + train_hours + test_hours]
-                helpers.indices_adjust(
+                stats_helpers.indices_adjust(
                     data_subset, train_hours, test_hours, "multiplicative"
                 )
 
@@ -1272,3 +1299,18 @@ pd.set_option('display.max_columns', 500)  # Shows all columns
 pd.set_option('display.expand_frame_repr', False)  # Prevents line break
 plt.style.use('seaborn-deep')
 main()
+
+# # Drop the forecast columns
+# df.drop(
+#     columns=["forecast solar day ahead",
+#              "forecast wind offshore eday ahead",
+#              "forecast wind onshore day ahead",
+#              "total load forecast",
+#              "price day ahead"],
+#     inplace=True
+# )
+#
+# df = df[["time", "total load actual", "price actual"]]
+#
+# # Drop the columns whose values are all either 0 or missing
+# return df.loc[:, (pd.isna(df) == (df == 0)).any(axis=0)]

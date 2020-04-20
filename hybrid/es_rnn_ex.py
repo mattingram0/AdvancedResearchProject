@@ -2,7 +2,7 @@
 import torch
 import torch.nn as nn
 from torch.distributions import Normal, Uniform
-from ml import drnn, non_lin, helpers
+from ml import drnn, non_lin, ml_helpers
 
 
 class ES_RNN_EX(nn.Module):

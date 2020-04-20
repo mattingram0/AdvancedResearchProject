@@ -7,7 +7,7 @@ import sys
 from sklearn.preprocessing import MinMaxScaler
 
 from ml import drnn
-from ml.helpers import create_pairs, batch_data
+from ml.ml_helpers import create_pairs, batch_data
 
 
 #TODO - make stateful when testing if testing more than a single 48 hour
