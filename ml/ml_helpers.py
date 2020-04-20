@@ -661,7 +661,7 @@ def plot_test(results, window_size, output_size, print_results):
             axes[0].plot(test_data, label="Actual Data")
             axes[0].plot([i for i in range(window_size, window_size +
                                            output_size)],
-                         prediction, label="ES_RNN")
+                         prediction, label="ES_RNN_S")
             axes[0].plot([i for i in range(window_size, window_size +
                                            output_size)],
                          naive_prediction, label="Naive2")

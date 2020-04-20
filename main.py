@@ -27,6 +27,13 @@ def main():
     # plot_sample(df["price actual"])
     # helpers.weather_analysis()
 
+    # Plotting results from Hamilton
+    # test_path = "/Users/matt/Projects/AdvancedResearchProject/test" \
+    #             "/sym_max_year_3_summer.txt"
+    # with open(test_path) as f:
+    #     plot_test(json.load(f), window_size, output_size, True)
+    # sys.exit(0)
+
     # hybrid.run(demand_df, weather_df)
 
     # ---------------------- LOAD MULTIPLE TIME SERIES ----------------------
@@ -786,7 +793,7 @@ def test(season_no, model_no):
     seasonality = 168
     forecast_length = 48
 
-    # For the ES_RNN, for each test, train the model num_ensemble
+    # For the ES_RNN_S, for each test, train the model num_ensemble
     # times and average the predictions. Further, if internal ensembling is
     # also specified, each prediction from the model will actually be the
     # average of the predictions from the last 5 epochs

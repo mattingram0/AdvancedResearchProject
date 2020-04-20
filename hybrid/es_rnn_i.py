@@ -1,11 +1,10 @@
-# Stateful, mini-batch trained DRNN. One feature.
 import torch
 import torch.nn as nn
 from torch.distributions import Normal, Uniform
-from ml import drnn, non_lin, ml_helpers
+from ml import drnn, non_lin
 
 
-class ES_RNN_EX(nn.Module):
+class ES_RNN_I(nn.Module):
     def __init__(self, output_size, input_size, batch_size, hidden_size,
                  num_layers, features, seasonality, dropout=0,
                  cell_type='LSTM', batch_first=False, dilations=None,
@@ -200,6 +199,13 @@ class ES_RNN_EX(nn.Module):
         # Concatenate the tensor from each feature into a single tensor
         labels = torch.cat(labels, dim=0)
         inputs = torch.cat(all_inputs, dim=2)
+
+        # Debugging:
+        # print(torch.max(inputs).item())
+        # print(torch.min(inputs).item())
+        # for i, f in enumerate(self.features):
+        #     print(f, torch.max(inputs[:, :, i]).item(),
+        #           torch.min(inputs[:, :, i]).item())
 
         # Feed inputs in to Dilated LSTM
         _, hidden = self.drnn(inputs.double())

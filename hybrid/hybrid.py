@@ -6,14 +6,15 @@ import sys
 import os
 import json
 
-from ml.ml_helpers import pinball_loss, plot_test, plot_es_comp, plot_gen_forecast
+from ml.ml_helpers import pinball_loss, plot_test, plot_es_comp, \
+    plot_gen_forecast
 from stats.stats_helpers import split_data, deseasonalise, reseasonalise
 from stats.errors import sMAPE, MASE, OWA
 from stats.naive import naive_2
 from math import sqrt
 
-from hybrid.es_rnn import ES_RNN
-from hybrid.es_rnn_mult import ES_RNN_MULT
+from hybrid.es_rnn_s import ES_RNN_S
+from hybrid.es_rnn_i import ES_RNN_I
 
 
 # Give the model the training data, the forecast length and the seasonality,
@@ -62,7 +63,7 @@ def es_rnn(data, forecast_length, seasonality, ensemble, multi_ts, skip_lstm):
         init_s_smooth[c] = -0.2
 
     # Create the model
-    lstm = ES_RNN(
+    lstm = ES_RNN_S(
         forecast_length, input_size, batch_size, hidden_size, num_layers,
         batch_first=batch_first, dilations=dilations, features=features,
         seasonality_1=None, seasonality_2=seasonality, residuals=residuals,
@@ -79,7 +80,7 @@ def es_rnn(data, forecast_length, seasonality, ensemble, multi_ts, skip_lstm):
     lstm.train()
 
     # Train the model, and make a (possibly ensembled) prediction.
-    prediction = train_and_predict(
+    prediction = train_and_predict_s(
         lstm, train_data, window_size, forecast_length,
         level_variability_penalty, loss_func, num_epochs,
         init_learning_rate, percentile, auto_lr, variable_lr,
@@ -115,7 +116,7 @@ def es_rnn(data, forecast_length, seasonality, ensemble, multi_ts, skip_lstm):
 
 # General function used to do testing and tweaking
 def run(demand_df, weather_df):
-    # Optionally can supply a year as a command line argument
+    # Optional command line arguments to specify year/season
     year = -1 if len(sys.argv) < 3 else int(sys.argv[2])
     season = -1 if len(sys.argv) < 4 else int(sys.argv[3])
 
@@ -123,13 +124,6 @@ def run(demand_df, weather_df):
     all_data = split_data(demand_df)
 
     # Each year = [<- 12 week Train -> | <- 1 week Val. -> | <- 1 week Test ->]
-    training_sets = [
-        all_data["Winter"][year if year >= 0 else 1][:-(15 * 24)],
-        all_data["Spring"][year if year >= 0 else 0][:-(15 * 24)],
-        all_data["Summer"][year if year >= 0 else 3][:-(15 * 24)],
-        all_data["Autumn"][year if year >= 0 else 2][:-(15 * 24)]
-    ]
-
     valid_sets = [
         all_data["Winter"][year if year >= 0 else 1][:-(7 * 24)],
         all_data["Spring"][year if year >= 0 else 0][:-(7 * 24)],
@@ -144,10 +138,7 @@ def run(demand_df, weather_df):
         all_data["Autumn"][year if year >= 0 else 2]
     ]
 
-    # Default to summer if no month provided in the input arguments
-    data = valid_sets[season if season >= 0 else 2]
-
-    # For now, just use one of the training sets
+    # Testing parameters
     window_size = 336
     output_size = 48
     plot = False
@@ -155,24 +146,24 @@ def run(demand_df, weather_df):
     skip_lstm = False
     init_params = True
     write_results = False
-    res_base = "/Users/matt/Projects/AdvancedResearchProject/test/"
-    multi_ts = False  # Use the multiple time series version of the model
-    multi_feat = True  # Use the multiple feature version of the model
-    weather = True  # Include weather data in the model
+    file_location = str(os.path.abspath(os.path.dirname(__file__)))
+    model = True  # True = Ingram, False = Smyl
+    multiple = False  # Use multiple time series in Smyl's model
+    weather = True  # Include weather data in the chosen model
+    valid = True  # True = use validation set, False = use test set
+    batch_first = True
 
-    # res_base = "/ddn/home/gkxx72/AdvancedResearchProject/run/test_res/"
+    if file_location == "/ddn/home/gkxx72/AdvancedResearchProject/dev":
+        res_base = "/ddn/home/gkxx72/AdvancedResearchProject/run/test_res/"
+    else:
+        res_base = "/Users/matt/Projects/AdvancedResearchProject/test/"
 
-    # Plot a result #TODO HOW TO PLOT RUN_TEST RESULT FROM HAM
-    # test_path = "/Users/matt/Projects/AdvancedResearchProject/test" \
-    #             "/sym_max_year_3_summer.txt"
-    # with open(test_path) as f:
-    #     plot_test(json.load(f), window_size, output_size, True)
-    # sys.exit(0)
+    if valid:
+        data = valid_sets[season if season >= 0 else 2]
+    else:
+        data = test_sets[season if season >= 0 else 2]
 
-    # Training parameters
-    # num_epochs = 50
-    #     # init_learning_rate = 0.1
-
+    # Model hyper parameters
     num_epochs = 5
     local_init_lr = 0.01
     global_init_lr = 0.005
@@ -188,23 +179,27 @@ def run(demand_df, weather_df):
     variable_lr = True  # Use list of epoch/rate pairs
     global_rates = {10: 1e-3, 20: 5e-4, 30: 1e-4}
     local_rates = {10: 5e-3, 20: 1e-3, 30: 5e-4}
+    auto_rate_threshold = 1.005  # If loss(x - 1) < 1.005 * loss(x) reduce rate
+    min_epochs_before_change = 2
+    residuals = tuple([[1, 3]])  # Residual connection from 2nd out -> 4th out
+    seasonality_1 = 24
+    seasonality_2 = 168
+    init_level_smoothing = -2
+    init_seasonal_smoothing = -1
 
     # TODO - FOR THE MULTI TS YOU NEED TO FIX THE LOCAL AND GLOBAL RATES STUFF
 
-    auto_rate_threshold = 1.005  # If loss(x - 1) < 1.005 * loss(x) reduce rate
-    min_epochs_before_change = 2
-    residuals = tuple([[1, 3]])  # Residual connection from output of 2nd layer
-    # to output of 4th layer
-
     test_model_week(data, output_size, input_size, hidden_size,
-                    num_layers, True, dilations, data.columns, 24, 168,
+                    num_layers, batch_first, dilations, data.columns,
+                    seasonality_1, seasonality_2,
                     residuals, window_size, level_variability_penalty,
                     loss_func, num_epochs, local_init_lr, global_init_lr,
+                    init_level_smoothing, init_seasonal_smoothing,
                     percentile, auto_lr, variable_lr, auto_rate_threshold,
                     min_epochs_before_change, local_rates, global_rates,
                     grad_clipping, write_results, plot, year, season,
-                    ensemble, multi_ts, skip_lstm, multi_feat, init_params,
-                    res_base)
+                    ensemble, multiple, skip_lstm, model, init_params,
+                    res_base, weather)
 
 
 # If output_size != 48 then this is broken. Pass in valid data or test
@@ -213,11 +208,15 @@ def test_model_week(data, output_size, input_size, hidden_size,
                     num_layers, batch_first, dilations, features, seasonality1,
                     seasonality2, residuals, window_size,
                     level_variability_penalty, loss_func, num_epochs,
-                    local_init_lr, global_init_lr, percentile, auto_lr,
-                    variable_lr, auto_rate_threshold, min_epochs_before_change,
-                    local_rates, global_rates, grad_clipping, write_results,
-                    plot, year, season, ensemble, multi_ts, skip_lstm, ex,
-                    init_params, res_base):
+                    local_init_lr, global_init_lr,
+                    init_level_smoothing, init_seasonal_smoothing, percentile,
+                    auto_lr, variable_lr, auto_rate_threshold,
+                    min_epochs_before_change, local_rates, global_rates,
+                    grad_clipping, write_results, plot, year, season,
+                    ensemble, multi_ts, skip_lstm, model, init_params,
+                    res_base, weather):
+
+    # Arrays and dictionaries to hold the results
     es_rnn_predictions = []
     es_rnn_smapes = []
     es_rnn_mases = []
@@ -227,21 +226,20 @@ def test_model_week(data, output_size, input_size, hidden_size,
     actuals_mases = []
     actuals = []
     owas = []
-
     results = {i: {} for i in range(1, 8)}
 
-    for i in range(2, 1, -1):
-        # Figure out start and end points of the data
+    # Loop through each day in the week
+    for i in range(8, 1, -1):
+
+        # Figure out start and end points of the training/test data
         end_train = -(i * 24)
         start_test = -(i * 24 + window_size)
         end_test = -(i * 24 - output_size) if i != 2 else None
-
         train_data = data[:end_train]
         mase_data = data["total load actual"][:end_test]
 
+        # Initialise (or not) the parameters
         if init_params:
-            # Determine initial parameter values. Can probably improved the
-            # inital smoothing coefficients to be time series specific
             init_seas = {}
             init_l_smooth = {}
             init_s_smooth = {}
@@ -249,8 +247,8 @@ def test_model_week(data, output_size, input_size, hidden_size,
                 deseas, indic = deseasonalise(train_data[c], 168,
                                               "multiplicative")
                 init_seas[c] = indic
-                init_l_smooth[c] = -2
-                init_s_smooth[c] = -1
+                init_l_smooth[c] = init_level_smoothing
+                init_s_smooth[c] = init_seasonal_smoothing
 
                 if c == "total load actual":
                     train_deseas = deseas
@@ -264,13 +262,13 @@ def test_model_week(data, output_size, input_size, hidden_size,
             init_l_smooth = None
             init_s_smooth = None
 
-        # Batch size properly calculated here, as training data size changes
+        # Calculate the batch size
         batch_size = len(train_data["total load actual"]) - window_size - \
                      output_size + 1
 
-        # Create a fresh model
-        if ex:
-            lstm = ES_RNN_MULT(
+        # Create a new model. Either mine or Smyl's
+        if model:
+            lstm = ES_RNN_I(
                 output_size, input_size, batch_size, hidden_size,
                 num_layers, features, seasonality2, batch_first=batch_first,
                 dilations=dilations, residuals=residuals,
@@ -278,7 +276,7 @@ def test_model_week(data, output_size, input_size, hidden_size,
                 init_seas_smoothing=init_s_smooth
             ).double()
         else:
-            lstm = ES_RNN(
+            lstm = ES_RNN_S(
                 output_size, input_size, batch_size, hidden_size, num_layers,
                 batch_first=batch_first, dilations=dilations,
                 features=features,
@@ -299,47 +297,51 @@ def test_model_week(data, output_size, input_size, hidden_size,
         print("----- TEST", str(9 - i), "-----")
 
         # Train the model. Discard prediction here (used in proper function)
-        if ex:
+        if model:
             test_data = data[start_test:end_test]
-            _, losses = train_and_predict_ex(lstm, train_data, window_size,
-                                             output_size,
-                                             level_variability_penalty,
-                                             loss_func,
-                                             num_epochs, local_init_lr,
-                                             global_init_lr,
-                                             percentile,
-                                             auto_lr, variable_lr,
-                                             auto_rate_threshold,
-                                             min_epochs_before_change,
-                                             test_data, local_rates,
-                                             global_rates,
-                                             ensemble)
+            _, losses = train_and_predict_i(
+                lstm, train_data, window_size,
+                output_size,
+                level_variability_penalty,
+                loss_func,
+                num_epochs, local_init_lr,
+                global_init_lr,
+                percentile,
+                auto_lr, variable_lr,
+                auto_rate_threshold,
+                min_epochs_before_change,
+                test_data, local_rates,
+                global_rates,
+                ensemble
+            )
         else:
             test_data = torch.tensor(
                 data["total load actual"][start_test:end_test],
                 dtype=torch.double
             )
-            _, losses = train_and_predict(lstm, train_data, window_size,
-                                          output_size,
-                                          level_variability_penalty,
-                                          loss_func, num_epochs,
-                                          local_init_lr, percentile,
-                                          auto_lr, variable_lr,
-                                          auto_rate_threshold,
-                                          min_epochs_before_change,
-                                          test_data, local_rates, ensemble,
-                                          multi_ts,
-                                          skip_lstm)
+            _, losses = train_and_predict_s(
+                lstm, train_data, window_size,
+                output_size,
+                level_variability_penalty,
+                loss_func, num_epochs,
+                local_init_lr, percentile,
+                auto_lr, variable_lr,
+                auto_rate_threshold,
+                min_epochs_before_change,
+                test_data, local_rates, ensemble,
+                multi_ts,
+                skip_lstm
+            )
 
         # Set model into evaluation mode
         lstm.eval()
 
-        # Make ES_RNN Prediction
+        # Make ES_RNN_S Prediction
         prediction, actual, out_levels, out_seas, all_levels, all_seasons, \
         rnn_out = lstm.predict(test_data, window_size, output_size)
 
         # Convert to correct form for results saving
-        if ex:
+        if model:
             test_data = torch.tensor(
                 data["total load actual"][start_test:end_test],
                 dtype=torch.double
@@ -401,7 +403,7 @@ def test_model_week(data, output_size, input_size, hidden_size,
             lstm.level_smoothing_coeffs["total load actual"].data
         )
 
-        if ex:
+        if model:
             results[9 - i]["seasonality_smoothing"] = float(
                 lstm.seasonality_smoothing_coeffs["total load actual"].data
             )
@@ -465,11 +467,11 @@ def test_model_week(data, output_size, input_size, hidden_size,
         plot_test(results, window_size, output_size, print_results=True)
 
 
-def train_and_predict_ex(lstm, data, window_size, output_size, lvp,
-                         loss_func, num_epochs, local_init_lr, global_init_lr,
-                         percentile, auto_lr, variable_lr, auto_rt,
-                         min_epochs_since_change, forecast_input,
-                         local_rates, global_rates, ensemble=False):
+def train_and_predict_i(lstm, data, window_size, output_size, lvp,
+                        loss_func, num_epochs, local_init_lr, global_init_lr,
+                        percentile, auto_lr, variable_lr, auto_rt,
+                        min_epochs_since_change, forecast_input,
+                        local_rates, global_rates, ensemble=False):
     parameter_dict = {c: [] for c in data.columns}
     parameter_dict["global"] = []
 
@@ -598,12 +600,12 @@ def train_and_predict_ex(lstm, data, window_size, output_size, lvp,
 # pass in ensemble = False, then a single prediction after training is
 # generated. If ensemble = True, the predictions from the final 5 epochs are
 # averaged and returned. If we wish to make use of the extra information
-# that the ES_RNN.predict() function returns, we can call it directly.
-def train_and_predict(lstm, data, window_size, output_size, lvp, loss_func,
-                      num_epochs, init_learning_rate, percentile, auto_lr,
-                      variable_lr, auto_rt, min_epochs_since_change,
-                      forecast_input, variable_rates=None, ensemble=False,
-                      multi_ts=False, skip_lstm=False):
+# that the ES_RNN_S.predict() function returns, we can call it directly.
+def train_and_predict_s(lstm, data, window_size, output_size, lvp, loss_func,
+                        num_epochs, init_learning_rate, percentile, auto_lr,
+                        variable_lr, auto_rt, min_epochs_since_change,
+                        forecast_input, variable_rates=None, ensemble=False,
+                        multi_ts=False, skip_lstm=False):
     # to make this stochastic gradient descent??? Output the final level and
     # seasonality of the chunk?? Then we could feed this in as the initial
     # seasonality and level. Would we then also need to make sure that the
@@ -640,14 +642,6 @@ def train_and_predict(lstm, data, window_size, output_size, lvp, loss_func,
     pred_ensemble = []
     losses = {f: {l: [] for l in ["RNN", "LVP", "Total"]} for f in
               data.columns}
-
-    # Print params
-    # for n, p in lstm.named_parameters():
-    #     print(n, p)
-    #     # if n == "total load actual level smoothing":
-    #     #     print("Level Smoothing:", torch.sigmoid(p))
-    #     # if n == "total load actual seasonality2 smoothing":
-    #     #     print("Seasonality Smoothing:", torch.sigmoid(p))
 
     # Loop through number of epochs amount of times
     for epoch in range(num_epochs):
@@ -707,14 +701,6 @@ def train_and_predict(lstm, data, window_size, output_size, lvp, loss_func,
                   "- %1.5f" % (name, epoch, level_var_loss.item(), loss.item(),
                                total_loss.item()))
 
-            # if name == "total load actual":
-            # Check if parameters are updating:
-            # for n, p in lstm.named_parameters():
-            #     if n == "total load actual level smoothing":
-            #         print("Level Smoothing:", torch.sigmoid(p))
-            #     if n == "total load actual seasonality2 smoothing":
-            #         print("Seasonality Smoothing:", torch.sigmoid(p))
-
             prev_loss = loss
 
             # If we didn't change the learning rate, make note of this
@@ -741,149 +727,10 @@ def train_and_predict(lstm, data, window_size, output_size, lvp, loss_func,
         return prediction, losses
 
 
-# This function takes all the data up to the end of the section (i.e up to
-# the end of the validation section or test section), then generates
-# forecasts for the last week of data. For an example data set, the first 12
-# weeks are for training, the next is for validation and the final one is
-# for testing. So we pass 13 weeks in to test on the validation, and all 14
-# to test on the test data. This is because, to calculate the MASE,
-# the entire data set is required.
-# Only going to work with an output size of 48 I think, sadly :((
-# Returns a list of 7 OWA
-def test_model(lstm, data, window_size, output_size):
-    # Data = [<- Train -1 Week -> | <- 1 Week -> <- Test = 1 week -> ]
-    # Extra week required because ES_RNN requires week of input to generate
-    # an output
-
-    # Number actually predicted is this value - 1
-    num_pred = 2
-    test_data = torch.tensor(
-        data["total load actual"][-(num_pred * 24 + window_size):],
-        dtype=torch.double
-    )
-
-    # Calculate ES_RNN predictions TODO - CHANGED WHAT PREDICT RETURNS!!
-    predictions, actuals, out_levels, out_seas, all_levels, all_seasons, \
-    rnn_out = lstm.predict(
-        test_data, window_size, output_size
-    )
-
-    predictions = [pd.Series(p) for p in predictions.detach().tolist()]
-    actuals = [pd.Series(a) for a in actuals.detach().tolist()]
-    out_levels
-
-    # Calculate Naive 2 predictions
-    naive_predictions = []
-    naive_actuals = []
-    for i in range(num_pred, 1, -1):
-        # Data = [<- Train -> | <- Test = 1 week ->]
-        # 1)   = [<- Train -> | <- Actual = 2 days -> <- Unused: 5 days ->]
-        # 2)   = [<- Train + 1 -> | <- Actual = 2 days -> <- Unused: 4 days ->]
-        # ...
-        # 7)   = [<-        Train + 6 days          -> | <- Actual = 2 days ->]
-        train = data["total load actual"][:-(i * 24)]
-        actual_end = -(i * 24 - output_size) if i > 2 else None
-        actual = data["total load actual"][-(i * 24):actual_end]
-
-        train_d, indices = deseasonalise(train, 168, "multiplicative")
-        naive_fit_forecast = reseasonalise(
-            naive_2(train_d, output_size),
-            indices,
-            "multiplicative"
-        )
-        naive_forecast = naive_fit_forecast[-output_size:]
-
-        naive_predictions.append(naive_forecast.reset_index(drop=True))
-        naive_actuals.append(actual)
-
-    # Plot predictions and actual
-    for i in range(num_pred - 1):
-        fig = plt.figure(figsize=(20, 15), dpi=250)
-        ax = fig.add_subplot(1, 1, 1)
-        ax.plot(predictions[i], label="ES_RNN Predicted")
-        ax.plot(naive_predictions[i], label="Naive2 Predictions")
-        ax.plot(actuals[i], label="Actual")
-        ax.legend(loc="best")
-        plt.show()
-
-    # Create the required sections of the data for the MASE. To calculate
-    # the MASE, [<- Train -> | <- Forecast ->] actual values are needed
-    mase_actuals = []
-    for i in range(num_pred - 2, 0, -1):
-        mase_actuals.append(
-            pd.Series(data["total load actual"][:-(i * 24)])
-        )
-    mase_actuals.append(pd.Series(data["total load actual"]))
-
-    # Calculate the MASE for ES_RNN
-    mase = []
-    for a, p in zip(mase_actuals, predictions):
-        m = MASE(p, a, 168, output_size)
-        print("ES-RNN MASE:", m)
-        mase.append(MASE(p, a, 168, output_size))
-
-    # Calculate the sMAPE for ES_RNN
-    smape = []
-    for a, p in zip(actuals, predictions):
-        m = sMAPE(p, a)
-        print("ES-RNN sMAPE:", m)
-        smape.append(m)
-
-    # Calculate the MASE for Naive 2
-    naive_mase = []
-    for a, p in zip(mase_actuals, naive_predictions):
-        m = MASE(p, a, 168, output_size)
-        print("Naive MASE:", m)
-        naive_mase.append(MASE(p, a, 168, output_size))
-
-    # Calculate the sMAPE for Naive 2
-    naive_smape = []
-    for a, p in zip(naive_actuals, naive_predictions):
-        m = sMAPE(p, a)
-        print("Naive sMAPE:", m)
-        smape.append(m)
-        naive_smape.append(m)
-
-    # Calculate the OWA
-    owa = []
-    for m, s, nm, ns in zip(mase, smape, naive_mase, naive_smape):
-        owa.append(OWA(ns, nm, s, m))
-
-    for n, p in lstm.named_parameters():
-        if n == "total load actual level smoothing":
-            print("Level Smoothing:", torch.sigmoid(p))
-        if n == "total load actual seasonality2 smoothing":
-            print("Seasonality Smoothing:", torch.sigmoid(p))
-
-    # print("Final Level:", level[0])
-    # print("Final Seasonality (Exponentiated):", out_seas2)
-    # print("Final Seasonality:", torch.log(out_seas2))
-
-    return owa, indices
-
-    # test_prediction = lstm.predict(
-    #     test_data["total load actual"], window_size, output_size
-    # )
-
-    # train_actual = np.array(data["total load actual"][
-    #                         1008:train_hours]).reshape(-1)
-    #
-    # prediction = np.array(valid_pred.detach())
-    # actual = np.concatenate((np.array(train_actual), np.array(valid_actual)))
-    #
-    # x1 = np.array([range(len(actual))]).reshape(-1)
-    # x2 = np.array([range(len(actual) - len(prediction),
-    #                      len(actual))]).reshape(-1)
-    #
-    # plt.figure(figsize=(12.8, 9.6), dpi=250)
-    # plt.plot(x1, actual, label="Actual Data")
-    # plt.plot(x2, prediction, label="Prediction")
-    #
-    # # plt.axvline(x=train_hours - window_size, c='orange', label="Training Data")
-    # # plt.axvline(x=train_hours - window_size + len(valid_actual), c='purple',
-    # #             label="Validation Data")
-    # plt.gca().set_xlabel("Time")
-    # plt.gca().set_ylabel("Total Energy Demand")
-    # plt.gca().legend(loc="best")
-    # plt.gca().set_title('Dilations: ' + str(dilations))
-    # plt.show()
+# if name == "total load actual":
+# Check if parameters are updating:
+# for n, p in lstm.named_parameters():
+#     if n == "total load actual level smoothing":
+#         print("Level Smoothing:", torch.sigmoid(p))
+#     if n == "total load actual seasonality2 smoothing":
+#         print("Seasonality Smoothing:", torch.sigmoid(p))

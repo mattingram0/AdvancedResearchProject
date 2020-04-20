@@ -5,7 +5,7 @@ from torch.distributions import Normal, Uniform
 from ml import drnn, non_lin, ml_helpers
 import sys
 
-class ES_RNN(nn.Module):
+class ES_RNN_S(nn.Module):
     def __init__(self, output_size, input_size, batch_size, hidden_size,
                  num_layers, features, seasonality_1, seasonality_2, dropout=0,
                  cell_type='LSTM', batch_first=False, dilations=None,
@@ -26,25 +26,20 @@ class ES_RNN(nn.Module):
         self.num_layers = num_layers
         self.cell_type = cell_type
 
-        # The input data may not necessarily start on a Monday, so we need
-        # to make a note of which day comes first in the seasonality params
-        self.first_day = 0  # By default, assum data begins on a Monday
+        # List of features
+        self.features = features
 
         # Seasonality values
-        # self.seasonality_1 = seasonality_1
-        self.seasonality_2 = seasonality_2
+        self.seasonality = seasonality_2
 
         # ES parameters
         self.level_smoothing_coeffs = {}
-        # self.seasonality1_smoothing_coeffs = {}
-        self.seasonality2_smoothing_coeffs = {}
-        self.hourly_seasonality_params = {}
-        self.weekly_seasonality_params = {}
+        self.seasonality_smoothing_coeffs = {}
+        self.init_seasonality_params = {}
 
         # ES level and seasonality values (for total load actual only)
         self.levels = []
-        # self.h_seasons = []
-        self.w_seasons = []
+        self.seasonals = []
 
         # Add all parameters to the network
         u1 = Uniform(-1, 1)  # Smoothing coefficients
@@ -60,11 +55,11 @@ class ES_RNN(nn.Module):
                     u1.sample(), requires_grad=True)
 
             if init_seas_smoothing:
-                self.seasonality2_smoothing_coeffs[f] = torch.nn.Parameter(
+                self.seasonality_smoothing_coeffs[f] = torch.nn.Parameter(
                     torch.tensor(init_seas_smoothing[f], dtype=torch.double),
                     requires_grad=True)
             else:
-                self.seasonality2_smoothing_coeffs[f] = torch.nn.Parameter(
+                self.seasonality_smoothing_coeffs[f] = torch.nn.Parameter(
                     u1.sample(), requires_grad=True)
 
             if init_seasonality:
@@ -86,11 +81,10 @@ class ES_RNN(nn.Module):
             # self.register_parameter(f + " seasonality1 smoothing",
             #                         self.seasonality1_smoothing_coeffs[f])
             self.register_parameter(f + " seasonality2 smoothing",
-                                    self.seasonality2_smoothing_coeffs[f])
+                                    self.seasonality_smoothing_coeffs[f])
 
             # for i, p in enumerate(self.hourly_seasonality_params[f]):
             #     self.register_parameter(f + " seasonality1 " + str(i), p)
-            # TODO YOU ARE HERE????/ SEE OUTPUT AND THE 1417??
             for i, p in enumerate(self.weekly_seasonality_params[f]):
                 self.register_parameter(f + " seasonality2 " + str(i), p)
 
@@ -136,18 +130,18 @@ class ES_RNN(nn.Module):
         lvl_smoothing = torch.sigmoid(
             self.level_smoothing_coeffs[feature]
         )
-        w_smoothing = torch.sigmoid(
-            self.seasonality2_smoothing_coeffs[feature]
+        seas_smoothing = torch.sigmoid(
+            self.seasonality_smoothing_coeffs[feature]
         )
 
         # Create lists holding the ES values
-        w_seasons = [
+        seasonals = [
             torch.exp(p) for p in self.weekly_seasonality_params[feature]
         ]
 
         # Handle initial values
-        levels = [x[0] / (w_seasons[0])]
-        w_seasons.append(w_seasons[0])
+        levels = [x[0] / (seasonals[0])]
+        seasonals.append(seasonals[0])
 
         # List to hold the log differences in the levels, to calculate the LVP
         log_level_diffs = []
@@ -156,13 +150,13 @@ class ES_RNN(nn.Module):
         # Double seasonality ES-style smoothing formulae
         for i in range(1, len(x[1:]) + 1):
             xi = x[i]
-            new_level = lvl_smoothing * xi / (w_seasons[i]) +\
+            new_level = lvl_smoothing * xi / (seasonals[i]) +\
                         (1 - lvl_smoothing) * levels[i - 1]
-            new_w_season = w_smoothing * xi / (new_level) + \
-                           (1 - w_smoothing) * w_seasons[i]
+            new_w_season = seas_smoothing * xi / (new_level) + \
+                           (1 - seas_smoothing) * seasonals[i]
 
             levels.append(new_level)
-            w_seasons.append(new_w_season)
+            seasonals.append(new_w_season)
 
             log_level_diffs.append(torch.log(new_level / levels[i - 1]))
 
@@ -191,10 +185,10 @@ class ES_RNN(nn.Module):
             # Get the level/seasonality values
             level = levels[i + window_size]
             w_seas_in = torch.tensor(
-                w_seasons[i: i + window_size], dtype=torch.double
+                seasonals[i: i + window_size], dtype=torch.double
             )
             w_seas_label = torch.tensor(
-                w_seasons[i + window_size: i + window_size + output_size],
+                seasonals[i + window_size: i + window_size + output_size],
                 dtype=torch.double
             )
 
@@ -216,9 +210,9 @@ class ES_RNN(nn.Module):
             labels.append(noisy_norm_label.unsqueeze(0))
 
             # Used for one of the plotting functions, ignore
-            if i == 7 * 24 * 4:
-                j = i
-                data_subset = x[i - (7 * 24): i + (3 * 7 * 24)]
+            # if i == 7 * 24 * 4:
+            #     j = i
+            #     data_subset = x[i - (7 * 24): i + (3 * 7 * 24)]
 
         labels = torch.cat(labels)
 
@@ -252,17 +246,17 @@ class ES_RNN(nn.Module):
             out = self.linear(self.tanh(linear_in))
 
         # Used for one of the plotting functions, ignore
-        rnn_in = inputs[j]
-        data_out = labels[j]
-        rnn_out = out[j]
-        if self.counter == 25:
-            ml_helpers.plot_sliding_window(data_subset, rnn_in, data_out, rnn_out)
+        # rnn_in = inputs[j]
+        # data_out = labels[j]
+        # rnn_out = out[j]
+        # if self.counter == 25:
+        #     ml_helpers.plot_sliding_window(data_subset, rnn_in, data_out, rnn_out)
 
         # Save the level and seasonality values so that we can use them to make
         # predictions
         if feature == "total load actual":
             self.levels = levels
-            self.w_seasons = w_seasons
+            self.seasonals = seasonals
 
         # Return model out, actual out, Level variability loss
         return out, labels, level_var_loss
@@ -286,22 +280,22 @@ class ES_RNN(nn.Module):
                 skip_lstm=False):
         # Get the final ES level and seasonality values
         levels = self.levels[:]
-        w_seasons = self.w_seasons[:]
+        seasonals = self.seasonals[:]
 
         # Replicate final seasonality and level values. Remember that we have
         # self.seasonality_2 extra values from the forward function! See
         # piece of paper for data breakdown if you forget/get confused!
         # Get the final seasonality values
-        start = len(w_seasons) - self.seasonality_2
+        start = len(seasonals) - self.seasonality
 
         for i in range(len(x) - window_size):
-            w_seasons.append(w_seasons[start + (i % self.seasonality_2)])
+            seasonals.append(seasonals[start + (i % self.seasonality)])
 
         levels.extend([levels[-1] for _ in range(len(x) - window_size)])
 
         # Get only the final levels and seasonality values that we need
         levels = levels[-len(x):]
-        w_seasons = w_seasons[-len(x):]
+        seasonals = seasonals[-len(x):]
 
         inputs = []
         actuals = []
@@ -321,11 +315,11 @@ class ES_RNN(nn.Module):
             level = levels[i + window_size]
 
             w_seas_in = torch.tensor(
-                w_seasons[i: i + window_size], dtype=torch.double
+                seasonals[i: i + window_size], dtype=torch.double
             )
 
             w_seas_out = torch.tensor(
-                w_seasons[i + window_size: i + window_size + output_size],
+                seasonals[i + window_size: i + window_size + output_size],
                 dtype=torch.double
             )
 
@@ -389,6 +383,6 @@ class ES_RNN(nn.Module):
             output_levels,  # 48 hour levels
             output_wseas,   # 48 hour seasonality
             levels,         # Levels for all of x
-            w_seasons,      # Seasonality for all x
+            seasonals,      # Seasonality for all x
             torch.exp(out),            # Output from LSTM
         )
