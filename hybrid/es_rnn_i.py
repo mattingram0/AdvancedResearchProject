@@ -6,9 +6,9 @@ from ml import drnn, non_lin
 
 class ES_RNN_I(nn.Module):
     def __init__(self, output_size, input_size, batch_size, hidden_size,
-                 num_layers, features, seasonality, dropout=0,
-                 cell_type='LSTM', batch_first=False, dilations=None,
-                 residuals=tuple([[]]), init_seasonality=None,
+                 num_layers, demand_features, weather_features, seasonality,
+                 dropout=0, cell_type='LSTM', batch_first=False,
+                 dilations=None, residuals=tuple([[]]), init_seasonality=None,
                  init_level_smoothing=None, init_seas_smoothing=None):
 
         super().__init__()
@@ -22,7 +22,8 @@ class ES_RNN_I(nn.Module):
         self.cell_type = cell_type
 
         # List of names of the features
-        self.features = features
+        self.demand_features = demand_features
+        self.weather_features = weather_features
 
         # Seasonality values
         self.seasonality = seasonality
@@ -39,7 +40,7 @@ class ES_RNN_I(nn.Module):
         # Add all parameters to the network
         u1 = Uniform(-1, 1)  # Smoothing coefficients
         u2 = Uniform(0.65, 1.35)  # Seasonality parameters
-        for f in features:
+        for f in demand_features:
             # Level smoothing parameters
             if init_level_smoothing:
                 self.level_smoothing_coeffs[f] = torch.nn.Parameter(
@@ -95,14 +96,15 @@ class ES_RNN_I(nn.Module):
         self.tanh = non_lin.Tanh(hidden_size, hidden_size)
         self.linear = nn.Linear(hidden_size, output_size)
 
-    def forward(self, data, window_size, output_size, lvp=0, std=0.001):
+    def forward(self, data, window_size, output_size, weather, lvp=0,
+                std=0.001):
         all_levels = {}
         all_seasonals = {}
         all_inputs = []
         labels = []
         level_var_losses = {}
 
-        for f in self.features:
+        for f in self.demand_features:
             # Get the data for the current features
             x = torch.tensor(data[f], dtype=torch.double)
 
@@ -182,8 +184,7 @@ class ES_RNN_I(nn.Module):
 
                     # Get corresponding seasonality
                     seas_label = torch.tensor(
-                        seasonals[
-                        i + window_size: i + window_size + output_size],
+                        seasonals[i + window_size: i + window_size + output_size],
                         dtype=torch.double
                     )
                     # De-seasonalise, normalise, and take logs
@@ -196,16 +197,20 @@ class ES_RNN_I(nn.Module):
             # then append to the list of all the inputs for all the features
             all_inputs.append(torch.cat(inputs).unsqueeze(2))
 
+        # Sliding window approach to add the weather features if including
+        if weather:
+            for f in self.weather_features:
+                x = torch.tensor(data[f], dtype=torch.double)
+                inputs = []
+
+                for i in range(len(x) - window_size - output_size + 1):
+                    inputs.append(x[i: i + window_size].unsqueeze(0))
+
+                all_inputs.append(torch.cat(inputs).unsqueeze(2))
+
         # Concatenate the tensor from each feature into a single tensor
         labels = torch.cat(labels, dim=0)
         inputs = torch.cat(all_inputs, dim=2)
-
-        # Debugging:
-        # print(torch.max(inputs).item())
-        # print(torch.min(inputs).item())
-        # for i, f in enumerate(self.features):
-        #     print(f, torch.max(inputs[:, :, i]).item(),
-        #           torch.min(inputs[:, :, i]).item())
 
         # Feed inputs in to Dilated LSTM
         _, hidden = self.drnn(inputs.double())
@@ -219,29 +224,20 @@ class ES_RNN_I(nn.Module):
         self.levels = all_levels
         self.seasonals = all_seasonals
 
-        # print(len(all_levels))
-        # print(len(all_seasonals))
-        # print(all_levels.keys())
-        # print(all_seasonals.keys())
-        # print(len(all_levels["total load actual"]))
-        # print(len(all_seasonals["total load actual"]))
-        # print(all_levels)
-        # print(all_seasonals)
-        # import sys
-        # sys.exit(0)
-
         # Return model out, actual out, Level variability loss
         return out, labels, level_var_losses
 
     # Stripped down version. Assumes x = [<window-size|<out size>].
-    def predict(self, data, window_size, output_size):
+    def predict(self, data, window_size, output_size, weather):
         all_inputs = []
+        all_levels = []
+        all_seasonals = []
 
         # Return the levels and seasonality corresponding to all x, and the
         # actual values corresponding to the output values
         out_actuals = []
 
-        for f in self.features:
+        for f in self.demand_features:
             x = torch.tensor(data[f], dtype=torch.double)
 
             #  Get the final ES level and seasonality values
@@ -282,6 +278,8 @@ class ES_RNN_I(nn.Module):
                 norm_input = torch.log(inp / (level * seas_in))
                 inputs.append(norm_input.unsqueeze(0))
 
+                # Get the output seasonals and levels for the total load actual
+                # to relevel and reseasonalise the output
                 if f == "total load actual":
                     out_levels = torch.tensor(
                         [level for _ in range(output_size)],
@@ -289,8 +287,21 @@ class ES_RNN_I(nn.Module):
                     )
                     out_seas = seas_out
                     out_actuals = label
+                    all_levels = levels
+                    all_seasonals = seasonals
 
             all_inputs.append(torch.cat(inputs).unsqueeze(2))
+
+        # Sliding window approach to add the weather features if including
+        if weather:
+            for f in self.weather_features:
+                x = torch.tensor(data[f], dtype=torch.double)
+                inputs = []
+
+                for i in range(len(x) - window_size - output_size + 1):
+                    inputs.append(x[i: i + window_size].unsqueeze(0))
+
+                all_inputs.append(torch.cat(inputs).unsqueeze(2))
 
         # Convert into tensor
         inputs = torch.cat(all_inputs, dim=2)
@@ -306,13 +317,13 @@ class ES_RNN_I(nn.Module):
         # Unsquash the output, and re-add the final level and seasonality
         pred = torch.exp(out) * out_levels * out_seas
 
-        # Return the prediction, and also the final seasonalities and levels
+        # Return the prediction and other debugging information
         return (
-            pred,           # 48 hour prediction
-            out_actuals,    # 48 hour actual
-            out_levels,     # 48 hour levels
-            out_seas,       # 48 hour seasonality
-            levels,         # Levels for all of x
-            seasonals,      # Seasonality for all x
-            torch.exp(out),            # Output from LSTM
+            pred,                       # 48 hour prediction
+            out_actuals,                # 48 hour actual
+            out_levels,                 # 48 hour levels
+            out_seas,                   # 48 hour seasonality
+            all_levels,                 # Levels for all of x
+            all_seasonals,              # Seasonality for all x
+            torch.exp(out),             # Output from LSTM
         )

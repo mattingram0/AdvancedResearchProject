@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="564df88f-763d-43a5-ba2e-b5cd80214a9e" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hybrid/es_rnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/hybrid/es_rnn_s.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hybrid/es_rnn_ex.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/hybrid/es_rnn_mult.py" beforeDir="false" afterPath="$PROJECT_DIR$/hybrid/es_rnn_i.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hybrid/es_rnn_i.py" beforeDir="false" afterPath="$PROJECT_DIR$/hybrid/es_rnn_i.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hybrid/es_rnn_s.py" beforeDir="false" afterPath="$PROJECT_DIR$/hybrid/es_rnn_s.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/hybrid/hybrid.py" beforeDir="false" afterPath="$PROJECT_DIR$/hybrid/hybrid.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ml/ml_helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/ml/ml_helpers.py" afterDir="false" />
@@ -34,42 +32,72 @@
     <favorites_list name="AdvancedResearchProject" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="64">
-              <caret line="55" column="26" selection-start-line="55" selection-start-column="19" selection-end-line="55" selection-end-column="26" />
-              <folding>
-                <element signature="e#0#19#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="291">
-              <caret line="628" column="16" selection-start-line="628" selection-start-column="16" selection-end-line="628" selection-end-column="16" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-                <element signature="e#901#4220#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/hybrid/es_rnn_i.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1515">
-              <caret line="104" column="17" selection-start-line="104" selection-start-column="17" selection-end-line="104" selection-end-column="17" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <splitter split-orientation="horizontal" split-proportion="0.5">
+      <split-first>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/main.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="471">
+                  <caret line="90" column="68" lean-forward="true" selection-start-line="90" selection-start-column="68" selection-end-line="90" selection-end-column="68" />
+                  <folding>
+                    <element signature="e#0#19#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/ml/ml_helpers.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="-1322">
+                  <caret line="643" column="31" lean-forward="true" selection-start-line="643" selection-start-column="31" selection-end-line="643" selection-end-column="31" />
+                  <folding>
+                    <element signature="e#0#18#0" expanded="true" />
+                    <element signature="e#220#8747#0" />
+                    <element signature="e#8769#13729#0" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="528">
+                  <caret line="497" column="66" lean-forward="true" selection-start-line="497" selection-start-column="66" selection-end-line="497" selection-end-column="66" />
+                  <folding>
+                    <element signature="e#0#18#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/hybrid/es_rnn_i.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="979">
+                  <caret line="212" column="45" lean-forward="true" selection-start-line="212" selection-start-column="45" selection-end-line="212" selection-end-column="45" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/hybrid/es_rnn_s.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="2715">
+                  <caret line="348" lean-forward="true" selection-start-line="348" selection-end-line="348" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-second>
+    </splitter>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -177,11 +205,11 @@
         <option value="$PROJECT_DIR$/hybrid/es_rnn_ex.py" />
         <option value="$PROJECT_DIR$/ml/helpers.py" />
         <option value="$PROJECT_DIR$/hybrid/es_rnn_mult.py" />
-        <option value="$PROJECT_DIR$/ml/ml_helpers.py" />
-        <option value="$PROJECT_DIR$/hybrid/es_rnn_i.py" />
         <option value="$PROJECT_DIR$/main.py" />
-        <option value="$PROJECT_DIR$/hybrid/hybrid.py" />
+        <option value="$PROJECT_DIR$/hybrid/es_rnn_i.py" />
+        <option value="$PROJECT_DIR$/ml/ml_helpers.py" />
         <option value="$PROJECT_DIR$/hybrid/es_rnn_s.py" />
+        <option value="$PROJECT_DIR$/hybrid/hybrid.py" />
       </list>
     </option>
   </component>
@@ -534,7 +562,7 @@
       <workItem from="1585649706616" duration="131134000" />
       <workItem from="1586451125501" duration="16227000" />
       <workItem from="1586529763785" duration="99012000" />
-      <workItem from="1587204860278" duration="46274000" />
+      <workItem from="1587204860278" duration="57976000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit. Git setup.">
       <created>1573219288446</created>
@@ -638,7 +666,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="1092381000" />
+    <option name="totallyTimeSpent" value="1104083000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -651,10 +679,11 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="1440" y="-180" width="1920" height="1080" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Structure" order="0" sideWeight="0.5020298" side_tool="true" weight="0.23109691" />
       <window_info id="Favorites" order="1" sideWeight="0.50147057" side_tool="true" weight="0.18157615" />
-      <window_info active="true" content_ui="combo" id="Project" order="2" sideWeight="0.49797022" visible="true" weight="0.12034079" />
+      <window_info content_ui="combo" id="Project" order="2" sideWeight="0.49797022" visible="true" weight="0.12034079" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32746115" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32920793" />
@@ -667,8 +696,8 @@
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50532484" side_tool="true" weight="0.34300518" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.32435232" />
-      <window_info anchor="bottom" x="9" y="580" width="1398" height="242" id="Python Console" order="12" sideWeight="0.4946752" weight="0.19067357" />
-      <window_info anchor="bottom" id="Statistic" order="13" weight="0.8375796" />
+      <window_info anchor="bottom" x="9" y="580" width="1398" height="242" id="Python Console" order="12" sideWeight="0.4946752" weight="0.20725389" />
+      <window_info anchor="bottom" id="Statistic" order="13" weight="0.8373057" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -1071,16 +1100,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stats/stats_helpers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="339">
-          <caret line="69" column="20" selection-start-line="69" selection-start-column="20" selection-end-line="69" selection-end-column="45" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/numpy/polynomial/polynomial.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="573">
@@ -1098,51 +1117,59 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ml/ml_helpers.py">
+    <entry file="file://$PROJECT_DIR$/stats/stats_helpers.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" selection-start-line="1" selection-end-line="1" selection-end-column="47" />
-          <folding>
-            <element signature="e#138#5098#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="64">
-          <caret line="55" column="26" selection-start-line="55" selection-start-column="19" selection-end-line="55" selection-end-column="26" />
+        <state relative-caret-position="975">
+          <caret line="65" column="4" selection-start-line="65" selection-start-column="4" selection-end-line="65" selection-end-column="4" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
+    <entry file="file://$PROJECT_DIR$/hybrid/es_rnn_i.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="291">
-          <caret line="628" column="16" selection-start-line="628" selection-start-column="16" selection-end-line="628" selection-end-column="16" />
+        <state relative-caret-position="979">
+          <caret line="212" column="45" lean-forward="true" selection-start-line="212" selection-start-column="45" selection-end-line="212" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="471">
+          <caret line="90" column="68" lean-forward="true" selection-start-line="90" selection-start-column="68" selection-end-line="90" selection-end-column="68" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ml/ml_helpers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1322">
+          <caret line="643" column="31" lean-forward="true" selection-start-line="643" selection-start-column="31" selection-end-line="643" selection-end-column="31" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#901#4220#0" />
+            <element signature="e#220#8747#0" />
+            <element signature="e#8769#13729#0" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/hybrid/es_rnn_s.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-372">
-          <caret line="28" column="26" selection-start-line="28" selection-start-column="26" selection-end-line="28" selection-end-column="26" />
-          <folding>
-            <element signature="e#50#62#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="2715">
+          <caret line="348" lean-forward="true" selection-start-line="348" selection-end-line="348" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/hybrid/es_rnn_i.py">
+    <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1515">
-          <caret line="104" column="17" selection-start-line="104" selection-start-column="17" selection-end-line="104" selection-end-column="17" />
+        <state relative-caret-position="528">
+          <caret line="497" column="66" lean-forward="true" selection-start-line="497" selection-start-column="66" selection-end-line="497" selection-end-column="66" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

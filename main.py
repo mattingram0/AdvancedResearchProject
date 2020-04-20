@@ -21,8 +21,9 @@ from numpy.polynomial.polynomial import polyfit
 
 
 def main():
-    demand_df = load_demand_data(True)
+    demand_df = load_demand_data()
     weather_df = load_weather_data()
+    hybrid.run(demand_df, weather_df)
     # test(int(sys.argv[1]), int(sys.argv[2]))
     # plot_sample(df["price actual"])
     # helpers.weather_analysis()
@@ -52,7 +53,7 @@ def main():
     # )
 
 
-def load_demand_data(multi_ts):
+def load_demand_data():
     base = os.path.abspath(os.path.dirname(__file__))
     filename = os.path.join(base, "data/spain/energy_dataset.csv")
 
@@ -67,16 +68,13 @@ def load_demand_data(multi_ts):
     #             ]
     # col_list = ["time", "total load actual", "generation fossil gas",
     #             "generation fossil hard coal", "generation fossil oil"]
-    if multi_ts:
-        col_list = ["time", "generation fossil gas",
-                    "generation fossil hard coal",
-                    "generation fossil oil",
-                    "generation hydro run-of-river and poundage",
-                    "generation hydro water reservoir", "total load forecast",
-                    "total load actual", "price day ahead", "price actual",
-                    ]
-    else:
-        col_list = ["time", "total load actual"]
+    col_list = ["time", "generation fossil gas",
+                "generation fossil hard coal",
+                "generation fossil oil",
+                "generation hydro run-of-river and poundage",
+                "generation hydro water reservoir", "total load forecast",
+                "total load actual", "price day ahead", "price actual",
+                ]
 
     df = pd.read_csv(filename, parse_dates=["time"],
                      infer_datetime_format=True, usecols=col_list)
