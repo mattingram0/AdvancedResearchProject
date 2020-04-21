@@ -24,13 +24,11 @@ from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 def main():
     demand_df = load_demand_data()
-    # weather_df = load_weather_data()
-    # hybrid.run(demand_df, weather_df)
+    weather_df = load_weather_data()
+    hybrid.run(demand_df, weather_df)
     # test(int(sys.argv[1]), int(sys.argv[2]))
     # plot_sample(df["price actual"])
     # helpers.weather_analysis()
-
-    holt_winters_test(demand_df)
 
     # Plotting results from Hamilton
     # test_path = "/Users/matt/Projects/AdvancedResearchProject/test" \

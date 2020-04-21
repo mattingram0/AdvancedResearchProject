@@ -124,15 +124,15 @@ def run(demand_df, weather_df):
     # Testing parameters
     window_size = 336
     output_size = 48
-    plot = True
+    plot = False
     ensemble = False
     skip_lstm = False
     init_params = True
-    write_results = False
+    write_results = True
     file_location = str(os.path.abspath(os.path.dirname(__file__)))
     model = False  # True = Ingram, False = Smyl
-    multiple = True  # Use multiple time series in Smyl's model
-    weather = False  # Include weather data in the chosen model
+    multiple = False  # Use multiple time series in Smyl's model
+    weather = True  # Include weather data in the chosen model
     valid = True  # True = use validation set, False = use test set
     batch_first = True
 
@@ -181,10 +181,10 @@ def run(demand_df, weather_df):
         input_size = 1  # Smyl's model, without weather
 
     # Model hyper parameters
-    num_epochs = 2
+    num_epochs = 108
     local_init_lr = 0.01
     global_init_lr = 0.005
-    hidden_size = 35
+    hidden_size = 40
     num_layers = 4
     dilations = [1, 4, 24, 168]
     level_variability_penalty = 80
@@ -199,12 +199,18 @@ def run(demand_df, weather_df):
     min_epochs_before_change = 2
     residuals = tuple([[1, 3]])  # Residual connection from 2nd out -> 4th out
     seasonality = 168
-    init_level_smoothing = -2
-    init_seasonal_smoothing = -1
+    init_level_smoothing = -1
+    init_seasonal_smoothing = 1
 
+    lr = [0.0001 * i for i in range(1, 10) for _ in range(3)] + \
+         [0.001 * i for i in range(1, 10) for _ in range(3)] + \
+         [0.01 * i for i in range(1, 10) for _ in range(3)] + \
+         [0.1 * i for i in range(1, 10) for _ in range(3)]
 
-
-    # TODO - FOR THE MULTI TS YOU NEED TO FIX THE LOCAL AND GLOBAL RATES STUFF
+    global_rates = {i: r for i, r in enumerate(lr)}
+    local_rates = {i: r for i, r in enumerate(lr)}
+    global_init_lr = global_rates[0]
+    local_init_lr = local_rates[0]
 
     test_model_week(data, output_size, input_size, hidden_size,
                     num_layers, batch_first, dilations, demand_features,
@@ -246,7 +252,7 @@ def test_model_week(data, output_size, input_size, hidden_size,
     results = {i: {} for i in range(1, 8)}
 
     # Loop through each day in the week
-    for i in range(3, 1, -1):
+    for i in range(2, 1, -1):
 
         # Figure out start and end points of the training/test data
         end_train = -(i * 24)
