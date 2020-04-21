@@ -641,8 +641,8 @@ def plot_test(results, window_size, output_size, print_results):
                 print("No. Improved:", results[day]["num_improved"])
                 print("Avg. Improvement:", results[day]["avg_improvement"])
                 print("Avg. Decline:", results[day]["avg_decline"])
-        elif day not in [7, 6]:
-            continue
+        # elif day not in [7, 6]:
+        #     continue
         else:
             # Note results (NCC)
             test_data = results[day]["test_data"]

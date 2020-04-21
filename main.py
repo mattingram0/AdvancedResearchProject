@@ -19,20 +19,24 @@ from ml import ml_helpers
 from hybrid import hybrid
 from numpy.polynomial.polynomial import polyfit
 
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
+
 
 def main():
     demand_df = load_demand_data()
-    weather_df = load_weather_data()
-    hybrid.run(demand_df, weather_df)
+    # weather_df = load_weather_data()
+    # hybrid.run(demand_df, weather_df)
     # test(int(sys.argv[1]), int(sys.argv[2]))
     # plot_sample(df["price actual"])
     # helpers.weather_analysis()
 
+    holt_winters_test(demand_df)
+
     # Plotting results from Hamilton
     # test_path = "/Users/matt/Projects/AdvancedResearchProject/test" \
-    #             "/sym_max_year_3_summer.txt"
+    #             "/extreme_year_1_winter.txt"
     # with open(test_path) as f:
-    #     plot_test(json.load(f), window_size, output_size, True)
+    #     ml_helpers.plot_test(json.load(f), 336, 48, True)
     # sys.exit(0)
 
     # hybrid.run(demand_df, weather_df)
@@ -775,6 +779,38 @@ def deseason(df):
     plt.show()
 
 
+def holt_winters_test(df):
+    data = stats_helpers.split_data(df)["Summer"][2]["total load actual"]
+    train_data = data[:-48]
+    test_data = data[-48:]
+
+    # [alpha, beta, gamma, l0, b0, phi, s0,.., s_(m - 1)]
+    _, indices = stats_helpers.deseasonalise(train_data, 168, "multiplicative")
+    init_params = [0.25, 0.75, train_data[0]]
+    init_params.extend(indices)
+
+    fitted_model = ExponentialSmoothing(
+        train_data, seasonal_periods=168, seasonal="mul"
+    ).fit(use_basinhopping=True, start_params=init_params)
+    init_prediction = fitted_model.predict(0, len(train_data) + 48 - 1)
+    params = fitted_model.params
+    print(params)
+
+    fitted_model = ExponentialSmoothing(
+        train_data, seasonal_periods=168, seasonal="mul"
+    ).fit(use_basinhopping=True)
+    prediction = fitted_model.predict(0, len(train_data) + 48 - 1)
+    params = fitted_model.params
+    print(params)
+
+    fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    ax.plot(test_data, label="Actual Data")
+    ax.plot(prediction[-48:], label="Non initialised")
+    ax.plot(init_prediction[-48:], label="Initialised")
+    ax.legend(loc="best")
+    plt.show()
+
+
 # The method must accept two parameters: season no. (1 - 4) and method no.
 def test(season_no, model_no):
     # Load data
@@ -1013,7 +1049,7 @@ def test(season_no, model_no):
                         results["MASE"][r][y][t][l],
                     )
 
-    # Average 48 hour forecast results
+    # Average the singele 48 hour forecast results
     all_res = []
     for r in range(1, num_reps + 1):
         for y in range(1, 5):
@@ -1023,7 +1059,7 @@ def test(season_no, model_no):
     mean = np.around(np.mean(all_res), decimals=3)
     std = np.around(np.std(all_res), decimals=3)
 
-    # Save averaged 48 forecast results
+    # Save averaged single 48 forecast results
     file_path = os.path.abspath(os.path.dirname(__file__))
     res_path = os.path.join(file_path, "results/results_1.txt")
     with open(res_path) as file:
@@ -1034,29 +1070,75 @@ def test(season_no, model_no):
     with open(res_path, "w") as file:
         json.dump(results_1, file)
 
-    # Average the lead time results
-    all_res = {l: [] for l in range(1, forecast_length + 1)}
+    # Average the lead time results for OWA
+    all_res_owa = {l: [] for l in range(1, forecast_length + 1)}
     for r in range(1, num_reps + 1):
         for y in range(1, 5):
             for t in range(1, 8):
                 for l in range(1, forecast_length + 1):
-                    all_res[l].append(results["sMAPE"][r][y][t][l - 1])
+                    all_res_owa[l].append(results["OWA"][r][y][t][l - 1])
 
-    for l in all_res.keys():
-        all_res[l] = np.around(np.mean(all_res[l]), decimals=3)
+    for l in all_res_owa.keys():
+        all_res_owa[l] = np.around(np.mean(all_res_owa[l]), decimals=3)
 
-    # Save the lead time results
-    res_path = os.path.join(file_path, "results/results_48_seasons.txt")
+    # Average the lead time results for sMAPE
+    all_res_smape = {l: [] for l in range(1, forecast_length + 1)}
+    for r in range(1, num_reps + 1):
+        for y in range(1, 5):
+            for t in range(1, 8):
+                for l in range(1, forecast_length + 1):
+                    all_res_smape[l].append(results["sMAPE"][r][y][t][l - 1])
+
+    for l in all_res_smape.keys():
+        all_res_smape[l] = np.around(np.mean(all_res_smape[l]), decimals=3)
+
+    # Average the lead time results for MASE
+    all_res_mase = {l: [] for l in range(1, forecast_length + 1)}
+    for r in range(1, num_reps + 1):
+        for y in range(1, 5):
+            for t in range(1, 8):
+                for l in range(1, forecast_length + 1):
+                    all_res_mase[l].append(results["MASE"][r][y][t][l - 1])
+
+    for l in all_res_mase.keys():
+        all_res_mase[l] = np.around(np.mean(all_res_mase[l]), decimals=3)
+
+    # Save the lead time results for OWA
+    res_path = os.path.join(file_path, "results/results_48_seasons_owa.txt")
     with open(res_path) as file:
         results_48 = json.load(file)
 
-    for l in all_res.keys():
-        results_48[str(l)][model_name][season_no - 1] = all_res[l]
+    for l in all_res_owa.keys():
+        results_48[str(l)][model_name][season_no - 1] = all_res_owa[l]
 
     with open(res_path, "w") as file:
         json.dump(results_48, file)
 
-    # Save the forecasts and results
+    # Save the lead time results for sMAPE
+    res_path = os.path.join(file_path,
+                            "results/results_48_seasons_smape.txt")
+    with open(res_path) as file:
+        results_48 = json.load(file)
+
+    for l in all_res_smape.keys():
+        results_48[str(l)][model_name][season_no - 1] = all_res_smape[l]
+
+    with open(res_path, "w") as file:
+        json.dump(results_48, file)
+
+    # Save the lead time results for MASE
+    res_path = os.path.join(file_path,
+                            "results/results_48_seasons_mase.txt")
+    with open(res_path) as file:
+        results_48 = json.load(file)
+
+    for l in all_res.keys():
+        results_48[str(l)][model_name][season_no - 1] = all_res_mase[l]
+
+    with open(res_path, "w") as file:
+        json.dump(results_48, file)
+
+    # Save the raw forecasts and results
     res_filename = seas_dict[season_no] + "_" + model_name + "_results.txt"
     forec_filename = seas_dict[season_no] + "_" + model_name + "_forecasts.txt"
     res_path = os.path.join(file_path, "results/" + res_filename)
@@ -1093,8 +1175,8 @@ def reset_results_files():
     with open(param_path, "w") as f:
         json.dump(params, f)
 
-    # Results 48 (all seasons)
-    res48s_path = os.path.join(file_path, "results/results_48_seasons.txt")
+    # Results 48 (all seasons) OWA
+    res48s_path = os.path.join(file_path, "results/results_48_seasons_owa.txt")
     methods = ["Naive1", "Naive2", "NaiveS", "SES", "Holt", "Damped",
                "Holt-Winters", "Comb", "ARIMA", "SARIMA", "Auto", "Theta",
                "ES RNN", "TSO"]
@@ -1102,8 +1184,40 @@ def reset_results_files():
     with open(res48s_path, "w") as f:
         json.dump(res48s, f)
 
-    # Results 48
-    res48_path = os.path.join(file_path, "results/results_48.txt")
+    # Results 48 (all seasons) sMAPE
+    res48s_path = os.path.join(file_path,
+                               "results/results_48_seasons_smape.txt")
+    methods = ["Naive1", "Naive2", "NaiveS", "SES", "Holt", "Damped",
+               "Holt-Winters", "Comb", "ARIMA", "SARIMA", "Auto", "Theta",
+               "ES RNN", "TSO"]
+    res48s = {l: {m: [0, 0, 0, 0] for m in methods} for l in range(1, 49)}
+    with open(res48s_path, "w") as f:
+        json.dump(res48s, f)
+
+    # Results 48 (all seasons) MASE
+    res48s_path = os.path.join(file_path,
+                               "results/results_48_seasons_mase.txt")
+    methods = ["Naive1", "Naive2", "NaiveS", "SES", "Holt", "Damped",
+               "Holt-Winters", "Comb", "ARIMA", "SARIMA", "Auto", "Theta",
+               "ES RNN", "TSO"]
+    res48s = {l: {m: [0, 0, 0, 0] for m in methods} for l in range(1, 49)}
+    with open(res48s_path, "w") as f:
+        json.dump(res48s, f)
+
+    # Results 48 OWA
+    res48_path = os.path.join(file_path, "results/results_48_owa.txt")
+    res48 = {l: {m: 0 for m in methods} for l in range(1, 49)}
+    with open(res48_path, "w") as f:
+        json.dump(res48, f)
+
+    # Results 48 sMAPE
+    res48_path = os.path.join(file_path, "results/results_48_smape.txt")
+    res48 = {l: {m: 0 for m in methods} for l in range(1, 49)}
+    with open(res48_path, "w") as f:
+        json.dump(res48, f)
+
+    # Results 48 MASE
+    res48_path = os.path.join(file_path, "results/results_48_mase.txt")
     res48 = {l: {m: 0 for m in methods} for l in range(1, 49)}
     with open(res48_path, "w") as f:
         json.dump(res48, f)

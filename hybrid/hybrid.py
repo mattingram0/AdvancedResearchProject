@@ -130,8 +130,8 @@ def run(demand_df, weather_df):
     init_params = True
     write_results = False
     file_location = str(os.path.abspath(os.path.dirname(__file__)))
-    model = True  # True = Ingram, False = Smyl
-    multiple = False  # Use multiple time series in Smyl's model
+    model = False  # True = Ingram, False = Smyl
+    multiple = True  # Use multiple time series in Smyl's model
     weather = False  # Include weather data in the chosen model
     valid = True  # True = use validation set, False = use test set
     batch_first = True
@@ -202,6 +202,8 @@ def run(demand_df, weather_df):
     init_level_smoothing = -2
     init_seasonal_smoothing = -1
 
+
+
     # TODO - FOR THE MULTI TS YOU NEED TO FIX THE LOCAL AND GLOBAL RATES STUFF
 
     test_model_week(data, output_size, input_size, hidden_size,
@@ -244,7 +246,7 @@ def test_model_week(data, output_size, input_size, hidden_size,
     results = {i: {} for i in range(1, 8)}
 
     # Loop through each day in the week
-    for i in range(2, 1, -1):
+    for i in range(3, 1, -1):
 
         # Figure out start and end points of the training/test data
         end_train = -(i * 24)
@@ -345,7 +347,7 @@ def test_model_week(data, output_size, input_size, hidden_size,
 
         # Make ES_RNN_S Prediction
         prediction, actual, out_levels, out_seas, all_levels, all_seasons, \
-        rnn_out = lstm.predict(test_data, window_size, output_size)
+        rnn_out = lstm.predict(test_data, window_size, output_size, weather)
 
         # Convert test data to correct form for results saving
         test_data = torch.tensor(test_data["total load actual"],
@@ -479,7 +481,6 @@ def train_and_predict_i(lstm, data, window_size, output_size, lvp,
         else:
             local_params.append(p)  # Handle the time-series specific params
 
-
     local_optimizer = torch.optim.Adam(params=local_params, lr=local_init_lr)
     global_optimizer = torch.optim.Adam(params=global_params,
                                         lr=global_init_lr)
@@ -492,8 +493,6 @@ def train_and_predict_i(lstm, data, window_size, output_size, lvp,
               lstm.demand_features}
     pred_ensemble = []
 
-
-    # TODO NEED TO CHECK ALL OF THIS WORKS
     # Loop through number of epochs amount of times
     for epoch in range(num_epochs):
         print("Epoch:", epoch)
@@ -596,6 +595,7 @@ def train_and_predict_s(lstm, data, window_size, output_size, lvp, loss_func,
                         ensemble, multi_ts, skip_lstm, weather):
 
     parameter_dict = {c: [] for c in lstm.demand_features}
+    parameter_dict["global"] = []
 
     # Create a dictionary of time_series -> parameters
     for n, p in lstm.named_parameters():
@@ -627,6 +627,7 @@ def train_and_predict_s(lstm, data, window_size, output_size, lvp, loss_func,
 
     # Loop through number of epochs amount of times
     for epoch in range(num_epochs):
+        print("Epoch:", epoch)
 
         # Loop through each time series
         for f in lstm.demand_features:
@@ -691,8 +692,8 @@ def train_and_predict_s(lstm, data, window_size, output_size, lvp, loss_func,
             local_optimizer.step()
             global_optimizer.step()
 
-            print("Name: %s: Epoch %d: LVP - %1.5f, Loss - %1.5f Total Loss "
-                  "- %1.5f" % (f, epoch, level_var_loss.item(), loss.item(),
+            print("Name: %s: LVP - %1.5f, Loss - %1.5f, Total Loss "
+                  "- %1.5f" % (f, level_var_loss.item(), loss.item(),
                                total_loss.item()))
 
             prev_loss = loss

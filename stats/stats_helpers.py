@@ -9,7 +9,6 @@ from statsmodels.tsa.api import seasonal_decompose
 from os import walk
 
 
-
 # Give training data (must be a multiple of a whole day). Returns
 # deseasonalised data, along with the seasonal indices
 def deseasonalise(data, seasonality, method):
