@@ -13,7 +13,8 @@ def weather_analysis():
                    "weather_features.csv"
     demand_file = "/Users/matt/Projects/AdvancedResearchProject/data/spain/" \
              "energy_dataset.csv"
-    weather_list = ["dt_iso", "city_name", "temp", "humidity", "wind_speed"]
+    weather_list = ["dt_iso", "city_name", "temp", "humidity", "wind_speed",
+                    "pressure"]
     demand_list = ["time", "total load actual"]
     weather = pd.read_csv(weather_file, parse_dates=["dt_iso"],
                      infer_datetime_format=True,
@@ -56,120 +57,70 @@ def weather_analysis():
     city_color_map = {"Valencia": "C1", "Madrid": "C2", "Barcelona": "C3",
                       "Seville": "C4", "Bilbao": "C5"}
 
+    # Font size
+    font = {'size': 20}
+    plt.rc('font', **font)
+
     # Plot of average temperature v total load actual
-    fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
-    ax.scatter(avg_weather["temp"], demand["total load actual"])
-    ax.set_title("Average: Demand against Temperature")
+    fig, axes = plt.subplots(2, 2, figsize=(20, 15), dpi=250)
+    axes = axes.flatten()
+    axes[0].scatter(avg_weather["temp"], demand["total load actual"])
+    axes[0].set_title("Aggregated Demand against Temperature (K)")
     b, m, m2 = polyfit(avg_weather["temp"], demand["total load actual"], 2)
     x = np.arange(
         np.floor(avg_weather["temp"].min()),
         np.ceil(avg_weather["temp"].max()) + 1
     )
-    ax.plot(x, b + m * x + m2 * x**2, color="#fc8403")
-    plt.show()
+    axes[0].plot(x, b + m * x + m2 * x**2, color="#fc8403")
+    # plt.show()
 
-    fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
-    ax.scatter(avg_weather["HD"], demand["total load actual"])
-    ax.set_title("Average: Demand against Heating Degree")
+    # fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    axes[1].scatter(avg_weather["HD"], demand["total load actual"])
+    axes[1].set_title("Aggregated Demand against Heating Degree")
     b, m = polyfit(avg_weather["HD"], demand["total load actual"], 1)
     x = np.arange(np.ceil(avg_weather["HD"].max()) + 1)
-    ax.plot(x, b + m * x, color="#fc8403")
-    plt.show()
+    axes[1].plot(x, b + m * x, color="#fc8403")
+    # plt.show()
 
-    fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
-    ax.scatter(avg_weather["CD"], demand["total load actual"])
-    ax.set_title("Average: Demand against Cooling Degree")
+    # fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    axes[2].scatter(avg_weather["CD"], demand["total load actual"])
+    axes[2].set_title("Aggregated Demand against Cooling Degree")
     b, m = polyfit(avg_weather["CD"], demand["total load actual"], 1)
     x = np.arange(np.ceil(avg_weather["CD"].max()) + 1)
-    ax.plot(x, b + m * x, color="#fc8403")
-    plt.show()
+    axes[2].plot(x, b + m * x, color="#fc8403")
+    # plt.show()
 
-    fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
-    ax.scatter(avg_weather["LE"], demand["total load actual"])
-    ax.set_title("Average: Demand against Latent Enthalpy")
+    # fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    axes[3].scatter(avg_weather["LE"], demand["total load actual"])
+    axes[3].set_title("Aggregated Demand against Latent Enthalpy")
     b, m = polyfit(avg_weather["LE"], demand["total load actual"], 1)
     x = np.arange(np.ceil(avg_weather["LE"].max()) + 1)
-    ax.plot(x, b + m * x, color="#fc8403")
+    axes[3].plot(x, b + m * x, color="#fc8403")
     plt.show()
 
-    # TODO CHECK WORKS Notes: replace values over 2500 with mean
-    # Not worth including
-    # avg_weather.loc[avg_weather["pressure"] > 2500, "pressure"] = \
-    #     avg_weather["pressure"].mean()
-    # avg_weather.loc[avg_weather["pressure"] < 950, "pressure"] = \
-    #     avg_weather["pressure"].mean()
     # fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
-    # ax.scatter(avg_weather["pressure"], demand["total load actual"])
-    # ax.set_title("Average: Demand against Pressure")
-    # b, m = polyfit(avg_weather["pressure"], demand["total load actual"], 1)
-    # x = np.arange(np.floor(avg_weather["pressure"].min()), np.ceil(
-    #     avg_weather["pressure"].max()) + 1)
+    # ax.scatter(avg_weather["humidity"], demand["total load actual"])
+    # ax.set_title("Average: Demand against Humidity")
+    # b, m = polyfit(avg_weather["humidity"], demand["total load actual"], 1)
+    # x = np.arange(
+    #     np.floor(avg_weather["humidity"].min()),
+    #     np.ceil(avg_weather["humidity"].max()) + 1
+    # )
     # ax.plot(x, b + m * x, color="#fc8403")
     # plt.show()
-
-    fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
-    ax.scatter(avg_weather["humidity"], demand["total load actual"])
-    ax.set_title("Average: Demand against Humidity")
-    b, m = polyfit(avg_weather["humidity"], demand["total load actual"], 1)
-    x = np.arange(
-        np.floor(avg_weather["humidity"].min()),
-        np.ceil(avg_weather["humidity"].max()) + 1
-    )
-    ax.plot(x, b + m * x, color="#fc8403")
-    plt.show()
-
-    # Set one value over 20 to the mean. Seems to be worth including
-    avg_weather.loc[avg_weather["wind_speed"] > 20, "wind_speed"] = \
-        avg_weather["wind_speed"].mean()
-    fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
-    ax.scatter(avg_weather["wind_speed"], demand["total load actual"])
-    ax.set_title("Average: Demand against Wind Speed")
-    b, m = polyfit(avg_weather["wind_speed"], demand["total load actual"], 1)
-    x = np.arange(np.ceil(avg_weather["wind_speed"].max()) + 1)
-    ax.plot(x, b + m * x, color="#fc8403")
-    plt.show()
-
-    # Of little use
+    #
+    # # Set one value over 20 to the mean. Seems to be worth including
+    # avg_weather.loc[avg_weather["wind_speed"] > 20, "wind_speed"] = \
+    #     avg_weather["wind_speed"].mean()
     # fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
-    # ax.scatter(avg_weather["rain_1h"], demand["total load actual"])
-    # ax.set_title("Average: Demand against Rain 1h")
-    # b, m = polyfit(avg_weather["rain_1h"], demand["total load actual"], 1)
-    # x = np.arange(np.ceil(avg_weather["rain_1h"].max()) + 1)
+    # ax.scatter(avg_weather["wind_speed"], demand["total load actual"])
+    # ax.set_title("Average: Demand against Wind Speed")
+    # b, m = polyfit(avg_weather["wind_speed"], demand["total load actual"], 1)
+    # x = np.arange(np.ceil(avg_weather["wind_speed"].max()) + 1)
     # ax.plot(x, b + m * x, color="#fc8403")
     # plt.show()
-
-    # Remove the one value of 0.4 and replot to see the trend. Probably of
-    # little use
-    # avg_weather.loc[avg_weather["rain_3h"] > 0.35, "rain_3h"] = \
-    #     avg_weather["rain_3h"].mean()
-    # fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
-    # ax.scatter(avg_weather["rain_3h"], demand["total load actual"])
-    # ax.set_title("Average: Demand against Rain 3h")
-    # b, m = polyfit(avg_weather["rain_3h"], demand["total load actual"], 1)
-    # # x = np.arange(np.ceil(avg_weather["rain_3h"].max()) + 1)
-    # x = np.linspace(0, 0.05, 20)
-    # ax.plot(x, b + m * x, color="#fc8403")
-    # plt.show()
-
-    # So little snow that this is of little value
-    # fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
-    # ax.scatter(avg_weather["snow_3h"], demand["total load actual"])
-    # ax.set_title("Average: Demand against Snow 3h")
-    # b, m = polyfit(avg_weather["snow_3h"], demand["total load actual"], 1)
-    # x = np.arange(np.ceil(avg_weather["snow_3h"].max()) + 1)
-    # ax.plot(x, b + m * x, color="#fc8403")
-    # plt.show()
-
-    # Little point in using, no correlation really
-    # fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
-    # ax.scatter(avg_weather["clouds_all"], demand["total load actual"])
-    # ax.set_title("Average: Demand against Cloud Cover")
-    # b, m = polyfit(avg_weather["clouds_all"], demand["total load actual"], 1)
-    # x = np.arange(np.ceil(avg_weather["clouds_all"].max()) + 1)
-    # ax.plot(x, b + m * x, color="#fc8403")
-    # plt.show()
-
-    # Plots of temperature v total load actual for each city
+    #
+    # # Plots of temperature v total load actual for each city
     # for c in cities:
     #     c = c.set_index('dt_iso').asfreq('H')
     #     name = c.iloc[0]["city_name"].strip()
@@ -215,7 +166,13 @@ def plot_lr():
     #     0.0005 for _ in range(10)] + [0.0001 for _ in range(5)]
     # x = [i for i in range(0, 35, 2)]
 
-    with open(init_fp if init else ninit_fp) as f:
+    # with open(init_fp if init else ninit_fp) as f:
+    #     results = json.load(f)
+
+    path = "/Users/matt/Projects/AdvancedResearchProject/test/" \
+           "ingram_weather_year_2_summer.txt"
+
+    with open(path) as f:
         results = json.load(f)
 
     lr = [0.0001 * i for i in range(1, 10) for _ in range(3)] + \
@@ -344,6 +301,66 @@ def plot_lr():
         axes[i].legend(loc="best")
 
     plt.show()
+
+
+def plot_learning_rates():
+    path = "/Users/matt/Projects/AdvancedResearchProject/test/" \
+           "both_year_1_winter.txt"
+
+    with open(path) as f:
+        results = json.load(f)
+
+    for test in [1, 2, 3, 4, 5, 6, 7]:
+
+        losses = results[str(test)]["losses"]
+        rnn = losses["total load actual"]["RNN"]
+        print(len(rnn))
+
+        lr = [0.0001 * i for i in range(1, 10) for _ in range(3)] + \
+             [0.001 * i for i in range(1, 10) for _ in range(3)] + \
+             [0.01 * i for i in range(1, 10) for _ in range(3)] + \
+             [0.1 * i for i in range(1, 10) for _ in range(3)]
+        labels = [np.round(lr[i], decimals=4) for i in range(0, len(lr), 5)]
+        x = [i for i in range(0, len(lr), 5)]
+
+        fig, axes = plt.subplots(2, 1, figsize=(20, 15), dpi=250)
+        axes[0].set_xticks(x)
+        axes[0].set_xticklabels(labels, rotation=45)
+        axes[0].plot(rnn, label="RNN Losses")
+        axes[0].set_title("RNN Test " + str(test))
+        axes[0].legend(loc="best")
+
+        axes[1].set_xticks(x)
+        axes[1].set_xticklabels(labels, rotation=45)
+        axes[1].plot(rnn[:65], label="RNN Losses")
+        axes[1].legend(loc="best")
+        plt.show()
+
+        # Plot LVPs for each
+        # col_list = ["generation fossil gas",
+        #             "generation fossil hard coal",
+        #             "generation fossil oil",
+        #             "generation hydro run-of-river and poundage",
+        #             "generation hydro water reservoir", "total load forecast",
+        #             "total load actual", "price day ahead", "price actual",
+        #             ]
+        # col_list = ["total load actual", "generation fossil gas",
+        #              "generation fossil hard coal", "generation fossil oil"]
+        # for f in col_list:
+        #     lvp = losses[f]["LVP"]
+        #     fig, axes = plt.subplots(2, 1, figsize=(20, 15), dpi=250)
+        #     axes[0].set_xticks(x)
+        #     axes[0].set_xticklabels(labels, rotation=45)
+        #     axes[0].plot(lvp, label="LVP Losses")
+        #     axes[0].set_title(f + " Test " + str(test))
+        #     axes[0].legend(loc="best")
+        #
+        #     axes[1].set_xticks(x)
+        #     axes[1].set_xticklabels(labels, rotation=45)
+        #     axes[1].plot(lvp[:65], label="LVP Losses")
+        #     axes[1].legend(loc="best")
+        #     plt.show()
+
 
 
 # Convert hPa to Pa
@@ -666,7 +683,7 @@ def plot_test(results, window_size, output_size, print_results):
                                            output_size)],
                          naive_prediction, label="Naive2")
             axes[0].axvline(x=window_size, linestyle=":", color="C5")
-            axes[0].set_title("Actual Data and Forecasts")
+            axes[0].set_title("Actual Data and Forecasts Test " + day)
             axes[0].legend(loc="best")
 
             axes[1].plot(all_levels, label="All Levels")

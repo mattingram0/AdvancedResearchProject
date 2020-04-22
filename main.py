@@ -23,6 +23,8 @@ from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 
 def main():
+    #ml_helpers.weather_analysis()
+    #ml_helpers.plot_learning_rates()
     demand_df = load_demand_data()
     weather_df = load_weather_data()
     hybrid.run(demand_df, weather_df)
@@ -31,11 +33,11 @@ def main():
     # helpers.weather_analysis()
 
     # Plotting results from Hamilton
-    # test_path = "/Users/matt/Projects/AdvancedResearchProject/test" \
-    #             "/extreme_year_1_winter.txt"
+    # test_path = "/Users/matt/Projects/AdvancedResearchProject/test/" \
+    #        "both_year_1_winter.txt"
     # with open(test_path) as f:
     #     ml_helpers.plot_test(json.load(f), 336, 48, True)
-    # sys.exit(0)
+    # ml_helpers.plot_learning_rates()
 
     # hybrid.run(demand_df, weather_df)
 

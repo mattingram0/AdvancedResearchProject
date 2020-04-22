@@ -117,7 +117,7 @@ def es_rnn(data, forecast_length, seasonality, ensemble, multi_ts, skip_lstm):
 
 # General function used to do testing and tweaking
 def run(demand_df, weather_df):
-    # Optional command line arguments to specify year/season
+    # Optional command line argumenkts to specify year/season
     year = -1 if len(sys.argv) < 3 else int(sys.argv[2])
     season = -1 if len(sys.argv) < 4 else int(sys.argv[3])
 
@@ -130,7 +130,7 @@ def run(demand_df, weather_df):
     init_params = True
     write_results = True
     file_location = str(os.path.abspath(os.path.dirname(__file__)))
-    model = False  # True = Ingram, False = Smyl
+    model = True  # True = Ingram, False = Smyl
     multiple = False  # Use multiple time series in Smyl's model
     weather = True  # Include weather data in the chosen model
     valid = True  # True = use validation set, False = use test set
@@ -162,7 +162,7 @@ def run(demand_df, weather_df):
         all_data["Autumn"][year if year >= 0 else 2]
     ]
 
-    if file_location == "/ddn/home/gkxx72/AdvancedResearchProject/dev":
+    if file_location == "/ddn/home/gkxx72/AdvancedResearchProject/dev/hybrid":
         res_base = "/ddn/home/gkxx72/AdvancedResearchProject/run/test_res/"
     else:
         res_base = "/Users/matt/Projects/AdvancedResearchProject/test/"
@@ -180,10 +180,46 @@ def run(demand_df, weather_df):
     else:
         input_size = 1  # Smyl's model, without weather
 
+    global_rates_dict = {
+        "ingram": {10: 5e-3, 20: 1e-3, 30: 5e-4},
+        "smyl_1": {10: 5e-3, 20: 1e-3, 30: 5e-4},
+        "smyl_m": {10: 5e-3, 20: 1e-3, 30: 5e-4}
+    }
+    global_init_rates_dict = {
+        "ingram": 0.008,
+        "syml_1": 0.008,
+        "smyl_m": 0.008
+    }
+    local_rates_dict = {
+        "ingram": {10: 2e-3, 20: 1e-3, 30: 5e-4},
+        "smyl_1": {10: 1e-3, 20: 5e-4, 30: 1e-4},
+        "smyl_m": {10: 2e-3, 20: 1e-3, 30: 5e-4}
+    }
+    local_init_rates_dict = {
+        "ingram": 0.01,
+        "syml_1": 0.005,
+        "smyl_m": 0.01
+    }
+
+    if model:
+        global_init_lr = global_init_rates_dict["ingram"]
+        global_rates = global_rates_dict["ingram"]
+        local_init_lr = local_init_rates_dict["ingram"]
+        local_rates = local_rates_dict["ingram"]
+    else:
+        if multiple:
+            global_init_lr = global_init_rates_dict["smyl_1"]
+            global_rates = global_rates_dict["smyl_1"]
+            local_init_lr = local_init_rates_dict["smyl_1"]
+            local_rates = local_rates_dict["smyl_1"]
+        else:
+            global_init_lr = global_init_rates_dict["smyl_m"]
+            global_rates = global_rates_dict["smyl_m"]
+            local_init_lr = local_init_rates_dict["smyl_m"]
+            local_rates = local_rates_dict["smyl_m"]
+
     # Model hyper parameters
-    num_epochs = 108
-    local_init_lr = 0.01
-    global_init_lr = 0.005
+    num_epochs = 35
     hidden_size = 40
     num_layers = 4
     dilations = [1, 4, 24, 168]
@@ -193,24 +229,12 @@ def run(demand_df, weather_df):
     grad_clipping = 20
     auto_lr = False  # Automatically adjust learning rates
     variable_lr = True  # Use list of epoch/rate pairs
-    global_rates = {10: 1e-3, 20: 5e-4, 30: 1e-4}
-    local_rates = {10: 5e-3, 20: 1e-3, 30: 5e-4}
     auto_rate_threshold = 1.005  # If loss(x - 1) < 1.005 * loss(x) reduce rate
     min_epochs_before_change = 2
     residuals = tuple([[1, 3]])  # Residual connection from 2nd out -> 4th out
     seasonality = 168
-    init_level_smoothing = -1
-    init_seasonal_smoothing = 1
-
-    lr = [0.0001 * i for i in range(1, 10) for _ in range(3)] + \
-         [0.001 * i for i in range(1, 10) for _ in range(3)] + \
-         [0.01 * i for i in range(1, 10) for _ in range(3)] + \
-         [0.1 * i for i in range(1, 10) for _ in range(3)]
-
-    global_rates = {i: r for i, r in enumerate(lr)}
-    local_rates = {i: r for i, r in enumerate(lr)}
-    global_init_lr = global_rates[0]
-    local_init_lr = local_rates[0]
+    init_level_smoothing = int(sys.argv[4]) if len(sys.argv) >= 5 else 0
+    init_seasonal_smoothing = int(sys.argv[5]) if len(sys.argv) >= 5 else 0
 
     test_model_week(data, output_size, input_size, hidden_size,
                     num_layers, batch_first, dilations, demand_features,
@@ -252,7 +276,7 @@ def test_model_week(data, output_size, input_size, hidden_size,
     results = {i: {} for i in range(1, 8)}
 
     # Loop through each day in the week
-    for i in range(2, 1, -1):
+    for i in range(8, 1, -1):
 
         # Figure out start and end points of the training/test data
         end_train = -(i * 24)
@@ -458,8 +482,9 @@ def test_model_week(data, output_size, input_size, hidden_size,
             filename = name + "_year_" + str(year) + s + ".txt"
         elif len(sys.argv) == 6:
             s = season_dict[season]
-            lr = str(local_init_lr).split(".")[1]
-            filename = name + "_year_" + str(year) + s + "_" + lr + ".txt"
+            filename = name + "_year_" + str(year) + s + "_" +\
+                       str(init_level_smoothing) + "_" +\
+                       str(init_seasonal_smoothing) + ".txt"
         else:
             filename = "test.txt"
 
