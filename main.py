@@ -372,7 +372,6 @@ def test(demand_df, weather_df, season_no, model_no):
             for t in range(1, 8):
                 for l in range(1, forecast_length + 1):
                     all_res_owa[l].append(results["OWA"][r][y][t][l - 1])
-
     for l in all_res_owa.keys():
         all_res_owa[l] = np.around(np.mean(all_res_owa[l]), decimals=3)
 
@@ -383,7 +382,6 @@ def test(demand_df, weather_df, season_no, model_no):
             for t in range(1, 8):
                 for l in range(1, forecast_length + 1):
                     all_res_smape[l].append(results["sMAPE"][r][y][t][l - 1])
-
     for l in all_res_smape.keys():
         all_res_smape[l] = np.around(np.mean(all_res_smape[l]), decimals=3)
 
@@ -394,7 +392,6 @@ def test(demand_df, weather_df, season_no, model_no):
             for t in range(1, 8):
                 for l in range(1, forecast_length + 1):
                     all_res_mase[l].append(results["MASE"][r][y][t][l - 1])
-
     for l in all_res_mase.keys():
         all_res_mase[l] = np.around(np.mean(all_res_mase[l]), decimals=3)
 
@@ -402,10 +399,8 @@ def test(demand_df, weather_df, season_no, model_no):
     res_path = os.path.join(file_path, "results/results_48_seasons_owa.txt")
     with open(res_path) as file:
         results_48 = json.load(file)
-
     for l in all_res_owa.keys():
         results_48[str(l)][model_name][season_no - 1] = all_res_owa[l]
-
     with open(res_path, "w") as file:
         json.dump(results_48, file)
 
@@ -414,10 +409,8 @@ def test(demand_df, weather_df, season_no, model_no):
                             "results/results_48_seasons_smape.txt")
     with open(res_path) as file:
         results_48 = json.load(file)
-
     for l in all_res_smape.keys():
         results_48[str(l)][model_name][season_no - 1] = all_res_smape[l]
-
     with open(res_path, "w") as file:
         json.dump(results_48, file)
 
@@ -426,10 +419,8 @@ def test(demand_df, weather_df, season_no, model_no):
                             "results/results_48_seasons_mase.txt")
     with open(res_path) as file:
         results_48 = json.load(file)
-
-    for l in all_res.keys():
+    for l in all_res_mase.keys():
         results_48[str(l)][model_name][season_no - 1] = all_res_mase[l]
-
     with open(res_path, "w") as file:
         json.dump(results_48, file)
 
