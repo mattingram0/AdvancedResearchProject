@@ -50,7 +50,7 @@ def sarima(data, forecast_length, order, seasonal_order):
         fitted_model = sm.tsa.statespace.SARIMAX(
             data, order=order, seasonal_order=seasonal_order, trend='c',
             initialization='approximate_diffuse'
-        ).fit(disp=-1, method='basinhopping')
+        ).fit(disp=-1, method='basinhopping', maxiter=20)
     except np.linalg.LinAlgError as err:
         print(err)
         print("SARIMA Forecast Failed. Exiting.")
@@ -64,7 +64,7 @@ def auto(data, forecast_length, seasonality):
         data,
         start_p=0, start_q=0, max_p=2, max_q=2,
         start_P=0, start_Q=0, max_Q=2, max_P=2,
-        m=seasonality, max_d=1, max_D=1, maxiter=25,
+        m=seasonality, max_d=1, max_D=1, maxiter=15,
         trace=True, suppress_warnings=False, stepwise=True,
         information_criterion='aicc', seasonal=True, stationary=True,
         method="basinhopping"

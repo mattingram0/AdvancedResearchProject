@@ -2,9 +2,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+import sys
 import os.path
 import json
-
 
 from pandas.plotting import register_matplotlib_converters
 from stats import arima, exponential_smoothing, naive, theta, errors, stats_helpers
@@ -14,12 +14,9 @@ from hybrid import hybrid, testing
 
 
 def main():
-    # demand_df = load_demand_data()
-    # weather_df = load_weather_data()
-    # testing.run(demand_df, weather_df)
-    # test(int(sys.argv[1]), int(sys.argv[2]))
-
-    ml_helpers.average_test()
+    demand_df = load_demand_data()
+    weather_df = load_weather_data()
+    test(demand_df, weather_df, int(sys.argv[1]), int(sys.argv[2]))
 
     # Plotting results from Hamilton
     # test_path = "/Users/matt/Projects/AdvancedResearchProject/test/smyl_multiple_weather_year_2_summer_-1_-1.txt"
@@ -92,16 +89,13 @@ def load_weather_data():
 
 
 # The method must accept two parameters: season no. (1 - 4) and method no.
-def test(season_no, model_no):
-    # Load data
-    file_path = os.path.abspath(os.path.dirname(__file__))
-    data_path = os.path.join(file_path, "data/spain/energy_dataset.csv")
-    df = pd.read_csv(data_path, parse_dates=["time"],
-                     usecols=["time", "total load actual", "total load "
-                                                           "forecast"],
-                     infer_datetime_format=True)
-    df = df.set_index('time').asfreq('H')
-    df.interpolate(inplace=True)
+def test(demand_df, weather_df, season_no, model_no):
+    demand_features = demand_df.columns
+    weather_features = weather_df.columns
+
+    # Add the weather data to the demand data
+    for c in weather_df.columns:
+        demand_df[c] = weather_df[c]
 
     # Testing hyper-parameters
     seasonality = 168
@@ -111,7 +105,7 @@ def test(season_no, model_no):
     # times and average the predictions. Further, if internal ensembling is
     # also specified, each prediction from the model will actually be the
     # average of the predictions from the last 5 epochs
-    ensemble = True
+    ensemble = False
     num_ensemble = 3
 
     # True = use final week for testing, False = use penultimate week for
@@ -147,10 +141,31 @@ def test(season_no, model_no):
 
         12: [theta.theta, 'Theta', True, None, True, 10],
 
-        13: [hybrid.es_rnn, 'ES RNN', False, [
-            seasonality, True, False, False], False, 1],
+        13: [None, 'TSO', False, None, False, 1],
 
-        14: [None, 'TSO', False, None, False, 1]
+        14: [hybrid.es_rnn_s, 'ES-RNN-S', False, [
+            seasonality, demand_features, weather_features, False, ensemble,
+            True], False, 1],
+
+        15: [hybrid.es_rnn_s, 'ES-RNN-SW', False, [
+            seasonality, demand_features, weather_features, True, ensemble,
+            True], False, 1],
+
+        16: [hybrid.es_rnn_s, 'ES-RNN-D', False, [
+            seasonality, demand_features, weather_features, False, ensemble,
+            False], False, 1],
+
+        17: [hybrid.es_rnn_s, 'ES-RNN-DW', False, [
+            seasonality, demand_features, weather_features, True, ensemble,
+            False], False, 1],
+
+        18: [hybrid.es_rnn_i, 'ES-RNN-I', False, [
+            seasonality, demand_features, weather_features, False, ensemble],
+            False, 1],
+
+        19: [hybrid.es_rnn_i, 'ES-RNN-IW', False, [
+            seasonality, demand_features, weather_features, True, ensemble],
+            False, 1],
     }
 
     # Optimum ARIMA Parameters (automatically checked, using the
@@ -191,7 +206,7 @@ def test(season_no, model_no):
 
     final_params = {y: [] for y in range(1, 5)}
 
-    all_data = stats_helpers.split_data(df)
+    all_data = stats_helpers.split_data(demand_df)
     years_df = all_data[seas_dict[season_no]]
 
     # The final 7 days are reserved for final testing
@@ -238,7 +253,7 @@ def test(season_no, model_no):
             for r in range(1, num_reps + 1):
 
                 # Handle the hybrid model individually
-                if model_no == 13:
+                if model_no > 13:
                     # Hybrid model requires the dataframe and extra data
                     if testing:
                         test_end = -((t - 2) * 24) if t > 2 else None
@@ -459,7 +474,8 @@ def reset_results_files():
     res48s_path = os.path.join(file_path, "results/results_48_seasons_owa.txt")
     methods = ["Naive1", "Naive2", "NaiveS", "SES", "Holt", "Damped",
                "Holt-Winters", "Comb", "ARIMA", "SARIMA", "Auto", "Theta",
-               "ES RNN", "TSO"]
+               "TSO", "ES-RNN-S", "ES-RNN-SW", "ES-RNN-D", "ES-RNN-DW",
+               "ES-RNN-I", "ES-RNN-IW"]
     res48s = {l: {m: [0, 0, 0, 0] for m in methods} for l in range(1, 49)}
     with open(res48s_path, "w") as f:
         json.dump(res48s, f)
@@ -467,9 +483,6 @@ def reset_results_files():
     # Results 48 (all seasons) sMAPE
     res48s_path = os.path.join(file_path,
                                "results/results_48_seasons_smape.txt")
-    methods = ["Naive1", "Naive2", "NaiveS", "SES", "Holt", "Damped",
-               "Holt-Winters", "Comb", "ARIMA", "SARIMA", "Auto", "Theta",
-               "ES RNN", "TSO"]
     res48s = {l: {m: [0, 0, 0, 0] for m in methods} for l in range(1, 49)}
     with open(res48s_path, "w") as f:
         json.dump(res48s, f)
@@ -477,9 +490,6 @@ def reset_results_files():
     # Results 48 (all seasons) MASE
     res48s_path = os.path.join(file_path,
                                "results/results_48_seasons_mase.txt")
-    methods = ["Naive1", "Naive2", "NaiveS", "SES", "Holt", "Damped",
-               "Holt-Winters", "Comb", "ARIMA", "SARIMA", "Auto", "Theta",
-               "ES RNN", "TSO"]
     res48s = {l: {m: [0, 0, 0, 0] for m in methods} for l in range(1, 49)}
     with open(res48s_path, "w") as f:
         json.dump(res48s, f)

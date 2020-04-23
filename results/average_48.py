@@ -3,7 +3,8 @@ import numpy as np
 
 methods = ["Naive1", "Naive2", "NaiveS", "SES", "Holt", "Damped",
            "Holt-Winters", "Comb", "ARIMA", "SARIMA", "Auto", "Theta",
-           "ES RNN", "TSO"]
+           "TSO", "ES-RNN-S", "ES-RNN-SW", "ES-RNN-D", "ES-RNN-DW",
+           "ES-RNN-I", "ES-RNN-IW"]
 
 # OWA
 with open('results_48_seasons_owa.txt') as f:

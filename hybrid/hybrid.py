@@ -1,40 +1,28 @@
+import sys
+from math import sqrt
+
 import numpy as np
 import pandas as pd
 import torch
-import sys
 
+from hybrid.es_rnn_i import ES_RNN_I
+from hybrid.es_rnn_s import ES_RNN_S
 from ml.ml_helpers import pinball_loss
 from stats.stats_helpers import deseasonalise
 
-from math import sqrt
 
-from hybrid.es_rnn_s import ES_RNN_S
-from hybrid.es_rnn_i import ES_RNN_I
-
-
-# Give the model the training data, the forecast length and the seasonality,
-# and this function trains the model and makes a single prediction
-# Must pass in the training data plus the following forecast_length data.
-# Note that the extra forecast_length of data (i.e the test data) doesn't
-# get used, we just need the data to be the correct length (just the way
-# I've coded it)
-def es_rnn_s(demand_data, weather_data, forecast_length, seasonality,
-             ensemble, multi_ts, weather):
-
-    demand_features = demand_data.columns
-    weather_features = weather_data.columns
-
-    if weather:
-        for c in weather_data.columns:
-            demand_data[c] = weather_data[c]
+# Train the model and generate a single prediction. Training data must
+# include test data to ensure it is of the correct length, it's not actually
+# used
+def es_rnn_s(data, forecast_length, seasonality,
+             demand_features, weather_features, weather,
+             ensemble, multi_ts):
 
     # Model hyper parameters
     window_size = 336
     num_epochs = 35
     hidden_size = 40
     num_layers = 4
-    input_size = len(demand_features) if not weather else len(
-        demand_features) + len(weather_features)
     dilations = [1, 4, 24, 168]
     level_variability_penalty = 80
     percentile = 0.49
@@ -47,6 +35,7 @@ def es_rnn_s(demand_data, weather_data, forecast_length, seasonality,
     residuals = tuple([[1, 3]])
     init_level_smoothing = -1
     init_seasonal_smoothing = -1.1
+    input_size = 1 + len(weather_features) if weather else 1
     batch_first = True
     skip_lstm = False
 
@@ -62,8 +51,8 @@ def es_rnn_s(demand_data, weather_data, forecast_length, seasonality,
         global_rates = {10: 5e-3, 20: 1e-3, 30: 5e-4}
 
     # Split the data
-    train_data = demand_data[:-forecast_length]
-    forecast_data = demand_data[-(forecast_length + window_size):]
+    train_data = data[:-forecast_length]
+    forecast_data = data[-(forecast_length + window_size):]
     batch_size = len(train_data) - window_size - forecast_length + 1
 
     # Estimate the seasonal indices and inital smoothing levels
@@ -108,14 +97,8 @@ def es_rnn_s(demand_data, weather_data, forecast_length, seasonality,
     return prediction
 
 
-def es_rnn_i(demand_data, weather_data, forecast_length, seasonality,
-             ensemble, weather):
-    demand_features = demand_data.columns
-    weather_features = weather_data.columns
-
-    if weather:
-        for c in weather_data.columns:
-            demand_data[c] = weather_data[c]
+def es_rnn_i(data, forecast_length, seasonality, demand_features,
+             weather_features, weather, ensemble):
 
     # Model hyper parameters
     window_size = 336
@@ -137,15 +120,14 @@ def es_rnn_i(demand_data, weather_data, forecast_length, seasonality,
     init_level_smoothing = -1
     init_seasonal_smoothing = -1.1
     batch_first = True
-    skip_lstm = False
     local_init_lr = 0.01
     global_init_lr = 0.008
     local_rates = {10: 2e-3, 20: 1e-3, 30: 5e-4}
     global_rates = {10: 5e-3, 20: 1e-3, 30: 5e-4}
 
     # Split the data
-    train_data = demand_data[:-forecast_length]
-    forecast_data = demand_data[-(forecast_length + window_size):]
+    train_data = data[:-forecast_length]
+    forecast_data = data[-(forecast_length + window_size):]
     batch_size = len(train_data) - window_size - forecast_length + 1
 
     # Estimate the seasonal indices and inital smoothing levels

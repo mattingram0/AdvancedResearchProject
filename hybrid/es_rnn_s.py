@@ -102,13 +102,9 @@ class ES_RNN_S(nn.Module):
         self.tanh_no_lstm = non_lin.Tanh(336, 336)
         self.linear_no_lstm = nn.Linear(336, output_size)
 
-        # TODO REMOVE
-        self.counter = 0
-
     def forward(self, data, feature, window_size, output_size, weather, lvp=0,
                 std=0.001, skip_lstm=False):
         n = Normal(torch.tensor([0.0]), torch.tensor([std]))
-        self.counter += 1
         x = torch.tensor(data[feature], dtype=torch.double)
 
         # Forward receives the entire sequence x = [seq_len]
@@ -189,11 +185,6 @@ class ES_RNN_S(nn.Module):
             inputs.append(noisy_norm_input.unsqueeze(0))  # Unsqueeze b4 cat
             labels.append(squashed_norm_label.unsqueeze(0))
 
-            # Used for one of the plotting functions, ignore
-            # if i == 7 * 24 * 4:
-            #     j = i
-            #     data_subset = x[i - (7 * 24): i + (3 * 7 * 24)]
-
         labels = torch.cat(labels)
 
         if skip_lstm:
@@ -236,13 +227,6 @@ class ES_RNN_S(nn.Module):
             # Pass DLSTM output through non-linear and linear layers
             linear_in = h_out[:, -inputs.size(0):, :].view(-1, self.hidden_size)
             out = self.linear(self.tanh(linear_in))
-
-        # Used for one of the plotting functions, ignore
-        # rnn_in = inputs[j]
-        # data_out = labels[j]
-        # rnn_out = out[j]
-        # if self.counter == 25:
-        #     ml_helpers.plot_sliding_window(data_subset, rnn_in, data_out, rnn_out)
 
         # Save the level and seasonality values so that we can use them to make
         # predictions
