@@ -1,11 +1,46 @@
 import numpy as np
 from numpy.polynomial.polynomial import polyfit
+import pandas as pd
 import matplotlib.pyplot as plt
 import pandas as pd
 import torch
 import json
 from math import sin, exp
 from os import walk
+
+
+def average_test():
+    base = "/Users/matt/Projects/AdvancedResearchProject/test/"
+    tests = ["smyl_multiple_weather_year_2_season_",
+             "smyl_multiple_no_weather_year_2_season_",
+             "smyl_1_weather_year_2_season_",
+             "smyl_1_no_weather_year_2_season_",
+             "ingram_weather_year_2_season_",
+             "ingram_no_weather_year_2_season_"]
+    test_names = ["ES_RNN_SW", "ES_RNN_S", "ES_RNN_DW", "ES_RNN_D",
+                  "ES_RNN_IW", "ES_RNN_I"]
+
+    init_vals = ["-1_-1.out", "-1_1.out", "1_-1.out", "1_1.out"]
+    init_vals_names = ["-1, -1", "-1, 1", "1, -1", "1, 1"]
+    seasons = ["0_smoothing_", "1_smoothing_", "2_smoothing_", "3_smoothing_"]
+
+    results = {t: {iv: 0 for iv in init_vals_names} for t in test_names}
+    for t, n in zip(tests, test_names):
+        for iv, ivn in zip(init_vals, init_vals_names):
+            owas = []
+            for s in seasons:
+                filename = base + t + s + iv
+
+                with open(filename) as f:
+                    avg_owa = list(f)[-4]
+                    owas.append(float(avg_owa.split(":")[1].strip()))
+
+            results[n][ivn] = np.mean(owas)
+
+    results = pd.DataFrame(results)
+    print(results, "\n")
+    print(results.min(axis=0), "\n")
+    print(results.min(axis=1))
 
 
 def weather_analysis():
@@ -304,8 +339,7 @@ def plot_lr():
 
 
 def plot_learning_rates():
-    path = "/Users/matt/Projects/AdvancedResearchProject/test/" \
-           "both_year_1_winter.txt"
+    path = "/Users/matt/Projects/AdvancedResearchProject/test/ingram_weather_year_2_winter_-1_1.txt"
 
     with open(path) as f:
         results = json.load(f)
@@ -314,14 +348,13 @@ def plot_learning_rates():
 
         losses = results[str(test)]["losses"]
         rnn = losses["total load actual"]["RNN"]
-        print(len(rnn))
 
-        lr = [0.0001 * i for i in range(1, 10) for _ in range(3)] + \
-             [0.001 * i for i in range(1, 10) for _ in range(3)] + \
-             [0.01 * i for i in range(1, 10) for _ in range(3)] + \
-             [0.1 * i for i in range(1, 10) for _ in range(3)]
-        labels = [np.round(lr[i], decimals=4) for i in range(0, len(lr), 5)]
-        x = [i for i in range(0, len(lr), 5)]
+        lr = [0.01 for _ in range(1, 10)] + \
+             [0.005 for _ in range(1, 10)] + \
+             [0.001 for _ in range(1, 10)] + \
+             [0.0001 for _ in range(1, 5)]
+        labels = [np.round(lr[i], decimals=5) for i in range(0, len(lr), 3)]
+        x = [i for i in range(0, len(lr), 3)]
 
         fig, axes = plt.subplots(2, 1, figsize=(20, 15), dpi=250)
         axes[0].set_xticks(x)
