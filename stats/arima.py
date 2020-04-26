@@ -1,5 +1,6 @@
 import statsmodels.api as sm
 import pmdarima as pm
+from timeit import default_timer as timer
 import numpy as np
 import pandas as pd
 import sys
@@ -48,14 +49,15 @@ def arima(data, forecast_length, order):
 def sarima(data, forecast_length, order, seasonal_order):
     try:
         fitted_model = sm.tsa.statespace.SARIMAX(
-            data, order=order, seasonal_order=seasonal_order, trend='c',
-            initialization='approximate_diffuse'
-        ).fit(disp=-1, method='basinhopping', maxiter=20)
+            data, order=order, seasonal_order=seasonal_order
+        ).fit(method='powell', maxiter=25, disp=True, low_memory=True)
     except np.linalg.LinAlgError as err:
         print(err)
         print("SARIMA Forecast Failed. Exiting.")
         sys.exit(0)
-    prediction = fitted_model.predict(0, len(data) + forecast_length - 1)
+    sys.stderr.flush()
+    sys.stdout.flush()
+    prediction = fitted_model.forecast(forecast_length)
     return prediction, fitted_model.params.to_dict()
 
 
@@ -64,18 +66,21 @@ def auto(data, forecast_length, seasonality):
         data,
         start_p=0, start_q=0, max_p=2, max_q=2,
         start_P=0, start_Q=0, max_Q=2, max_P=2,
-        m=seasonality, max_d=1, max_D=1, maxiter=15,
+        m=seasonality, max_d=1, max_D=1, maxiter=25,
         trace=True, suppress_warnings=False, stepwise=True,
         information_criterion='aicc', seasonal=True, stationary=True,
-        method="basinhopping"
+        method="powell", low_memory=True
     )
-    fitted = fitted_model.predict_in_sample(start=0, end=(len(data) - 1))
+    sys.stderr.flush()
+    sys.stdout.flush()
+    # fitted = fitted_model.predict_in_sample(start=0, end=(len(data) - 1))
     prediction = fitted_model.predict(forecast_length)
     params = fitted_model.params().tolist()
     hyper_params = fitted_model.get_params()
     params.append(hyper_params["order"])
     params.append(hyper_params["seasonal_order"])
 
-    return pd.Series(np.concatenate((fitted, prediction))), params
+    # return pd.Series(np.concatenate((fitted, prediction))), params
+    return pd.Series(prediction), params
     # Play with the stepwise. Stepwise=True enforces the H-K algo. Possibly
     # also increase the max values or the params?

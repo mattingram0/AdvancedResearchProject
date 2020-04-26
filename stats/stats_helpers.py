@@ -16,6 +16,7 @@ from timeit import default_timer as timer
 from math import fabs
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+from stats.errors import sMAPE
 
 
 # Give training data (must be a multiple of a whole day). Returns
@@ -102,75 +103,214 @@ def split_data(df):
 
 # Plot the test result forecasts for all the stats models for a given
 # season, year, and test number.
-def plot_forecasts(df, season, year, test):
-    fig, axes = plt.subplots(2, 1, figsize=(20, 15), dpi=250)
+def plot_forecasts(df, season, year):
+    split = split_data(df)
+    for test in range(8, 1, -1):
+        fig, axes = plt.subplots(2, 1, figsize=(20, 15), dpi=250)
 
-    test_path = "/Users/matt/Projects/AdvancedResearchProject/results/"
-    (_, _, filenames) = next(os.walk(test_path))
+        test_path = "/Users/matt/Projects/AdvancedResearchProject/results" \
+                    "/non_ensemble_results/res/"
+        (_, _, filenames) = next(os.walk(test_path))
 
-    actual = split_data(df)[season][year]["total load actual"][-48:].tolist()
+        train_end = -(test * 24)
+        test_end = -(test * 24 - 48) if test > 2 else None
+        actual = split[season][year]["total load actual"][train_end:test_end].tolist()
 
-    axes[0].plot(actual, label="Actual")
-    axes[1].plot(actual, label="Actual")
+        axes[0].plot(actual, label="Actual")
+        axes[1].plot(actual, label="Actual")
 
-    for file in filenames:
-        if "forecasts" not in file:
-            continue
+        for file in filenames:
+            if "forecasts" not in file:
+                continue
 
-        seas, method, _ = file.split("_")
+            seas, method, _ = file.split("_")
 
-        if seas != season:
-            continue
+            if seas != season:
+                continue
 
-        top = ["NaiveS", "ES RNN", "Comb", "Holt", "Naive2", "SES", "TSO"]
-        bottom = ["Theta", "Damped", "ARIMA", "SARIMA", "Holt-Winters", "Naive1"]
+            # methods = ["Naive1", "Naive2", "NaiveS", "SES", "Holt", "Damped",
+            #            "Holt-Winters", "Comb", "ARIMA", "SARIMA", "Auto", "Theta",
+            #            "TSO", "ES-RNN-S", "ES-RNN-SW", "ES-RNN-D", "ES-RNN-DW",
+            #            "ES-RNN-I", "ES-RNN-IW"]
+            # good = [""]
 
-        with open(test_path + file) as f:
-            all_forecasts = json.load(f)
-            forecast = all_forecasts[str(year)][str(1)][str(test)]
+            # top = ["NaiveS", "ES-RNN-I", "Comb", "Holt", "Naive2", "SES", "TSO"]
+            top = ["NaiveS", "TSO"]
+            bottom = ["Theta", "Damped", "ARIMA", "SARIMA", "Holt-Winters", "Naive1"]
 
-        # Plot 6 tests on first axes
-        if method in top:
-            axes[0].plot(forecast, label=method, marker='o')
-        elif method in bottom:
-            axes[1].plot(forecast, label=method, marker='o')
-        else:
-            pass  # To handle the empty 'Auto' forecasts
+            with open(test_path + file) as f:
+                all_forecasts = json.load(f)
+                forecast = all_forecasts[str(year)][str(1)][str(test - 1)]
 
-    axes[0].legend(loc="best")
-    axes[1].legend(loc="best")
-    plt.show()
+            # Plot 6 tests on first axes
+            if method in top:
+                axes[0].plot(forecast, label=method, marker='o')
+            elif method in bottom:
+                axes[1].plot(forecast, label=method, marker='o')
+            else:
+                pass  # To handle the empty 'Auto' forecasts
+
+        axes[0].legend(loc="best")
+        axes[1].legend(loc="best")
+        plt.show()
+
+
+def check_errors(df):
+    forecast_length = 48
+    base = "/Users/matt/Projects/AdvancedResearchProject/results" \
+           "/non_ensemble_results/res/"
+    seasons = ["Spring_", "Summer_", "Autumn_", "Winter_"]
+    methods = ["Naive2_forecasts.txt", "NaiveS_forecasts.txt", "TSO_forecasts.txt", "ES-RNN-I_forecasts.txt"]
+    seas_dict = {1: "Spring", 2: "Summer", 3: "Autumn", 4: "Winter"}
+
+    # Begin with a hard coded season:
+    seas = 3  # 0: Spring, 1: Summer, 2: Autumn, 3: Winter
+    seas_n = seas_dict[seas + 1]
+
+    split = split_data(df)
+
+    # Load forecasts
+    with open(base + seasons[seas] + methods[0]) as f:
+        naive2_forecasts = json.load(f)
+
+    with open(base + seasons[seas] + methods[1]) as f:
+        naives_forecasts = json.load(f)
+
+    with open(base + seasons[seas] + methods[2]) as f:
+        tso_forecasts = json.load(f)
+
+    with open(base + seasons[seas] + methods[3]) as f:
+        es_rnn_i_forecasts = json.load(f)
+
+    # TSO Results
+    with open(base + seasons[seas] + "TSO_results.txt") as f:
+        tso_results = json.load(f)
+
+    # Calculate sMAPES:
+    tso_smapes = []
+    es_rnn_smapes = []
+    naive2_smapes = []
+    naives_smapes = []
+    tso_test_smapes = []
+    for y in range(1, 5):
+        for t in range(1, 8):
+            train_end = -((t + 1) * 24)
+            test_end = -((t + 1) * 24 - forecast_length) if (t + 1) > 2 else None
+            naive2 = naive2_forecasts[str(y)][str(1)][str(t)]
+            naives = naives_forecasts[str(y)][str(1)][str(t)]
+            tso = tso_forecasts[str(y)][str(1)][str(t)]
+            es_rnn = es_rnn_i_forecasts[str(y)][str(1)][str(t)]
+            actual = split[seas_n][y - 1]["total load actual"][
+                     train_end:test_end].tolist()
+            tso_smapes.append(sMAPE(pd.Series(actual), pd.Series(tso)))
+            es_rnn_smapes.append(sMAPE(pd.Series(actual), pd.Series(es_rnn)))
+            naive2_smapes.append(sMAPE(pd.Series(actual), pd.Series(naive2)))
+            naives_smapes.append(sMAPE(pd.Series(actual), pd.Series(naives)))
+            tso_test_smapes.append(tso_results["sMAPE"][str(1)][str(y)][str(
+                t)][47])
+
+    print("Average ES-RNN-I sMAPE:", np.mean(es_rnn_smapes))
+    print("Average TSO sMAPE:", np.mean(tso_smapes))
+    print("Average TSO (Results):", np.mean(tso_test_smapes))
+    print("Average Naive2 sMAPE:", np.mean(naive2_smapes))
+    print("Average NaiveS sMAPE:", np.mean(naives_smapes))
 
 
 def plot_48_results():
     methods = ["Naive1", "Naive2", "NaiveS", "SES", "Holt", "Damped",
                "Holt-Winters", "Comb", "ARIMA", "SARIMA", "Auto", "Theta",
-               "ES RNN", "TSO"]
-    res = {m: [0] * 48 for m in methods}
-
+               "TSO", "ES-RNN-S", "ES-RNN-SW", "ES-RNN-D", "ES-RNN-DW",
+               "ES-RNN-I", "ES-RNN-IW"]
+    circles = ["ES-RNN-S", "ES-RNN-SW", "ES-RNN-D", "ES-RNN-DW",
+               "ES-RNN-I", "ES-RNN-IW"]
+    exclude = ["Naive1", "Auto", "SARIMA"]
     sns.reset_orig()
     clrs = sns.color_palette('husl', n_colors=len(methods))
+    x_tick_locs = [0] + [i for i in range(-1, 48, 5)][1:] + [47]
+    x_tick_labels = [1] + [i + 1 for i in range(-1, 48, 5)][1:] + [48]
 
+    # Load OWA
     with open("/Users/matt/Projects/AdvancedResearchProject/results/"
-              "results_48_sMAPE.txt") as file:
-        res48 = json.load(file)
+              "non_ensemble_results/res/results_48_owa.txt") as file:
+        owas48 = json.load(file)
 
     # Convert {Lead: {Method: Val, ...}, ...} to {Method: [Vals], ...}
-    for lead, vals in res48.items():
+    owas = {m: [0] * 48 for m in methods}
+    for lead, vals in owas48.items():
         for m, owa in vals.items():
-            res[m][int(lead) - 1] = owa
+            owas[m][int(lead) - 1] = owa
 
+    # Load sMAPE
+    with open("/Users/matt/Projects/AdvancedResearchProject/results/"
+              "non_ensemble_results/res/results_48_smape.txt") as file:
+        smapes48 = json.load(file)
+
+    # Convert {Lead: {Method: Val, ...}, ...} to {Method: [Vals], ...}
+    smapes = {m: [0] * 48 for m in methods}
+    for lead, vals in smapes48.items():
+        for m, smape in vals.items():
+            smapes[m][int(lead) - 1] = smape
+
+    # Load MASE
+    with open("/Users/matt/Projects/AdvancedResearchProject/results/"
+              "non_ensemble_results/res/results_48_mase.txt") as file:
+        mases48 = json.load(file)
+
+    # Convert {Lead: {Method: Val, ...}, ...} to {Method: [Vals], ...}
+    mases = {m: [0] * 48 for m in methods}
+    for lead, vals in mases48.items():
+        for m, mase in vals.items():
+            mases[m][int(lead) - 1] = mase
+
+    font = {'size': 20}
+    plt.rc('font', **font)
+
+    # Plot OWAS
     fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
-    for i, (m, owas) in enumerate(res.items()):
-        if m == "Naive1" or m == "Holt-Winters" or m == "SARIMA" or m == \
-                "Auto":
+    for i, (m, e) in enumerate(owas.items()):
+        if m in exclude:
             continue
-        if m != "Theta" and m != "ES RNN" and m != "Naive2" and m != "NaiveS":
-            continue
-        ax.plot(owas, label=m, marker='x')
+
+        marker = 'o' if m in circles else 'x'
+        ax.plot(e, label=m, marker=marker)
 
     ax.legend(loc="best")
     ax.axvline(x=24, linestyle=":")
+    ax.set_title("OWA against Lead Time")
+    ax.set_xticks(x_tick_locs)
+    ax.set_xticklabels(x_tick_labels)
+    plt.show()
+
+    # Plot sMAPES
+    fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    for i, (m, e) in enumerate(smapes.items()):
+        if m in exclude:
+            continue
+
+        marker = 'o' if m in circles else 'x'
+        ax.plot(e, label=m, marker=marker)
+
+    ax.legend(loc="best")
+    ax.axvline(x=24, linestyle=":")
+    ax.set_title("sMAPE against Lead Time")
+    ax.set_xticks(x_tick_locs)
+    ax.set_xticklabels(x_tick_labels)
+    plt.show()
+
+    # Plot MASES
+    fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    for i, (m, e) in enumerate(mases.items()):
+        if m in exclude:
+            continue
+
+        marker = 'o' if m in circles else 'x'
+        ax.plot(e, label=m, marker=marker)
+
+    ax.legend(loc="best")
+    ax.axvline(x=24, linestyle=":")
+    ax.set_title("MASE against Lead Time")
+    ax.set_xticks(x_tick_locs)
+    ax.set_xticklabels(x_tick_labels)
     plt.show()
 
 

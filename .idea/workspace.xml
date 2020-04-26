@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="564df88f-763d-43a5-ba2e-b5cd80214a9e" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hybrid/hybrid.py" beforeDir="false" afterPath="$PROJECT_DIR$/hybrid/hybrid.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stats/arima.py" beforeDir="false" afterPath="$PROJECT_DIR$/stats/arima.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stats/stats_helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/stats/stats_helpers.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -28,117 +32,20 @@
     <favorites_list name="AdvancedResearchProject" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5">
-      <split-first>
-        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/hybrid/es_rnn_s.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="3375">
-                  <caret line="228" column="51" selection-start-line="228" selection-start-column="51" selection-end-line="228" selection-end-column="51" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/ml/drnn.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="146">
-                  <caret line="29" column="8" selection-start-line="29" selection-start-column="8" selection-end-line="29" selection-end-column="8" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/main.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="454">
-                  <caret line="410" column="36" lean-forward="true" selection-start-line="410" selection-start-column="36" selection-end-line="410" selection-end-column="36" />
-                  <folding>
-                    <element signature="e#0#19#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/results/average.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="105">
-                  <caret line="7" column="35" selection-start-line="7" selection-start-column="35" selection-end-line="7" selection-end-column="35" />
-                  <folding>
-                    <element signature="e#0#19#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/results/average_48.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="75">
-                  <caret line="6" column="35" selection-start-line="6" selection-start-column="35" selection-end-line="6" selection-end-column="35" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/stats/arima.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="198">
-                  <caret line="39" column="41" selection-start-line="39" selection-start-column="41" selection-end-line="39" selection-end-column="41" />
-                  <folding>
-                    <element signature="e#0#28#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/results/print_results.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="240">
-                  <caret line="16" column="26" selection-start-line="16" selection-start-column="26" selection-end-line="16" selection-end-column="26" />
-                  <folding>
-                    <element signature="e#0#19#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/results/params.txt">
-              <provider selected="true" editor-type-id="text-editor" />
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/hybrid/testing.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="2284">
-                  <caret line="174" column="13" lean-forward="true" selection-start-line="174" selection-start-column="13" selection-end-line="174" selection-end-column="13" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-833">
-                  <caret line="39" column="21" selection-start-line="39" selection-start-column="21" selection-end-line="39" selection-end-column="21" />
-                  <folding>
-                    <element signature="e#0#10#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-second>
-    </splitter>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/main.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="169">
+              <caret line="151" lean-forward="true" selection-start-line="151" selection-end-line="171" selection-end-column="5" />
+              <folding>
+                <element signature="e#0#19#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -149,12 +56,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>sample</find>
-      <find>font</find>
-      <find>detach</find>
-      <find>det</find>
-      <find>eval</find>
-      <find>flush</find>
       <find>type</find>
       <find>grid</find>
       <find>subp</find>
@@ -179,6 +80,12 @@
       <find>smoothing</find>
       <find>plot_lr</find>
       <find>hybrid</find>
+      <find>timer</find>
+      <find>timer()</find>
+      <find>flush</find>
+      <find>Auto</find>
+      <find>set_x</find>
+      <find>font</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -193,9 +100,6 @@
   <component name="Git.Settings">
     <option name="ROOT_SYNC" value="SYNC" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/ml/lstm_48.py" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -232,7 +136,6 @@
         <option value="$PROJECT_DIR$/other/demo.py" />
         <option value="$PROJECT_DIR$/stats/errors.py" />
         <option value="$PROJECT_DIR$/ml/drnn.py" />
-        <option value="$PROJECT_DIR$/stats/naive.py" />
         <option value="$PROJECT_DIR$/stats/exponential_smoothing.py" />
         <option value="$PROJECT_DIR$/stats/helpers.py" />
         <option value="$PROJECT_DIR$/hybrid/es_rnn.py" />
@@ -242,19 +145,20 @@
         <option value="$PROJECT_DIR$/hybrid/es_rnn_i.py" />
         <option value="$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/holtwinters.py" />
         <option value="$PROJECT_DIR$/ml/ml_helpers.py" />
-        <option value="$PROJECT_DIR$/stats/stats_helpers.py" />
         <option value="$PROJECT_DIR$/hybrid/testing.py" />
         <option value="$PROJECT_DIR$/hybrid/es_rnn_s.py" />
         <option value="$PROJECT_DIR$/results/average.py" />
         <option value="$PROJECT_DIR$/results/average_48.py" />
         <option value="$PROJECT_DIR$/results/print_results.py" />
+        <option value="$PROJECT_DIR$/stats/naive.py" />
         <option value="$PROJECT_DIR$/hybrid/hybrid.py" />
         <option value="$PROJECT_DIR$/stats/arima.py" />
+        <option value="$PROJECT_DIR$/stats/stats_helpers.py" />
         <option value="$PROJECT_DIR$/main.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds">
     <option name="x" value="1440" />
     <option name="y" value="-180" />
     <option name="width" value="1920" />
@@ -272,6 +176,11 @@
             <path>
               <item name="AdvancedResearchProject" type="b2602c69:ProjectViewProjectNode" />
               <item name="AdvancedResearchProject" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="AdvancedResearchProject" type="b2602c69:ProjectViewProjectNode" />
+              <item name="AdvancedResearchProject" type="462c0819:PsiDirectoryNode" />
+              <item name="data" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="AdvancedResearchProject" type="b2602c69:ProjectViewProjectNode" />
@@ -297,7 +206,7 @@
     <property name="last_opened_file_path" value="$USER_HOME$/Desktop/Trained" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -329,6 +238,9 @@
       <module name="AdvancedResearchProject" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -348,6 +260,9 @@
       <module name="AdvancedResearchProject" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -355,7 +270,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
-      <option name="PARAMETERS" value="2 19" />
+      <option name="PARAMETERS" value="2 11" />
       <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -433,7 +348,8 @@
       <workItem from="1586451125501" duration="16227000" />
       <workItem from="1586529763785" duration="99012000" />
       <workItem from="1587204860278" duration="72756000" />
-      <workItem from="1587478415175" duration="34480000" />
+      <workItem from="1587478415175" duration="58630000" />
+      <workItem from="1587903475110" duration="169000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit. Git setup.">
       <created>1573219288446</created>
@@ -537,7 +453,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="1153343000" />
+    <option name="totallyTimeSpent" value="1177685000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -554,7 +470,7 @@
     <layout>
       <window_info id="Structure" order="0" sideWeight="0.5020298" side_tool="true" weight="0.23109691" />
       <window_info id="Favorites" order="1" sideWeight="0.50147057" side_tool="true" weight="0.18157615" />
-      <window_info content_ui="combo" id="Project" order="2" sideWeight="0.49797022" visible="true" weight="0.17891374" />
+      <window_info active="true" content_ui="combo" id="Project" order="2" sideWeight="0.49797022" visible="true" weight="0.29605964" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32746115" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32920793" />
@@ -567,12 +483,12 @@
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50532484" side_tool="true" weight="0.34300518" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.32435232" />
-      <window_info active="true" anchor="bottom" x="9" y="580" width="1398" height="242" id="Python Console" order="12" sideWeight="0.4946752" visible="true" weight="0.031088082" />
+      <window_info anchor="bottom" x="9" y="580" width="1398" height="242" id="Python Console" order="12" sideWeight="0.4946752" visible="true" weight="0.30051813" />
       <window_info anchor="bottom" id="Statistic" order="13" weight="0.8373057" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" x="0" y="22" width="1440" height="878" id="SciView" maximized="true" order="3" sideWeight="0.48142165" type="WINDOWED" weight="0.73801917" />
+      <window_info anchor="right" x="0" y="22" width="1440" height="878" id="SciView" maximized="true" order="3" sideWeight="0.48142165" weight="0.73801917" />
       <window_info anchor="right" id="Database" order="4" weight="0.11821086" />
       <window_info anchor="right" x="0" y="0" width="310" height="700" id="Documentation" order="5" sideWeight="0.51857835" side_tool="true" weight="0.78168267" />
     </layout>
@@ -686,18 +602,6 @@
     <SUITE FILE_PATH="coverage/AdvancedResearchProject$Pandas.coverage" NAME="Pandas Coverage Results" MODIFIED="1573231911049" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/stats" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/stats/autoSarima.py" />
-    <entry file="file://$PROJECT_DIR$/stats/naive2_adjusted.py" />
-    <entry file="file://$PROJECT_DIR$/tutorials/pandas2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="15" selection-start-line="5" selection-start-column="11" selection-end-line="5" selection-end-column="15" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/stats/naiveS.py" />
     <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/sklearn/utils/validation.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -761,13 +665,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/statespace/sarimax.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="945" column="29" lean-forward="true" selection-start-line="945" selection-start-column="29" selection-end-line="945" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/numpy/lib/index_tricks.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="6133">
@@ -822,27 +719,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stats/naive.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="17" column="4" selection-start-line="17" selection-start-column="4" selection-end-line="17" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tutorials/pandas1.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="239">
           <caret line="63" column="3" selection-start-line="63" selection-start-column="3" selection-end-line="63" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stats/errors.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="28" column="37" selection-start-line="28" selection-start-column="37" selection-end-line="28" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#21#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -946,44 +826,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ml/ml_helpers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="446">
-          <caret line="51" column="31" lean-forward="true" selection-start-line="51" selection-start-column="31" selection-end-line="51" selection-end-column="31" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stats/stats_helpers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="19" selection-start-line="19" selection-end-line="19" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hybrid/es_rnn_s.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3375">
-          <caret line="228" column="51" selection-start-line="228" selection-start-column="51" selection-end-line="228" selection-end-column="51" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ml/drnn.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="146">
           <caret line="29" column="8" selection-start-line="29" selection-start-column="8" selection-end-line="29" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hybrid/testing.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2284">
-          <caret line="174" column="13" lean-forward="true" selection-start-line="174" selection-start-column="13" selection-end-line="174" selection-end-column="13" />
         </state>
       </provider>
     </entry>
@@ -1010,37 +856,116 @@
     <entry file="file://$PROJECT_DIR$/results/params.txt">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
+    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/base/model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-833">
-          <caret line="39" column="21" selection-start-line="39" selection-start-column="21" selection-end-line="39" selection-end-column="21" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="2432">
+          <caret line="257" column="8" selection-start-line="257" selection-start-column="8" selection-end-line="257" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/statespace/mlemodel.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="337" column="8" selection-start-line="337" selection-start-column="8" selection-end-line="337" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/pmdarima/arima/auto.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="175" column="4" selection-start-line="175" selection-start-column="4" selection-end-line="175" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/statespace/sarimax.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="297" column="8" selection-start-line="297" selection-start-column="8" selection-end-line="297" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stats/naive.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" column="52" selection-start-line="19" selection-start-column="52" selection-end-line="19" selection-end-column="52" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/results/average_48.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="6" column="35" selection-start-line="6" selection-start-column="35" selection-end-line="6" selection-end-column="35" />
+        <state relative-caret-position="30">
+          <caret line="3" selection-start-line="3" selection-end-line="6" selection-end-column="35" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/stats/arima.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="39" column="41" selection-start-line="39" selection-start-column="41" selection-end-line="39" selection-end-column="41" />
+        <state relative-caret-position="408">
+          <caret line="58" column="22" selection-start-line="58" selection-start-column="22" selection-end-line="58" selection-end-column="22" />
           <folding>
             <element signature="e#0#28#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/hybrid/es_rnn_s.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3375">
+          <caret line="228" column="51" selection-start-line="228" selection-start-column="51" selection-end-line="228" selection-end-column="51" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ml/ml_helpers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3630">
+          <caret line="242" selection-start-line="242" selection-end-line="243" selection-end-column="52" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stats/stats_helpers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3255">
+          <caret line="217" selection-start-line="217" selection-end-line="217" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stats/errors.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="21" column="60" selection-start-line="21" selection-start-column="60" selection-end-line="21" selection-end-column="60" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hybrid/testing.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2400">
+          <caret line="174" column="13" selection-start-line="174" selection-start-column="13" selection-end-line="174" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1485">
+          <caret line="99" column="20" selection-start-line="99" selection-start-column="20" selection-end-line="99" selection-end-column="20" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="454">
-          <caret line="410" column="36" lean-forward="true" selection-start-line="410" selection-start-column="36" selection-end-line="410" selection-end-column="36" />
+        <state relative-caret-position="169">
+          <caret line="151" lean-forward="true" selection-start-line="151" selection-end-line="171" selection-end-column="5" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>

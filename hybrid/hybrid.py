@@ -84,7 +84,7 @@ def es_rnn_s(data, forecast_length, seasonality,
     lstm.train()
 
     # Train the model, and make a (possibly ensembled) prediction.
-    prediction = train_and_predict_s(
+    prediction, _ = train_and_predict_s(
                 lstm, train_data, window_size, forecast_length,
                 level_variability_penalty, loss_func, num_epochs,
                 local_init_lr, global_init_lr, percentile, auto_lr,
@@ -159,7 +159,7 @@ def es_rnn_i(data, forecast_length, seasonality, demand_features,
     lstm.train()
 
     # Train the model, and make a (possibly ensembled) prediction.
-    prediction = train_and_predict_i(
+    prediction, _ = train_and_predict_i(
         lstm, train_data, window_size, forecast_length,
         level_variability_penalty, loss_func, num_epochs,
         local_init_lr, global_init_lr, percentile, auto_lr,

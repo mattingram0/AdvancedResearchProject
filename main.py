@@ -12,11 +12,14 @@ from sklearn.preprocessing import MinMaxScaler
 from ml import ml_helpers
 from hybrid import hybrid, testing
 
-
 def main():
     demand_df = load_demand_data()
-    weather_df = load_weather_data()
-    test(demand_df, weather_df, int(sys.argv[1]), int(sys.argv[2]))
+    # weather_df = load_weather_data()
+    # test(demand_df, weather_df, int(sys.argv[1]), int(sys.argv[2]))
+    # Season, year, test
+    stats_helpers.plot_forecasts(demand_df, "Winter", 4)
+    stats_helpers.check_errors(demand_df)
+    # stats_helpers.plot_48_results()
 
     # Plotting results from Hamilton
     # test_path = "/Users/matt/Projects/AdvancedResearchProject/test/smyl_multiple_weather_year_2_summer_-1_-1.txt"
@@ -137,7 +140,7 @@ def test(demand_df, weather_df, season_no, model_no):
         10: [arima.sarima, 'SARIMA', False,
              [(2, 0, 1), (2, 0, 1, 24)], True, 1],
 
-        11: [arima.auto, 'Auto', False, [24], True, 1],
+        11: [arima.auto, 'Auto', False, [168], True, 1],
 
         12: [theta.theta, 'Theta', True, None, True, 10],
 
@@ -276,7 +279,7 @@ def test(demand_df, weather_df, season_no, model_no):
                                                    *params)
 
                 # Handle the TSO forecast individually (no forecast method)
-                elif model_no == 14:
+                elif model_no == 13:
                     forec_results = tso_data
 
                 # Handle the statistical models. Fit the model and forecast,
@@ -331,6 +334,7 @@ def test(demand_df, weather_df, season_no, model_no):
                 # Save model params only for final repetition and train time
                 if r == num_reps and t == 2 and ret_params:
                     final_params[y_index + 1] = fit_params
+            print("Year:", str(y_index), "Test:", str(t), "Finished")
 
     # Calculate OWA for all forecasts
     for r in range(1, num_reps + 1):
@@ -344,7 +348,7 @@ def test(demand_df, weather_df, season_no, model_no):
                         results["MASE"][r][y][t][l],
                     )
 
-    # Average the singele 48 hour forecast results
+    # Average the single 48 hour forecast results
     all_res = []
     for r in range(1, num_reps + 1):
         for y in range(1, 5):
