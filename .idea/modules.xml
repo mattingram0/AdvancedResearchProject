@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/AdvancedResearchProject.iml" filepath="$PROJECT_DIR$/.idea/AdvancedResearchProject.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../BrysonPredictor/.idea/BrysonPredictor.iml" filepath="$PROJECT_DIR$/../BrysonPredictor/.idea/BrysonPredictor.iml" />
     </modules>
   </component>
 </project>

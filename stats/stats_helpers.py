@@ -100,7 +100,6 @@ def split_data(df):
         ]
     }
 
-
 # Plot the test result forecasts for all the stats models for a given
 # season, year, and test number.
 def plot_forecasts(df, season, year):
@@ -223,7 +222,8 @@ def plot_48_results():
                "ES-RNN-I", "ES-RNN-IW"]
     circles = ["ES-RNN-S", "ES-RNN-SW", "ES-RNN-D", "ES-RNN-DW",
                "ES-RNN-I", "ES-RNN-IW"]
-    exclude = ["Naive1", "Auto", "SARIMA"]
+    # exclude = ["Naive1", "Auto", "SARIMA"]
+    exclude = ["TSO", "Auto", "Naive1"]
     sns.reset_orig()
     clrs = sns.color_palette('husl', n_colors=len(methods))
     x_tick_locs = [0] + [i for i in range(-1, 48, 5)][1:] + [47]
@@ -262,56 +262,101 @@ def plot_48_results():
         for m, mase in vals.items():
             mases[m][int(lead) - 1] = mase
 
-    font = {'size': 20}
+    font = {'size': 24}
     plt.rc('font', **font)
 
     # Plot OWAS
-    fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
-    for i, (m, e) in enumerate(owas.items()):
-        if m in exclude:
-            continue
+    # fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    # for i, (m, e) in enumerate(owas.items()):
+    #     if m in exclude:
+    #         continue
+    #
+    #     marker = 'o' if m in circles else 'x'
+    #     ax.plot(e, label=m, marker=marker)
+    #
+    #
+    # ax.legend(loc="best")
+    # ax.axvline(x=24, linestyle=":")
+    # ax.set_title("OWA against Lead Time")
+    # ax.set_xticks(x_tick_locs)
+    # ax.set_xticklabels(x_tick_labels)
+    # plt.show()
 
-        marker = 'o' if m in circles else 'x'
-        ax.plot(e, label=m, marker=marker)
-
-    ax.legend(loc="best")
-    ax.axvline(x=24, linestyle=":")
-    ax.set_title("OWA against Lead Time")
-    ax.set_xticks(x_tick_locs)
-    ax.set_xticklabels(x_tick_labels)
-    plt.show()
-
-    # Plot sMAPES
+    # Plot sMAPES - 48 hour
+    legend_1_plots = []
+    legend_2_plots = []
     fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
     for i, (m, e) in enumerate(smapes.items()):
         if m in exclude:
             continue
 
         marker = 'o' if m in circles else 'x'
-        ax.plot(e, label=m, marker=marker)
+        a, = ax.plot(e, label=m, marker=marker)
+        ax.set_ylim(1, 5)
 
-    ax.legend(loc="best")
-    ax.axvline(x=24, linestyle=":")
-    ax.set_title("sMAPE against Lead Time")
+        if m in circles:
+            legend_1_plots.append(a)
+        else:
+            legend_2_plots.append(a)
+
+    # ax.legend(loc="lower right")
+    ax.axvline(x=23, linestyle=":")
+    ax.set_title("sMAPE against Lead Time: 48 Hour Forecast")
     ax.set_xticks(x_tick_locs)
     ax.set_xticklabels(x_tick_labels)
+    ax.set_xlabel("Hour Ahead")
+    ax.set_ylabel("sMAPE (%)")
+    first_legend = ax.legend(handles=legend_1_plots, loc='upper left')
+    ax.add_artist(first_legend)
+    ax.legend(handles=legend_2_plots, loc='lower right')
     plt.show()
 
-    # Plot MASES
+    # Plot sMAPES - 12 Hour
+    max_lead = 12
+    legend_1_plots = []
+    legend_2_plots = []
     fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
-    for i, (m, e) in enumerate(mases.items()):
+    for i, (m, e) in enumerate(smapes.items()):
         if m in exclude:
             continue
 
         marker = 'o' if m in circles else 'x'
-        ax.plot(e, label=m, marker=marker)
+        a, = ax.plot(e[:max_lead], label=m, marker=marker)
+        ax.set_ylim(1, 4)
 
-    ax.legend(loc="best")
-    ax.axvline(x=24, linestyle=":")
-    ax.set_title("MASE against Lead Time")
-    ax.set_xticks(x_tick_locs)
-    ax.set_xticklabels(x_tick_labels)
+        if m in circles:
+            legend_1_plots.append(a)
+        else:
+            legend_2_plots.append(a)
+
+    first_legend = ax.legend(handles=legend_1_plots, loc='upper left')
+    ax.add_artist(first_legend)
+    ax.legend(handles=legend_2_plots, loc='lower right')
+    ax.set_xticks([i for i in range(max_lead)])
+    ax.set_xticklabels([i + 1 for i in range(max_lead)])
+    ax.set_title("sMAPE against Lead Time: " + str(max_lead) + " Hour "
+                                                               "Forecast")
+    ax.set_xlabel("Hour Ahead")
+    ax.set_ylabel("sMAPE (%)")
     plt.show()
+
+    print(pd.DataFrame(smapes))
+
+    # Plot MASES
+    # fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    # for i, (m, e) in enumerate(mases.items()):
+    #     if m in exclude:
+    #         continue
+    #
+    #     marker = 'o' if m in circles else 'x'
+    #     ax.plot(e, label=m, marker=marker)
+    #
+    # ax.legend(loc="best")
+    # ax.axvline(x=24, linestyle=":")
+    # ax.set_title("MASE against Lead Time")
+    # ax.set_xticks(x_tick_locs)
+    # ax.set_xticklabels(x_tick_labels)
+    # plt.show()
 
 
 
@@ -497,7 +542,7 @@ def plot_sample(df):
             ax.set_ylabel("Year 3")
         if i == 8:
             ax.set_ylabel("Year 4")
-        ax.plot(week, color="C0")
+        ax.plot(week["total load actual"], color="C0")
         ax.set_xticks([])
     plt.show()
 
@@ -517,7 +562,7 @@ def plot_sample(df):
             ax.set_ylabel("Year 3")
         if i == 9:
             ax.set_ylabel("Year 4")
-        ax.plot(week, color="C1")
+        ax.plot(week["total load actual"], color="C1")
         ax.set_xticks([])
     plt.show()
 
@@ -537,7 +582,7 @@ def plot_sample(df):
             ax.set_ylabel("Year 3")
         if i == 9:
             ax.set_ylabel("Year 4")
-        ax.plot(week, color="C2")
+        ax.plot(week["total load actual"], color="C2")
         ax.set_xticks([])
     plt.show()
 
@@ -557,7 +602,7 @@ def plot_sample(df):
             ax.set_ylabel("Year 3")
         if i == 9:
             ax.set_ylabel("Year 4")
-        ax.plot(week, color="C3")
+        ax.plot(week["total load actual"], color="C3")
         ax.set_xticks([])
     plt.show()
 
@@ -607,15 +652,15 @@ def train_test_split(df):
     plt.rc('font', **font)
     fig, axes = plt.subplots(3, 1, figsize=(20, 15), dpi=250)
     axes[0].plot(
-        df.loc["2015-01-01 00:00:00+01:00":"2015-02-14 23:00:00+01:00"],
+        df.loc["2015-01-01 00:00:00+01:00":"2015-02-13 23:00:00+01:00"],
         label="Training"
     )
     axes[0].plot(
-        df.loc["2015-02-15 00:00:00+01:00":"2015-02-21 23:00:00+01:00"],
+        df.loc["2015-02-14 00:00:00+01:00":"2015-02-20 23:00:00+01:00"],
         label="Validation", color="C2"
     )
     axes[0].plot(
-        df.loc["2015-02-22 00:00:00+01:00":"2015-02-28 23:00:00+01:00"],
+        df.loc["2015-02-21 00:00:00+01:00":"2015-02-28 23:00:00+01:00"],
         label="Test", color="C1"
     )
 
@@ -657,6 +702,36 @@ def train_test_split(df):
     axes[1].legend(loc="best")
     axes[2].legend(loc="best")
     plt.show()
+
+
+def plot_a_season(df, season):
+    split = split_data(df)
+
+    for y in split[season]:
+        # Plot first quarter
+        fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+        ax.plot(y["total load actual"][:int(len(y["total load actual"])/4.0)])
+        plt.show()
+
+        # Plot second quarter
+        fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+        ax.plot(y["total load actual"][int(len(y["total load actual"]) /
+                                           4.0):int(len(y["total load "
+                                                         "actual"]) / 2.0)])
+        plt.show()
+
+        # Plot third quarter
+        fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+        ax.plot(y["total load actual"][int(len(y["total load actual"]) /
+                                           2.0):int(3.0 * len(y["total load "
+                                                          "actual"]) / 4.0)])
+        plt.show()
+
+        # Plot fourth quarter
+        fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+        ax.plot(y["total load actual"][int(3.0 * len(y["total load actual"])
+                                           / 4):])
+        plt.show()
 
 
 # Identify the correct ARIMA order for each season

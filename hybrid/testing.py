@@ -32,7 +32,7 @@ def run(demand_df, weather_df):
     file_location = str(os.path.abspath(os.path.dirname(__file__)))
     model = True  # True = Ingram, False = Smyl
     multiple = False  # Use multiple time series in Smyl's model
-    weather = True  # Include weather data in the chosen model
+    weather = False  # Include weather data in the chosen model
     valid = True  # True = use validation set, False = use test set
     batch_first = True
 
@@ -133,8 +133,8 @@ def run(demand_df, weather_df):
     min_epochs_before_change = 2
     residuals = tuple([[1, 3]])  # Residual connection from 2nd out -> 4th out
     seasonality = 168
-    init_level_smoothing = int(sys.argv[4]) if len(sys.argv) >= 5 else 0
-    init_seasonal_smoothing = int(sys.argv[5]) if len(sys.argv) >= 5 else 0
+    init_level_smoothing = int(sys.argv[4]) if len(sys.argv) >= 5 else -1
+    init_seasonal_smoothing = int(sys.argv[5]) if len(sys.argv) >= 5 else -1.1
 
     test_model_week(data, output_size, input_size, hidden_size,
                     num_layers, batch_first, dilations, demand_features,
@@ -345,6 +345,13 @@ def test_model_week(data, output_size, input_size, hidden_size,
 
         sys.stderr.flush()
         sys.stdout.flush()
+
+        # Save the model and exit - TODO REMOVE
+        torch.save(lstm,
+                   "/Users/matt/Projects/AdvancedResearchProject/models"
+                   "/model_all"
+                   ".pt")
+        sys.exit()
 
     # Print final results
     owas_np = np.array(owas)

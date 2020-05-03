@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import matplotlib.pyplot as plt
 from torch.distributions import Normal, Uniform
 from ml import drnn, non_lin
 
@@ -281,6 +282,22 @@ class ES_RNN_I(nn.Module):
                 # Get the output seasonals and levels for the total load actual
                 # to relevel and reseasonalise the output
                 if f == "total load actual":
+
+                    # Plot the deseasonalised data TODO - REMOVE
+                    #input("2. De-seasonalise and normalise the data")
+
+                    # fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+                    # ax.plot(norm_input.view(-1).detach())
+                    # ax.set_title("De-seasonalised and Normalised Data")
+                    # plt.show()
+
+                    # fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+                    # ax.plot(norm_input.view(-1).detach()[8 * 24:], color="C0")
+                    # ax.set_title("De-seasonalised and Normalised Input "
+                    #              "Data")
+                    # ax.set_xticks([])
+                    # plt.show()
+
                     out_levels = torch.tensor(
                         [level for _ in range(output_size)],
                         dtype=torch.double
@@ -314,6 +331,14 @@ class ES_RNN_I(nn.Module):
         linear_in = lstm_out[:, -inputs.size(0):, :].view(-1, self.hidden_size)
         out = self.linear(self.tanh(linear_in))
 
+        # input("3. Input into the dLSTM")
+        # # Plot the deseasonalised data TODO - REMOVE
+        # fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+        # ax.plot(out.view(-1).detach(), color="C3")
+        # ax.set_title("Output of the dLSTM")
+        # plt.show()
+
+        # input("4. Re-seasonalise and de-normalise the data")
         # Unsquash the output, and re-add the final level and seasonality
         pred = torch.exp(out) * out_levels * out_seas
 

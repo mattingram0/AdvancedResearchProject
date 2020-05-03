@@ -167,6 +167,11 @@ def es_rnn_i(data, forecast_length, seasonality, demand_features,
         forecast_data, local_rates, global_rates, ensemble, weather
     )
 
+    # Save the model and exit - TODO REMOVE
+    torch.save(lstm.state_dict(),
+               "ddn/home/gkxx72/AdvancedResearchProject/run/model.pt")
+    sys.exit()
+
     # Return prediction
     return prediction
 

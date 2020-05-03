@@ -1,5 +1,7 @@
 import numpy as np
 from numpy.polynomial.polynomial import polyfit
+from stats.stats_helpers import split_data, deseasonalise
+from hybrid.es_rnn_i import ES_RNN_I
 import pandas as pd
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -7,6 +9,246 @@ import torch
 import json
 from math import sin, exp
 from os import walk
+import sys
+
+
+def plots_for_presentation(demand_df):
+    font = {'size': 24}
+    plt.rc('font', **font)
+
+    # Plots of the data
+
+    # Model hyper parameters
+    window_size = 336
+    output_size = 48
+    weather = False
+
+    all_data = split_data(demand_df)
+    data = all_data["Spring"][2]
+
+    fig, axes = plt.subplots(2, 2, figsize=(20, 15), dpi=250)
+    axes = axes.flatten()
+    axes[0].plot(data.loc["2017-03-06 00:00:00+01:00":"2017-03-12 23:00:00+01:00"]["total load actual"], color="C0")
+    axes[0].set_title("Total Energy Demanded")
+    axes[1].plot(
+        data.loc["2017-03-06 00:00:00+01:00":"2017-03-12 23:00:00+01:00"][
+            "generation fossil gas"], color="C1")
+    axes[1].set_title("Energy Generated - Gas")
+    axes[2].plot(
+        data.loc["2017-03-06 00:00:00+01:00":"2017-03-12 23:00:00+01:00"][
+            "generation fossil oil"], color="C2")
+    axes[2].set_title("Energy Generated - Oil")
+    axes[3].plot(
+        data.loc["2017-03-06 00:00:00+01:00":"2017-03-12 23:00:00+01:00"][
+            "price actual"], color="C3")
+    axes[3].set_title("Energy Price")
+
+    for ax in axes:
+        ax.set_xticks([])
+        # ax.set_xlabel("Time")
+    plt.show()
+    sys.exit(0)
+
+    pre_end = 5 * 24
+    inp_end = 14 * 24 + pre_end
+    out_end = 2 * 24 + inp_end
+    aft_end = 2 * 24 + out_end
+    start = (64 - 19) * 24
+    end = (64 + 4) * 24
+    input_data = data["total load actual"][start:end].tolist()  # Sliding window with
+    # extra before and after
+    test_data = data[start + pre_end:start + out_end]
+
+
+    model = torch.load("/Users/matt/Projects/AdvancedResearchProject/models"
+                       "/model_all.pt")
+    model.eval()
+
+    levels = [l.item() for l in model.levels["total load actual"]]
+    seasonals = [s.item() for s in model.seasonals["total load actual"]]
+
+    fig, axes = plt.subplots(4, 1, figsize=(20, 15), dpi=250)
+    axes[0].set_title("Sliding Window, Fitted ES Components, and Normalised "
+                      "Data")
+    axes[0].plot(input_data[:inp_end], color="C0", label="Input Data")
+    axes[0].plot([i for i in range(inp_end, out_end)],
+                 input_data[inp_end: out_end], color="C0", linestyle="--")
+    axes[0].plot([i for i in range(out_end, aft_end)],
+                 input_data[out_end: aft_end], color="C0")
+    axes[0].plot([pre_end, inp_end, inp_end, pre_end, pre_end],
+                 [19000, 19000, 35000, 35000, 19000],
+                 linestyle=":", label="Input Window", color="darkorange")
+    axes[0].plot([inp_end, out_end, out_end, inp_end, inp_end],
+                 [19000, 19000, 35000, 35000, 19000],
+                 linestyle=":", label="Output Window", color="teal")
+    axes[1].plot(levels[start + pre_end:start + inp_end], color="C1",
+                 label="Fitted ES Level Values")
+    axes[1].plot([i for i in range(inp_end - pre_end, out_end - pre_end)],
+                 levels[start + inp_end:start + out_end], color="C1",
+                 linestyle="--")
+    axes[1].axvline(x=336, c='grey', linestyle=":")
+    axes[2].plot(seasonals[start + pre_end:start + inp_end], color="C2",
+                 label="Fitted ES Seasonality Values")
+    axes[2].plot([i for i in range(inp_end - pre_end, out_end - pre_end)],
+                 seasonals[168 + start + inp_end:168 + start + out_end],
+                 color="C2", linestyle="--")
+    axes[2].axvline(x=336, c='grey', linestyle=":")
+
+    normalised_inp = np.log(
+        np.array(input_data[pre_end:inp_end]) /
+        (np.array(seasonals[168 + start + pre_end: 168 + start + inp_end]) *
+         levels[start + inp_end])
+    )
+    normalised_out = np.log(
+        np.array(input_data[inp_end:out_end]) /
+        (np.array(seasonals[168 + start + inp_end: 168 + start + out_end]) *
+         levels[start + inp_end])
+    )
+
+    axes[3].plot(normalised_inp, color="C3", label="De-seasonalised and "
+                                               "Normalised Data")
+    axes[3].plot([i for i in range(inp_end - pre_end, out_end - pre_end)],
+                 normalised_out, color="C5", linestyle="--")
+    axes[3].axvline(x=336, c='grey', linestyle=":")
+    for ax in axes:
+        ax.legend(loc="upper left")
+    plt.show()
+
+    pred, out_actuals, out_levels, out_seas, all_levels, \
+    all_seasonals, out = model.predict(test_data, window_size, output_size,
+                                   weather)
+
+    fig, axes = plt.subplots(4, 1, figsize=(20, 15), dpi=250)
+    axes[0].set_title("dLSTM and Actual Output")
+    axes[0].plot(normalised_out, label="Actual Output", color="C5", linestyle="--")
+    axes[0].plot(torch.log(out).detach().view(-1).numpy(), label="dLSTM Output", color="C3")
+    axes[0].legend(loc="upper right")
+    plt.show()
+
+
+
+
+def plots_for_poster(demand_df):
+    font = {'size': 24}
+    plt.rc('font', **font)
+
+    # Model hyper parameters
+    window_size = 336
+    output_size = 48
+    weather = False
+
+    all_data = split_data(demand_df)
+    data = all_data["Spring"][2]
+    start_test = -(15 * 24 + window_size)
+    end_test = -(15 * 24 - output_size)
+    test_data = data[start_test:end_test]
+
+    model = torch.load("/Users/matt/Projects/AdvancedResearchProject/models"
+                   "/model_all"
+                   ".pt")
+    model.eval()
+
+    levels = [l.item() for l in model.levels["total load actual"]]
+    seasonals = [s.item() for s in model.seasonals["total load actual"]]
+
+    # input("1. Load the fitted exponential smoothing values")
+
+    # Presentation
+    # fig, axes = plt.subplots(3, 1, figsize=(20, 15), dpi=250)
+    # axes[0].plot(test_data["total load actual"][:window_size], color="C0")
+    # axes[0].set_title("Final Week of Training Data")
+    # axes[1].plot(levels[-window_size:], color="C1")
+    # axes[1].set_title("Fitted Level Values")
+    # axes[2].plot(seasonals[-window_size:], color="C2")
+    # axes[2].set_title("Fitted Seasonality Values")
+    # plt.show()
+
+    # Poster
+    fig, axes = plt.subplots(4, 1, figsize=(20, 15), dpi=250)
+    axes[0].set_title("Input Data, Fitted ES Components, and Normalised Data")
+    axes[0].plot(test_data["total load actual"][:window_size], color="C0",
+                 label="Input Data")
+    axes[1].plot(levels[-window_size:], color="C1",
+                 label="Fitted ES Level Values")
+    axes[2].plot(seasonals[-window_size:], color="C2",
+                 label="Fitted ES Seasonality Values")
+    axes[2].plot([7 * 24, 9 * 24, 9 * 24, 7 * 24, 7 * 24],
+                 [2.1, 2.1, 3.3, 3.3, 2.1], color="C2",
+                 linestyle=":", label="Output Window")
+    normalised = np.log(
+        np.array(test_data["total load actual"][:window_size]) /
+        (np.array(seasonals[-window_size:]) * levels[-1])
+    )
+    axes[3].plot(normalised, color="C3", label="De-seasonalised and "
+                                               "Normalised Data")
+    for ax in axes:
+        ax.legend(loc="upper left")
+    plt.show()
+
+    # Presentation
+    # fig, axes = plt.subplots(3, 1, figsize=(20, 15), dpi=250)
+    # axes[0].plot(test_data["total load actual"][:window_size], color="C0")
+    # axes[0].set_title("Final Week of Training Data and Fitted Level and "
+    #                   "Seasonality Vales")
+    # axes[1].plot(levels[-window_size:], color="C1")
+    # axes[1].set_title("Fitted Level Values")
+    # axes[2].plot(seasonals[-window_size:], color="C2")
+    # axes[2].set_title("Fitted Seasonality Values")
+    # plt.show()
+
+    pred, out_actuals, out_levels, out_seas, all_levels, \
+    all_seasonals, out = model.predict(test_data, window_size, output_size,
+                                   weather)
+
+    # Poster
+    # fig, ax = plt.subplots(1, 1, figsize=(20, 15), dpi=250)
+    # ax.plot([i for i in range(8 * 24, window_size)],
+    #         test_data["total load actual"][8 * 24:window_size],
+    #         color="C0", label="Input")
+    # ax.set_title("Input Data")
+    # ax.set_xticks([])
+    # ax.plot([i for i in range(window_size, window_size + output_size)],
+    #            pred.view(-1).detach(), color="C1", label="Forecast")
+    # ax.plot([i for i in range(window_size, window_size + output_size)],
+    #            out_actuals, color="C2", label="Actual")
+    # ax.axvline(x=window_size, linestyle=":", color="black")
+    # ax.set_title("Input Data, Actual Data, and Forecast")
+    # ax.legend(loc="best")
+    # plt.show()
+    #
+    # # Poster
+    # fig, ax = plt.subplots(3, 1, figsize=(20, 15), dpi=250)
+    # ax[2].plot(out_levels.view(-1).detach(), color="C1", label="Extrapolated Level")
+    # ax[2].set_xticks([])
+    # ax[2].legend(loc="best")
+    # ax[1].plot(out_seas.view(-1).detach(), color="C1", label="Repeated "
+    #                                                          "Seasonality Values")
+    # ax[1].set_xticks([])
+    # ax[1].legend(loc="best")
+    # ax[0].plot(out.view(-1).detach(), color="C1", label="Output of the dLSTM")
+    # ax[0].set_xticks([])
+    # ax[0].legend(loc="best")
+    # ax[0].set_title("dLSTM Output, Repeated Seasonality Values, "
+    #              "and Extrapolated Level")
+    # plt.show()
+
+    # Poster
+    fig, axes = plt.subplots(4, 1, figsize=(20, 15), dpi=250)
+    axes[0].set_title("dLSTM Output, Repeated Level and Seasonality Values, "
+                      "and Final Forecast")
+    axes[0].plot(out.view(-1).detach(), color="C3",
+                 label="dLSTM Output")
+    axes[1].plot(out_levels.view(-1).detach(), color="C1",
+                 label="Extrapolated Level Values")
+    axes[2].plot(out_seas.view(-1).detach(), color="C2",
+                 label="Repeated Seasonality Values")
+    axes[3].plot(pred.view(-1).detach(), color="C4",
+                 label="Final Forecast")
+    axes[3].plot(out_actuals, color="C5",
+                 label="Actual Data")
+    for ax in axes:
+        ax.legend(loc="upper left")
+    plt.show()
 
 
 def average_test():

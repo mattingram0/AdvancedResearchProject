@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="564df88f-763d-43a5-ba2e-b5cd80214a9e" name="Default Changelist" comment="">
+    <list default="true" id="6e5237c4-db1e-4a8f-b091-3c1bfdab810a" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/AdvancedResearchProject.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/AdvancedResearchProject.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/matt.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/other.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/other.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hybrid/es_rnn_i.py" beforeDir="false" afterPath="$PROJECT_DIR$/hybrid/es_rnn_i.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/hybrid/hybrid.py" beforeDir="false" afterPath="$PROJECT_DIR$/hybrid/hybrid.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hybrid/testing.py" beforeDir="false" afterPath="$PROJECT_DIR$/hybrid/testing.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stats/arima.py" beforeDir="false" afterPath="$PROJECT_DIR$/stats/arima.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ml/ml_helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/ml/ml_helpers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stats/stats_helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/stats/stats_helpers.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -14,157 +20,134 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="DatabaseView">
-    <option name="SHOW_INTERMEDIATE" value="true" />
-    <option name="GROUP_DATA_SOURCES" value="true" />
-    <option name="GROUP_SCHEMA" value="true" />
-    <option name="GROUP_CONTENTS" value="false" />
-    <option name="SORT_POSITIONED" value="false" />
-    <option name="SHOW_EMPTY_GROUPS" value="false" />
-    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
-    <option name="HIDDEN_KINDS">
-      <set />
-    </option>
-    <expand />
-    <select />
-  </component>
-  <component name="FavoritesManager">
-    <favorites_list name="AdvancedResearchProject" />
-  </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/main.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="169">
-              <caret line="151" lean-forward="true" selection-start-line="151" selection-end-line="171" selection-end-column="5" />
-              <folding>
-                <element signature="e#0#19#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
-  </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Python Script" />
-      </list>
-    </option>
+    <splitter split-orientation="horizontal" split-proportion="0.5">
+      <split-first>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/main.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="268">
+                  <caret line="38" column="25" selection-start-line="38" selection-start-column="25" selection-end-line="38" selection-end-column="46" />
+                  <folding>
+                    <element signature="e#0#19#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/ml/ml_helpers.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="533">
+                  <caret line="47" column="10" selection-start-line="47" selection-start-column="10" selection-end-line="47" selection-end-column="10" />
+                  <folding>
+                    <element signature="e#0#18#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/hybrid/testing.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="3435">
+                  <caret line="229" column="11" selection-start-line="229" selection-start-column="11" selection-end-line="229" selection-end-column="11" />
+                  <folding>
+                    <element signature="e#0#19#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/hybrid/es_rnn_i.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="1724">
+                  <caret line="340" column="10" selection-start-line="340" selection-start-column="10" selection-end-line="340" selection-end-column="10" />
+                  <folding>
+                    <element signature="e#0#12#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/stats/stats_helpers.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="373">
+                  <caret line="84" column="75" selection-start-line="84" selection-start-column="14" selection-end-line="84" selection-end-column="75" />
+                  <folding>
+                    <element signature="e#0#19#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="495">
+                  <caret line="33" column="12" selection-start-line="33" selection-start-column="12" selection-end-line="33" selection-end-column="12" />
+                  <folding>
+                    <element signature="e#0#10#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-second>
+    </splitter>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>type</find>
-      <find>grid</find>
-      <find>subp</find>
-      <find>xlim</find>
-      <find>rotation</find>
-      <find>subplo</find>
-      <find>suptitle</find>
-      <find>fon</find>
-      <find>import</find>
-      <find>print</find>
-      <find>fig, a</find>
-      <find>self.seasonals</find>
-      <find>self.fea</find>
-      <find>test</find>
-      <find>plot_test</find>
-      <find>split</find>
-      <find>stats_help</find>
-      <find>subplots</find>
-      <find>summer</find>
-      <find>smoot</find>
-      <find>smooth</find>
-      <find>smoothing</find>
-      <find>plot_lr</find>
-      <find>hybrid</find>
-      <find>timer</find>
-      <find>timer()</find>
-      <find>flush</find>
-      <find>Auto</find>
-      <find>set_x</find>
-      <find>font</find>
+      <find>sample</find>
+      <find>set_xlim</find>
+      <find>loc=</find>
+      <find>train_test</find>
+      <find>batch_size</find>
+      <find>.item</find>
+      <find>set_ti</find>
+      <find>xticks</find>
+      <find>xticks(</find>
+      <find>xticklabels</find>
+      <find>ax.ax</find>
+      <find>legends</find>
+      <find>r&quot;</find>
+      <find>r'</find>
+      <find>plot_sliding</find>
+      <find>sliding_win</find>
+      <find>axvl</find>
+      <find>Fitted ES Seasonality Values</find>
+      <find>xlabel</find>
     </findStrings>
-    <replaceStrings>
-      <replace />
-      <replace>adjust</replace>
-      <replace>double differenced</replace>
-      <replace>seasonally differenced</replace>
-      <replace>train_hours</replace>
-      <replace>test_hours</replace>
-      <replace>data['seasonally decomposed']</replace>
-    </replaceStrings>
   </component>
   <component name="Git.Settings">
-    <option name="ROOT_SYNC" value="SYNC" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/main6.py" />
-        <option value="$PROJECT_DIR$/main7.py" />
-        <option value="$PROJECT_DIR$/main9.py" />
-        <option value="$PROJECT_DIR$/main11.py" />
-        <option value="$PROJECT_DIR$/main10.py" />
-        <option value="$PROJECT_DIR$/main8.py" />
-        <option value="$PROJECT_DIR$/main1.py" />
-        <option value="$PROJECT_DIR$/stats/plots.py" />
-        <option value="$PROJECT_DIR$/stats/holtWinters.py" />
-        <option value="$PROJECT_DIR$/stats/holtDamped_adjusted.py" />
-        <option value="$PROJECT_DIR$/stats/sarima.py" />
-        <option value="$PROJECT_DIR$/analyse.py" />
-        <option value="$PROJECT_DIR$/ml/lstm.py" />
-        <option value="$PROJECT_DIR$/ml/simple_lstm.py" />
-        <option value="$PROJECT_DIR$/ml/basic_lstm.py" />
-        <option value="$APPLICATION_CONFIG_DIR$/pycharm.vmoptions" />
-        <option value="$PROJECT_DIR$/ml/dilated_lstm.py" />
-        <option value="$PROJECT_DIR$/ml/dlstm.py" />
-        <option value="$PROJECT_DIR$/ml/lstm_48.py" />
-        <option value="$PROJECT_DIR$/ml/lstm_48_multiple.py" />
-        <option value="$PROJECT_DIR$/ml/drnn_48_multiple.py" />
-        <option value="$PROJECT_DIR$/ml/es_rnn.py" />
-        <option value="$PROJECT_DIR$/ml/drnn_48.py" />
-        <option value="$PROJECT_DIR$/ml/non_lin.py" />
-        <option value="$PROJECT_DIR$/stats/ses_adjusted.py" />
-        <option value="$PROJECT_DIR$/stats/autoSarima.py" />
-        <option value="$PROJECT_DIR$/tutorials/pandas1.py" />
-        <option value="$PROJECT_DIR$/stats/naiveS.py" />
-        <option value="$PROJECT_DIR$/stats/theta.py" />
-        <option value="$PROJECT_DIR$/other/demo.py" />
-        <option value="$PROJECT_DIR$/stats/errors.py" />
-        <option value="$PROJECT_DIR$/ml/drnn.py" />
-        <option value="$PROJECT_DIR$/stats/exponential_smoothing.py" />
-        <option value="$PROJECT_DIR$/stats/helpers.py" />
-        <option value="$PROJECT_DIR$/hybrid/es_rnn.py" />
-        <option value="$PROJECT_DIR$/hybrid/es_rnn_ex.py" />
-        <option value="$PROJECT_DIR$/ml/helpers.py" />
-        <option value="$PROJECT_DIR$/hybrid/es_rnn_mult.py" />
-        <option value="$PROJECT_DIR$/hybrid/es_rnn_i.py" />
-        <option value="$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/holtwinters.py" />
-        <option value="$PROJECT_DIR$/ml/ml_helpers.py" />
-        <option value="$PROJECT_DIR$/hybrid/testing.py" />
-        <option value="$PROJECT_DIR$/hybrid/es_rnn_s.py" />
-        <option value="$PROJECT_DIR$/results/average.py" />
-        <option value="$PROJECT_DIR$/results/average_48.py" />
-        <option value="$PROJECT_DIR$/results/print_results.py" />
-        <option value="$PROJECT_DIR$/stats/naive.py" />
         <option value="$PROJECT_DIR$/hybrid/hybrid.py" />
-        <option value="$PROJECT_DIR$/stats/arima.py" />
+        <option value="$PROJECT_DIR$/hybrid/testing.py" />
+        <option value="$PROJECT_DIR$/hybrid/es_rnn_i.py" />
         <option value="$PROJECT_DIR$/stats/stats_helpers.py" />
         <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/ml/ml_helpers.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="1440" />
-    <option name="y" value="-180" />
+    <option name="y" value="-157" />
     <option name="width" value="1920" />
-    <option name="height" value="1080" />
+    <option name="height" value="1057" />
   </component>
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
@@ -180,7 +163,7 @@
             <path>
               <item name="AdvancedResearchProject" type="b2602c69:ProjectViewProjectNode" />
               <item name="AdvancedResearchProject" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
+              <item name="hybrid" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="AdvancedResearchProject" type="b2602c69:ProjectViewProjectNode" />
@@ -202,24 +185,9 @@
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="full.screen.before.presentation.mode" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$/Desktop/Trained" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors" />
-  </component>
-  <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/hybrid" />
-      <recent name="$PROJECT_DIR$/tutorials" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$USER_HOME$/Desktop/Trained" />
-      <recent name="$USER_HOME$/Documents/Durham/4th Year/Advanced Research Project/Results" />
-      <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/demo" />
-      <recent name="$PROJECT_DIR$/stats" />
-    </key>
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -234,28 +202,6 @@
     </option>
   </component>
   <component name="RunManager" selected="Python.Test">
-    <configuration name="Main" type="PythonConfigurationType" factoryName="Python">
-      <module name="AdvancedResearchProject" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
-      <option name="PARAMETERS" value="ready 1 2 -1 2" />
-      <option name="SHOW_COMMAND_LINE" value="true" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <configuration name="Test" type="PythonConfigurationType" factoryName="Python">
       <module name="AdvancedResearchProject" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -263,14 +209,36 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="" />
+      <option name="SDK_HOME" value="$USER_HOME$/anaconda3/bin/python" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
+      <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
-      <option name="PARAMETERS" value="2 11" />
+      <option name="PARAMETERS" value="plotting 2 1" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <module name="AdvancedResearchProject" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -278,8 +246,30 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="AdvancedResearchProject" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/anaconda3/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <list>
-      <item itemvalue="Python.Main" />
+      <item itemvalue="Python.main" />
       <item itemvalue="Python.Test" />
     </list>
   </component>
@@ -288,704 +278,160 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="564df88f-763d-43a5-ba2e-b5cd80214a9e" name="Default Changelist" comment="" />
-      <created>1573150147721</created>
+      <changelist id="6e5237c4-db1e-4a8f-b091-3c1bfdab810a" name="Default Changelist" comment="" />
+      <created>1587945847016</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1573150147721</updated>
-      <workItem from="1573150149943" duration="24328000" />
-      <workItem from="1573232602412" duration="32768000" />
-      <workItem from="1573642445141" duration="25431000" />
-      <workItem from="1573815772139" duration="19350000" />
-      <workItem from="1574178248040" duration="44000" />
-      <workItem from="1574782648752" duration="40591000" />
-      <workItem from="1575021271725" duration="5597000" />
-      <workItem from="1575028320978" duration="14982000" />
-      <workItem from="1575557337001" duration="313000" />
-      <workItem from="1575628774416" duration="3787000" />
-      <workItem from="1575634436298" duration="5480000" />
-      <workItem from="1575640610648" duration="374000" />
-      <workItem from="1575734708305" duration="5573000" />
-      <workItem from="1575750603566" duration="62000" />
-      <workItem from="1575752410072" duration="9000" />
-      <workItem from="1575752525851" duration="12000" />
-      <workItem from="1575752898636" duration="9000" />
-      <workItem from="1575753420923" duration="1357000" />
-      <workItem from="1575804177730" duration="7300000" />
-      <workItem from="1575895683740" duration="7541000" />
-      <workItem from="1576075282045" duration="9776000" />
-      <workItem from="1576164964986" duration="550000" />
-      <workItem from="1576165766479" duration="36000" />
-      <workItem from="1576165856658" duration="4485000" />
-      <workItem from="1576242877798" duration="341000" />
-      <workItem from="1576243799015" duration="501000" />
-      <workItem from="1576244467986" duration="1497000" />
-      <workItem from="1576934547923" duration="21054000" />
-      <workItem from="1577358953019" duration="9849000" />
-      <workItem from="1577545569143" duration="293000" />
-      <workItem from="1577545973098" duration="25569000" />
-      <workItem from="1578911995599" duration="8184000" />
-      <workItem from="1579430758282" duration="35562000" />
-      <workItem from="1579976638844" duration="15000" />
-      <workItem from="1580042860567" duration="7911000" />
-      <workItem from="1580483333069" duration="53000" />
-      <workItem from="1580484350651" duration="39568000" />
-      <workItem from="1581329882964" duration="387000" />
-      <workItem from="1581330626166" duration="91113000" />
-      <workItem from="1581956576537" duration="150976000" />
-      <workItem from="1584962834353" duration="589000" />
-      <workItem from="1584963458533" duration="406000" />
-      <workItem from="1584963901129" duration="13585000" />
-      <workItem from="1584980550136" duration="30067000" />
-      <workItem from="1585077565738" duration="22000" />
-      <workItem from="1585077636155" duration="239000" />
-      <workItem from="1585077880045" duration="6041000" />
-      <workItem from="1585085460832" duration="15143000" />
-      <workItem from="1585142305243" duration="110462000" />
-      <workItem from="1585561243572" duration="17685000" />
-      <workItem from="1585640787792" duration="2867000" />
-      <workItem from="1585649706616" duration="131134000" />
-      <workItem from="1586451125501" duration="16227000" />
-      <workItem from="1586529763785" duration="99012000" />
-      <workItem from="1587204860278" duration="72756000" />
-      <workItem from="1587478415175" duration="58630000" />
-      <workItem from="1587903475110" duration="169000" />
+      <updated>1587945847016</updated>
+      <workItem from="1587945854387" duration="3887000" />
+      <workItem from="1588063246544" duration="2370000" />
+      <workItem from="1588069804906" duration="7033000" />
+      <workItem from="1588153820976" duration="495000" />
+      <workItem from="1588156899019" duration="23032000" />
+      <workItem from="1588363916802" duration="3363000" />
+      <workItem from="1588419091452" duration="13044000" />
     </task>
-    <task id="LOCAL-00001" summary="Initial commit. Git setup.">
-      <created>1573219288446</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1573219288446</updated>
-    </task>
-    <task id="LOCAL-00002" summary="Added datasets.">
-      <created>1573221170187</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1573221170187</updated>
-    </task>
-    <task id="LOCAL-00003" summary="Worked through pandas online tutorial. Changed theme">
-      <created>1573233296459</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1573233296459</updated>
-    </task>
-    <task id="LOCAL-00004" summary="Begun naive forecasting methods.">
-      <created>1573314179626</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1573314179626</updated>
-    </task>
-    <task id="LOCAL-00005" summary="More learning - pandas and plotting.">
-      <created>1573399058379</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1573399058379</updated>
-    </task>
-    <task id="LOCAL-00006" summary="More learning - scipy.">
-      <created>1573406130143</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1573406130143</updated>
-    </task>
-    <task id="LOCAL-00007" summary="Added naive seasonal forecast method, and autocorrelation plots to identify seasonality.">
-      <created>1573642811684</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1573642811684</updated>
-    </task>
-    <task id="LOCAL-00008" summary="Added resampling techniques, and Simple Exponential Smoothing">
-      <created>1573815071085</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1573815071085</updated>
-    </task>
-    <task id="LOCAL-00009" summary="Finished SES, refactored plotting code">
-      <created>1573833023308</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1573833023309</updated>
-    </task>
-    <task id="LOCAL-00010" summary="Added Holt, Damped Holt, and Holt-Winters forecasting.">
-      <created>1574177821787</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1574177821787</updated>
-    </task>
-    <task id="LOCAL-00011" summary="Converted (seasonally) differenced forecasts back to actual forecasts, and computed error statistics on those.">
-      <created>1575636213741</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1575636213741</updated>
-    </task>
-    <task id="LOCAL-00012" summary="Added another forecasting method, which creates seasonal indices and then uses these to convert data into seasonally adjusted data, on which SES etc is performed, before the data is converted back.">
-      <created>1575741664907</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1575741664907</updated>
-    </task>
-    <task id="LOCAL-00013" summary="Refactored some of the helper code into different files, and added the comb and comb_adjusted forecasting methods.">
-      <created>1577195374840</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1577195374840</updated>
-    </task>
-    <task id="LOCAL-00014" summary="Refactored a lot of code. Added the general test function. Checked that seasonal decomposition is correct (it is).">
-      <created>1577221723004</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1577221723004</updated>
-    </task>
-    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="1177685000" />
-  </component>
-  <component name="TodoView">
-    <todo-panel id="selected-file">
-      <is-autoscroll-to-source value="true" />
-    </todo-panel>
-    <todo-panel id="all">
-      <are-packages-shown value="true" />
-      <is-autoscroll-to-source value="true" />
-    </todo-panel>
+    <option name="totallyTimeSpent" value="53224000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1440" y="-180" width="1920" height="1080" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Structure" order="0" sideWeight="0.5020298" side_tool="true" weight="0.23109691" />
-      <window_info id="Favorites" order="1" sideWeight="0.50147057" side_tool="true" weight="0.18157615" />
-      <window_info active="true" content_ui="combo" id="Project" order="2" sideWeight="0.49797022" visible="true" weight="0.29605964" />
+      <window_info content_ui="combo" id="Project" order="0" weight="0.18690096" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32746115" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32920793" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49946752" weight="0.4746114" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.2569948" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" weight="0.3284974" />
+      <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="8" weight="0.3554404" />
+      <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
-      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50532484" side_tool="true" weight="0.34300518" />
-      <window_info anchor="bottom" id="Terminal" order="11" weight="0.32435232" />
-      <window_info anchor="bottom" x="9" y="580" width="1398" height="242" id="Python Console" order="12" sideWeight="0.4946752" visible="true" weight="0.30051813" />
-      <window_info anchor="bottom" id="Statistic" order="13" weight="0.8373057" />
+      <window_info anchor="bottom" id="Statistic" order="10" />
+      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.49946752" weight="0.15336788" />
+      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.5005325" side_tool="true" weight="0.17720208" />
+      <window_info anchor="bottom" id="Python Console" order="13" sideWeight="0.49946752" weight="0.27875647" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" x="0" y="22" width="1440" height="878" id="SciView" maximized="true" order="3" sideWeight="0.48142165" weight="0.73801917" />
-      <window_info anchor="right" id="Database" order="4" weight="0.11821086" />
-      <window_info anchor="right" x="0" y="0" width="310" height="700" id="Documentation" order="5" sideWeight="0.51857835" side_tool="true" weight="0.78168267" />
+      <window_info active="true" anchor="right" x="0" y="22" width="1440" height="878" id="SciView" maximized="true" order="3" type="WINDOWED" visible="true" weight="0.32960597" />
+      <window_info anchor="right" x="0" y="0" width="430" height="880" id="Documentation" order="4" side_tool="true" weight="0.32960597" />
+      <window_info anchor="right" id="Database" order="5" />
     </layout>
-    <layout-to-restore>
-      <window_info id="Structure" order="0" sideWeight="0.5020298" side_tool="true" weight="0.23109691" />
-      <window_info id="Favorites" order="1" sideWeight="0.50147057" side_tool="true" weight="0.18157615" />
-      <window_info content_ui="combo" id="Project" order="2" sideWeight="0.49797022" visible="true" weight="0.17891374" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32746115" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32920793" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49946752" weight="0.4746114" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" weight="0.3284974" />
-      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="8" weight="0.3554404" />
-      <window_info anchor="bottom" id="Database Changes" order="9" />
-      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50532484" side_tool="true" weight="0.34300518" />
-      <window_info anchor="bottom" id="Terminal" order="11" weight="0.32435232" />
-      <window_info active="true" anchor="bottom" x="9" y="580" width="1398" height="242" id="Python Console" order="12" sideWeight="0.4946752" visible="true" weight="0.33056995" />
-      <window_info anchor="bottom" id="Statistic" order="13" weight="0.8373057" />
-      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" x="0" y="22" width="1440" height="878" id="SciView" maximized="true" order="3" sideWeight="0.48142165" type="WINDOWED" visible="true" weight="0.73801917" />
-      <window_info anchor="right" id="Database" order="4" weight="0.11821086" />
-      <window_info anchor="right" x="0" y="0" width="310" height="700" id="Documentation" order="5" sideWeight="0.51857835" side_tool="true" weight="0.78168267" />
-    </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
-  <component name="Vcs.Log.History.Properties">
-    <option name="COLUMN_ORDER">
-      <list>
-        <option value="0" />
-        <option value="2" />
-        <option value="3" />
-        <option value="1" />
-      </list>
-    </option>
-  </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State>
-              <option name="RECENTLY_FILTERED_USER_GROUPS">
-                <collection />
-              </option>
-              <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
-                <collection />
-              </option>
-              <option name="COLUMN_ORDER">
-                <list>
-                  <option value="0" />
-                  <option value="1" />
-                  <option value="2" />
-                  <option value="3" />
-                </list>
-              </option>
-            </State>
-          </value>
-        </entry>
-      </map>
-    </option>
-    <option name="RECENT_FILTERS">
-      <map>
-        <entry key="Branch">
-          <value>
-            <list />
-          </value>
-        </entry>
-        <entry key="User">
-          <value>
-            <list />
-          </value>
-        </entry>
-      </map>
-    </option>
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="Initial commit. Git setup." />
-    <MESSAGE value="Added datasets." />
-    <MESSAGE value="Worked through pandas online tutorial. Changed theme" />
-    <MESSAGE value="Begun naive forecasting methods." />
-    <MESSAGE value="More learning - pandas and plotting." />
-    <MESSAGE value="More learning - scipy." />
-    <MESSAGE value="Added naive seasonal forecast method, and autocorrelation plots to identify seasonality." />
-    <MESSAGE value="Added resampling techniques, and Simple Exponential Smoothing" />
-    <MESSAGE value="Finished SES, refactored plotting code" />
-    <MESSAGE value="Added Holt, Damped Holt, and Holt-Winters forecasting." />
-    <MESSAGE value="Converted (seasonally) differenced forecasts back to actual forecasts, and computed error statistics on those." />
-    <MESSAGE value="Added another forecasting method, which creates seasonal indices and then uses these to convert data into seasonally adjusted data, on which SES etc is performed, before the data is converted back." />
-    <MESSAGE value="Refactored some of the helper code into different files, and added the comb and comb_adjusted forecasting methods." />
-    <MESSAGE value="Refactored a lot of code. Added the general test function. Checked that seasonal decomposition is correct (it is)." />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactored a lot of code. Added the general test function. Checked that seasonal decomposition is correct (it is)." />
-  </component>
-  <component name="XDebuggerManager">
-    <watches-manager>
-      <configuration name="PythonConfigurationType">
-        <watch expression="act" />
-        <watch expression="pred" />
-      </configuration>
-    </watches-manager>
-  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/AdvancedResearchProject$Main.coverage" NAME="Main Coverage Results" MODIFIED="1587551841881" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/AdvancedResearchProject$Stats_Forecast.coverage" NAME="Stats Forecast Coverage Results" MODIFIED="1586534443831" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/AdvancedResearchProject$Pandas.coverage" NAME="Pandas Coverage Results" MODIFIED="1573231911049" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/stats" />
+    <SUITE FILE_PATH="coverage/AdvancedResearchProject$main.coverage" NAME="main Coverage Results" MODIFIED="1588187849820" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/AdvancedResearchProject$Test.coverage" NAME="Test Coverage Results" MODIFIED="1588507316058" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/stats/naiveS.py" />
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/sklearn/utils/validation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-535">
-          <caret line="53" selection-start-line="53" selection-end-line="53" />
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor />
+          <second_editor />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stats/holtWinters.py" />
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/pandas/core/indexes/base.py">
+    <entry file="file://$PROJECT_DIR$/ml/basic_lstm.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="625">
-          <caret line="4729" selection-start-line="4729" selection-end-line="4729" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/pandas/core/series.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="1070" selection-start-line="1070" selection-end-line="1070" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/stattools.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="124" column="4" selection-start-line="124" selection-start-column="4" selection-end-line="124" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/matplotlib/pyplot.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15720">
-          <caret line="1097" column="4" selection-start-line="1097" selection-start-column="4" selection-end-line="1097" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stats/theta.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="660">
-          <caret line="46" column="26" selection-start-line="46" selection-start-column="26" selection-end-line="46" selection-end-column="26" />
+        <state>
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stats/plots.py" />
-    <entry file="file://$PROJECT_DIR$/stats/ses.py" />
-    <entry file="file://$USER_HOME$/Library/Caches/PyCharm2019.1/python_stubs/-1361816944/math.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="313">
-          <caret line="104" column="4" selection-start-line="104" selection-start-column="4" selection-end-line="104" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/statespace/tools.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="138">
-          <caret line="320" column="4" selection-start-line="320" selection-start-column="4" selection-end-line="320" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/numpy/lib/index_tricks.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6133">
-          <caret line="430" column="20" selection-start-line="430" selection-start-column="20" selection-end-line="443" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/torch/nn/modules/module.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="589">
-          <caret line="858" selection-start-line="858" selection-end-line="858" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/other/demo.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="387">
-          <caret line="80" column="34" lean-forward="true" selection-start-line="80" selection-start-column="34" selection-end-line="80" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/arima_model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="313">
-          <caret line="999" column="8" selection-start-line="999" selection-start-column="8" selection-end-line="999" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/other/ses.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-268">
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/other/naive2.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/base/tsa_model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="313">
-          <caret line="45" column="8" selection-start-line="45" selection-start-column="8" selection-end-line="45" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../BrysonPredictor/lib/python3.7/site-packages/pip/_vendor/distlib/util.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="313">
-          <caret line="486" column="13" selection-start-line="486" selection-start-column="13" selection-end-line="486" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tutorials/pandas1.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="239">
-          <caret line="63" column="3" selection-start-line="63" selection-start-column="3" selection-end-line="63" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/matplotlib/artist.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="218">
-          <caret line="208" selection-start-line="208" selection-end-line="208" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ml/dilated_lstm.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1515">
-          <caret line="101" column="15" selection-start-line="101" selection-start-column="15" selection-end-line="101" selection-end-column="15" />
-          <folding>
-            <element signature="e#0#12#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ml/non_lin.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="5" column="8" selection-start-line="5" selection-start-column="8" selection-end-line="5" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/torch/optim/optimizer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-10">
-          <caret line="17" column="17" selection-start-line="17" selection-start-column="17" selection-end-line="17" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/torch/optim/adam.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="5" column="16" selection-start-line="5" selection-start-column="16" selection-end-line="5" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/matplotlib/axes/_base.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1901">
-          <caret line="3320" column="40" lean-forward="true" selection-start-line="3320" selection-start-column="40" selection-end-line="3320" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/numpy/polynomial/polynomial.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="573">
-          <caret line="1342" column="24" selection-start-line="1342" selection-start-column="24" selection-end-line="1342" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hybrid/es_rnn_ex.py" />
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/tests/test_holtwinters.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="313">
-          <caret line="412" column="43" selection-start-line="412" selection-start-column="43" selection-end-line="412" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stats/exponential_smoothing.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="435">
-          <caret line="29" column="4" selection-start-line="29" selection-start-column="4" selection-end-line="35" selection-end-column="29" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/holtwinters.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4">
-          <caret line="689" column="44" selection-start-line="689" selection-start-column="44" selection-end-line="689" selection-end-column="44" />
-          <folding>
-            <element signature="e#900#1184#0" />
-            <element signature="e#1242#1508#0" />
-            <element signature="e#1572#2042#0" />
-            <element signature="e#2106#2567#0" />
-            <element signature="e#2619#3038#0" />
-            <element signature="e#3103#3604#0" />
-            <element signature="e#3669#4182#0" />
-            <element signature="e#4254#4996#0" />
-            <element signature="e#5068#5818#0" />
-            <element signature="e#5890#6602#0" />
-            <element signature="e#8407#15399#0" />
-            <element signature="e#15455#15824#0" />
-            <element signature="e#39898#42378#0" />
-            <element signature="e#42419#45650#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hybrid/es_rnn_i.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3135">
-          <caret line="212" column="45" selection-start-line="212" selection-start-column="45" selection-end-line="212" selection-end-column="45" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ml/drnn.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="146">
-          <caret line="29" column="8" selection-start-line="29" selection-start-column="8" selection-end-line="29" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/results/average.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="35" selection-start-line="7" selection-start-column="35" selection-end-line="7" selection-end-column="35" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/results/print_results.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="16" column="26" selection-start-line="16" selection-start-column="26" selection-end-line="16" selection-end-column="26" />
+        <state>
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/results/params.txt">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/base/model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2432">
-          <caret line="257" column="8" selection-start-line="257" selection-start-column="8" selection-end-line="257" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/statespace/mlemodel.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="337" column="8" selection-start-line="337" selection-start-column="8" selection-end-line="337" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/pmdarima/arima/auto.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="175" column="4" selection-start-line="175" selection-start-column="4" selection-end-line="175" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/statespace/sarimax.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="112">
-          <caret line="297" column="8" selection-start-line="297" selection-start-column="8" selection-end-line="297" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stats/naive.py">
+    <entry file="file://$APPLICATION_CONFIG_DIR$/pycharm.vmoptions">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
-          <caret line="19" column="52" selection-start-line="19" selection-start-column="52" selection-end-line="19" selection-end-column="52" />
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/results/average_48.py">
+    <entry file="file://$PROJECT_DIR$/hybrid/testing.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="3" selection-start-line="3" selection-end-line="6" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stats/arima.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="58" column="22" selection-start-line="58" selection-start-column="22" selection-end-line="58" selection-end-column="22" />
+        <state relative-caret-position="3435">
+          <caret line="229" column="11" selection-start-line="229" selection-start-column="11" selection-end-line="229" selection-end-column="11" />
           <folding>
-            <element signature="e#0#28#0" expanded="true" />
+            <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/hybrid/es_rnn_s.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3375">
-          <caret line="228" column="51" selection-start-line="228" selection-start-column="51" selection-end-line="228" selection-end-column="51" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ml/ml_helpers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3630">
-          <caret line="242" selection-start-line="242" selection-end-line="243" selection-end-column="52" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stats/stats_helpers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3255">
-          <caret line="217" selection-start-line="217" selection-end-line="217" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stats/errors.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="21" column="60" selection-start-line="21" selection-start-column="60" selection-end-line="21" selection-end-column="60" />
-          <folding>
-            <element signature="e#0#21#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/hybrid/testing.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2400">
-          <caret line="174" column="13" selection-start-line="174" selection-start-column="13" selection-end-line="174" selection-end-column="13" />
+        <state relative-caret-position="1380">
+          <caret line="95" column="9" selection-start-line="95" selection-start-column="9" selection-end-line="95" selection-end-column="9" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/hybrid/hybrid.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1485">
-          <caret line="99" column="20" selection-start-line="99" selection-start-column="20" selection-end-line="99" selection-end-column="20" />
+        <state relative-caret-position="495">
+          <caret line="33" column="12" selection-start-line="33" selection-start-column="12" selection-end-line="33" selection-end-column="12" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
+    <entry file="file://$PROJECT_DIR$/hybrid/es_rnn_i.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="169">
-          <caret line="151" lean-forward="true" selection-start-line="151" selection-end-line="171" selection-end-column="5" />
+        <state relative-caret-position="1724">
+          <caret line="340" column="10" selection-start-line="340" selection-start-column="10" selection-end-line="340" selection-end-column="10" />
+          <folding>
+            <element signature="e#0#12#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stats/stats_helpers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="373">
+          <caret line="84" column="75" selection-start-line="84" selection-start-column="14" selection-end-line="84" selection-end-column="75" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-  </component>
-  <component name="masterDetails">
-    <states>
-      <state key="ScopeChooserConfigurable.UI">
-        <settings>
-          <splitter-proportions>
-            <option name="proportions">
-              <list>
-                <option value="0.2" />
-              </list>
-            </option>
-          </splitter-proportions>
-        </settings>
-      </state>
-    </states>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="268">
+          <caret line="38" column="25" selection-start-line="38" selection-start-column="25" selection-end-line="38" selection-end-column="46" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ml/ml_helpers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="533">
+          <caret line="47" column="10" selection-start-line="47" selection-start-column="10" selection-end-line="47" selection-end-column="10" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
   </component>
 </project>
