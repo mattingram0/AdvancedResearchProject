@@ -3,6 +3,7 @@ import torch.nn as nn
 
 use_cuda = torch.cuda.is_available()
 
+# Used to develop and test the dilated LSTM
 def main():
     n_input = 3
     n_hidden = 6
@@ -20,6 +21,7 @@ def main():
     # out, hidden = model(x2, hidden)
 
 
+# Original implementation of the dLSTM
 class DRNN(nn.Module):
 
     def __init__(self, num_features, n_hidden, n_layers, dropout=0, cell_type='GRU',
@@ -284,4 +286,4 @@ class DRNN(nn.Module):
         else:
             return hidden
 
-main()
+# main()

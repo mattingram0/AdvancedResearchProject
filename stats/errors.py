@@ -1,8 +1,5 @@
 from math import sqrt
 import numpy as np
-import sys
-
-# All the error functions accept input data as a pandas series
 
 # Calculate the Mean Absolute Percentage Error of a prediction
 def sMAPE(predicted, actual):
@@ -30,8 +27,7 @@ def MAE(predicted, actual):
 
 
 # Calculate the Mean Average Scaled Error of a prediction
-# The actual must include all data from start of the data set to the end of
-# the forecast
+# The actual must include all data from start of the data set
 def MASE(predicted, actual, seasonality, test_hours):
     act = actual[-test_hours:].to_numpy()
     pred = predicted.to_numpy()

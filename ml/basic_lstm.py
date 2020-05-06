@@ -6,8 +6,7 @@ import torch.nn as nn
 from sklearn.preprocessing import MinMaxScaler
 
 
-# Here, train_hours is the window size, and test_hours is the size of the
-# data to be reserved for testing
+# Generate a forecast
 def forecast(data, train_hours, valid_hours, test_hours, window_size,
              in_place):
     # Scale the training data into the range (0, 1), and generate training set
@@ -134,6 +133,7 @@ def create_training_set(train_data, window_size):
     return np.array(inputs), np.array(labels)
 
 
+# First attempt at implementing a simple LSTM layer
 class LSTM(nn.Module):
     def __init__(self, output_size, input_size, hidden_size, num_layers):
         super().__init__()

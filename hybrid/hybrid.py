@@ -11,9 +11,7 @@ from ml.ml_helpers import pinball_loss
 from stats.stats_helpers import deseasonalise
 
 
-# Train the model and generate a single prediction. Training data must
-# include test data to ensure it is of the correct length, it's not actually
-# used
+# Train ES-RNN-S(W) (or -D(W)) model and generate single prediction
 def es_rnn_s(data, forecast_length, seasonality,
              demand_features, weather_features, weather,
              ensemble, multi_ts):
@@ -97,6 +95,7 @@ def es_rnn_s(data, forecast_length, seasonality,
     return prediction
 
 
+# Train ES-RNN-I(W) model and generate single prediction
 def es_rnn_i(data, forecast_length, seasonality, demand_features,
              weather_features, weather, ensemble):
 
@@ -176,9 +175,7 @@ def es_rnn_i(data, forecast_length, seasonality, demand_features,
     return prediction
 
 
-# Trains a model and generates a prediction. If ensemble=True, the forecasts
-# from the final 5 epochs are used. If we wish to use the extra information
-# that the ES_RNN_S.predict() function returns, we can call it directly.
+# Helper function to train the ES-RNN-S/D(W) model
 def train_and_predict_s(lstm, data, window_size, output_size, lvp, loss_func,
                         num_epochs, local_init_lr, global_init_lr,
                         percentile, auto_lr, variable_lr, auto_rt,
@@ -316,6 +313,7 @@ def train_and_predict_s(lstm, data, window_size, output_size, lvp, loss_func,
         return prediction, losses
 
 
+# Helper function to train the ES-RNN-I(W) model
 def train_and_predict_i(lstm, data, window_size, output_size, lvp,
                         loss_func, num_epochs, local_init_lr, global_init_lr,
                         percentile, auto_lr, variable_lr, auto_rt,

@@ -2,30 +2,7 @@ import torch
 import torch.nn as nn
 
 
-# def main():
-#     seq_len = 32
-#     hidden_size = 10
-#     num_layers = 4
-#     num_features = 2
-#     batch_size = 4
-#     cell_type = 'LSTM'
-#
-#     model = DRNN(2, hidden_size, num_layers, cell_type=cell_type)
-#
-#     x1 = torch.randn(seq_len, batch_size, num_features)
-#     x2 = torch.randn(seq_len, batch_size, num_features)
-#
-#     out, (h_n, c_n) = model(x1)
-#     print(out.shape)
-#     print(len(h_n), [h.shape for h in h_n])
-#     print(len(c_n), [c.shape for c in c_n])
-#
-#     out2, (h_n2, c_n2) = model(x2, (h_n, c_n))
-#     print(out2.shape)
-#     print(len(h_n2), [h.shape for h in h_n2])
-#     print(len(c_n2), [c.shape for c in c_n2])
-
-
+# Final implementation of the 4 layer dilated LSTM
 class DRNN(nn.Module):
     def __init__(self, num_features, hidden_size, num_layers, dropout=0,
                  cell_type='LSTM', batch_first=False, dilations=None,
@@ -58,11 +35,7 @@ class DRNN(nn.Module):
         for i in range(num_layers):
             if i == 0:
                 c = cell(num_features, hidden_size, dropout=dropout)
-                c.double()  # TODO FOR SOME REASON THIS FIXED IT. Think it's
-                # because the model itself needs to be using doubles for the
-                # weight matrices, whereas prior to this it uses floats by
-                # default. possibly consider changing all to floats and
-                # removing this to save time and memory
+                c.double()
             else:
                 c = cell(hidden_size, hidden_size, dropout=dropout)
                 c.double()
@@ -262,6 +235,3 @@ class DRNN(nn.Module):
             return hidden.double(), cell_state.double()
         else:
             return hidden.double()
-
-
-# main()

@@ -1,12 +1,10 @@
-import pandas as pd
-import numpy as np
 import torch
 import torch.nn as nn
-import matplotlib.pyplot as plt
 
 from stats import stats_helpers
 
 
+# Generate forecast for basic LSTM model
 def forecast(data, train_hours, test_hours, in_place):
     stats_helpers.indices_adjust(
         data, len(data) - test_hours, test_hours, "multiplicative"
@@ -76,6 +74,7 @@ def forecast(data, train_hours, test_hours, in_place):
     # width and height of the cuboid is 1 x 1
 
 
+# Calculate input, target pairs for LSTM model
 def create_pairs(train_data, window_size):
     pairs = []
 
@@ -87,6 +86,7 @@ def create_pairs(train_data, window_size):
     return pairs
 
 
+# Basic LSTM layer. One feature. One hour forecast.
 class LSTM(nn.Module):
     def __init__(self, input_size=1, hidden_layer_size=40, output_size=1):
         super().__init__()  # Call __init__() of nn.Module()

@@ -1,10 +1,10 @@
-# Stateful, mini-batch trained DRNN. One feature.
 import torch
 import torch.nn as nn
 from torch.distributions import Normal, Uniform
 from ml import drnn, non_lin
 
 
+# Final implementation of the ES-RNN-S/D (W) model
 class ES_RNN_S(nn.Module):
     def __init__(self, output_size, input_size, batch_size, hidden_size,
                  num_layers, demand_features, weather_features, seasonality,

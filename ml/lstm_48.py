@@ -3,11 +3,11 @@ import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 from sklearn.preprocessing import MinMaxScaler
-import sys
 
 from ml.ml_helpers import create_pairs, batch_data
 
 
+# Generate a forecast
 def forecast(data, train_hours, valid_hours, test_hours, window_size,
              output_size, batch_size, in_place):
 
@@ -52,6 +52,7 @@ def forecast(data, train_hours, valid_hours, test_hours, window_size,
                scaler)
 
 
+# Complete training procedure
 def train_model(lstm, optimizer, loss_func, num_epochs, training_data,
                 batch_size):
     # Split into batches
@@ -72,6 +73,7 @@ def train_model(lstm, optimizer, loss_func, num_epochs, training_data,
             print("Epoch %d: Loss - %1.5f" % (epoch, loss.item()))
 
 
+# Train the model on a single batch
 def train_batch(lstm, optimizer, loss_func, inputs, labels):
     outputs = lstm(inputs.double())
     labels = labels.view(labels.size(0), -1)  # Remove redundant dimension
@@ -83,6 +85,7 @@ def train_batch(lstm, optimizer, loss_func, inputs, labels):
     return loss
 
 
+# Test the model on unseen data
 def test_model(lstm, data, valid_data, test_data, train_hours, window_size,
                scaler):
 
@@ -120,7 +123,7 @@ def test_model(lstm, data, valid_data, test_data, train_hours, window_size,
     plt.show()
 
 
-# Stateful, mini-batch trained LSTM. One feature.
+# Stateful, mini-batch trained LSTM. One feature. 48 hour forecasts.
 class LSTM(nn.Module):
     def __init__(self, output_size, input_size, batch_size, hidden_size,
                  num_layers):

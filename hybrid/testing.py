@@ -6,7 +6,8 @@ import os
 import torch
 import json
 
-from ml.ml_helpers import pinball_loss, plot_test
+from ml.ml_helpers import pinball_loss
+from plotting import plot_test
 from stats.stats_helpers import split_data, deseasonalise, reseasonalise
 from stats.errors import sMAPE, MASE, OWA
 from stats.naive import naive_2
@@ -15,7 +16,7 @@ from hybrid.es_rnn_s import ES_RNN_S
 from hybrid.es_rnn_i import ES_RNN_I
 
 
-# General function used to do testing and tweaking
+# General function used to do testing and tweaking of the hybrid model
 def run(demand_df, weather_df):
     # Optional command line argumenkts to specify year/season
     year = -1 if len(sys.argv) < 3 else int(sys.argv[2])
@@ -149,8 +150,7 @@ def run(demand_df, weather_df):
                     res_base, weather)
 
 
-# If output_size != 48 then this is broken. Pass in valid data or test
-# data!! (i.e all up to the end of the valid section/test section).
+# Test the model across entire week of validation or test data (7 forecasts)
 def test_model_week(data, output_size, input_size, hidden_size,
                     num_layers, batch_first, dilations, demand_features,
                     weather_features, seasonality, residuals, window_size,

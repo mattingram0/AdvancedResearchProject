@@ -3,6 +3,7 @@ import pandas as pd
 from statsmodels.tsa.holtwinters import SimpleExpSmoothing
 
 
+# Implementation of the Theta method, following Hyndman's paper
 def theta(data, forecast_length):
     theta0 = 0
     theta2 = 2

@@ -1,38 +1,27 @@
-import pandas as pd
+import json
+import os.path
+import sys
+
 import matplotlib.pyplot as plt
 import numpy as np
-
-import sys
-import os.path
-import json
-
+import pandas as pd
 from pandas.plotting import register_matplotlib_converters
-from stats import arima, exponential_smoothing, naive, theta, errors, stats_helpers
 from sklearn.preprocessing import MinMaxScaler
+
+from hybrid import hybrid
 from ml import ml_helpers
-from hybrid import hybrid, testing
+from stats import arima, exponential_smoothing, naive, theta, errors, \
+    stats_helpers
 
 
+# Entry point
 def main():
     demand_df = load_demand_data()
-    # weather_df = load_weather_data()
-    # testing.run(demand_df, weather_df)
-    ml_helpers.plots_for_presentation(demand_df)
-    # test(demand_df, weather_df, int(sys.argv[1]), int(sys.argv[2]))
-    # Season, year, test
-    # stats_helpers.plot_forecasts(demand_df, "Winter", 4)
-    # stats_helpers.check_errors(demand_df)
-    # stats_helpers.plot_48_results()
-    # stats_helpers.train_test_split(demand_df["total load actual"])
-    # stats_helpers.plot_a_season(demand_df, "Spring")
-
-    # Plotting results from Hamilton
-    # test_path = "/Users/matt/Projects/AdvancedResearchProject/test/smyl_multiple_weather_year_2_summer_-1_-1.txt"
-    #
-    # with open(test_path) as f:
-    #     ml_helpers.plot_test(json.load(f), 336, 48, True)
+    weather_df = load_weather_data()
+    test(demand_df, weather_df, int(sys.argv[1]), int(sys.argv[2]))
 
 
+# Loads the energy demand data and performs interpolation
 def load_demand_data():
     base = os.path.abspath(os.path.dirname(__file__))
     filename = os.path.join(base, "data/spain/energy_dataset.csv")
@@ -53,6 +42,7 @@ def load_demand_data():
     return df
 
 
+# Loads weather data and calculates additional metrics
 def load_weather_data():
     base = os.path.abspath(os.path.dirname(__file__))
     filename = os.path.join(base, "data/spain/weather_features.csv")
@@ -96,7 +86,7 @@ def load_weather_data():
     return avg_scaled_df
 
 
-# The method must accept two parameters: season no. (1 - 4) and method no.
+# Testing procedure. Tests given model on given season and saves results
 def test(demand_df, weather_df, season_no, model_no):
     demand_features = demand_df.columns
     weather_features = weather_df.columns
@@ -176,13 +166,7 @@ def test(demand_df, weather_df, season_no, model_no):
             False, 1],
     }
 
-    # sarima_orders = {
-      # 1: [(2, 0, 0), (1, 0, 1, 168)],
-      # 2: [(2, 0, 0), (1, 0, 1, 168)],
-      # 3: [(2, 0, 0), (1, 0, 1, 168)],
-      # 4: [(1, 0, 2), (1, 0, 1, 168)]
-      # }
-
+    # Optimal SARIMA orders for each season
     sarima_orders = {
         1: [(2, 0, 0), (1, 0, 1, 168)],
         2: [(2, 0, 1), (1, 0, 1, 168)],
@@ -474,7 +458,7 @@ def test(demand_df, weather_df, season_no, model_no):
             json.dump(saved_params, file)
 
 
-# Delete all files in results/, then run this function to regenerate
+# Delete all files in results/, then run this to regenerate empty results files
 def reset_results_files():
     file_path = os.path.abspath(os.path.dirname(__file__))
 
@@ -536,12 +520,12 @@ def reset_results_files():
         json.dump(res1, f)
 
 
+# Output options for pandas and matplotlib
 register_matplotlib_converters()
 pd.options.mode.chained_assignment = None
 pd.set_option('display.max_columns', 500)  # Shows all columns
 pd.set_option('display.expand_frame_repr', False)  # Prevents line break
 plt.style.use('seaborn-deep')
-main()
 
-# # Drop the columns whose values are all either 0 or missing
-# return df.loc[:, (pd.isna(df) == (df == 0)).any(axis=0)]
+# Run main()
+main()

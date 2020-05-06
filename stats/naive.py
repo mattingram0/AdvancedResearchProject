@@ -1,6 +1,7 @@
 import pandas as pd
 
 
+# Calculate Naive1 prediction
 def naive_1(data,  forecast_length):
     fitted_values = data.shift(1)
     fitted_values[0] = data[0]
@@ -8,6 +9,7 @@ def naive_1(data,  forecast_length):
     return fitted_values.append(forecasted_values).reset_index(drop=True)
 
 
+# Calculate Naive2 prediction
 def naive_2(data, forecast_length):
     fitted_values = data.shift(1)
     fitted_values[0] = data[0]
@@ -15,6 +17,7 @@ def naive_2(data, forecast_length):
     return fitted_values.append(forecasted_values).reset_index(drop=True)
 
 
+# Calculate NaiveS prediction
 def naive_s(data, forecast_length, seasonality):
     fitted_values = data.shift(seasonality)
     fitted_values[:seasonality] = data[:seasonality]
