@@ -104,10 +104,6 @@ def sliding_window(train_data, output_size, window_size, section, multiple):
         x = train_data[i: i + window_size]
 
         if multiple:
-            # Use only the total load actual column (column 14) for the label
-            # y = train_data[i + window_size: i + window_size + output_size,
-        # 14]
-            # TODO - CHANGE BACK when fixed the zero values
             y = train_data[i + window_size: i + window_size + output_size, 1]
         else:
             y = train_data[i + window_size: i + window_size + output_size]

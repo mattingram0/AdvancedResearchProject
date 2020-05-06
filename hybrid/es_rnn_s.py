@@ -12,10 +12,6 @@ class ES_RNN_S(nn.Module):
                  dilations=None, residuals=tuple([[]]), init_seasonality=None,
                  init_level_smoothing=None, init_seas_smoothing=None):
 
-        # TODO - the initial smoothing coefficients will need to be a
-        #  dictionary, and given for all the features, when I add the other
-        #  features
-
         super().__init__()
 
         # RNN Hyperparameters
@@ -242,10 +238,6 @@ class ES_RNN_S(nn.Module):
     # data that extends into the test, then the final seasonality values are
     # repeated, along with the final length. We ca neither specify to make
     # contiguous forecasts, or we can specify to make overlapping forecasts.
-    #
-    # Todo 2. Add the contiguous/non-contiguous functionality. If you pass
-    #  in cont=True, you'll get a 1d tensor of contiguous forecasts. If
-    #  cont=True, you'll get a 2d tensor of overlapping forecasts.
     def predict(self, data, window_size, output_size, weather,
                 cont=False, skip_lstm=False):
         x = torch.tensor(data["total load actual"], dtype=torch.double)

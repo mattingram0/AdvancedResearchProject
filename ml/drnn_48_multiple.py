@@ -148,7 +148,6 @@ class DRNN_48(nn.Module):
         self.cell_type = cell_type
 
         # Allows the LSTM to be stateful between mini-batches
-        # TODO - this is not correct, but doesn't require changing at the
         # moment as I'm not using stateful LSTM. init_hidden_states needs
         # changing too
         if self.cell_type == "LSTM":

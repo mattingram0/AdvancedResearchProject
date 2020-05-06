@@ -44,7 +44,6 @@ def sarima(data, forecast_length, order, seasonal_order):
     except np.linalg.LinAlgError as err:
         print(err)
         print("SARIMA Forecast Failed. Exiting.")
-        sys.exit(0)
     sys.stderr.flush()
     sys.stdout.flush()
     prediction = fitted_model.forecast(forecast_length)

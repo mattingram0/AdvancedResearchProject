@@ -346,13 +346,6 @@ def test_model_week(data, output_size, input_size, hidden_size,
         sys.stderr.flush()
         sys.stdout.flush()
 
-        # Save the model and exit - TODO REMOVE
-        torch.save(lstm,
-                   "/Users/matt/Projects/AdvancedResearchProject/models"
-                   "/model_all"
-                   ".pt")
-        sys.exit()
-
     # Print final results
     owas_np = np.array(owas)
     num_improved = len(owas_np[owas_np < 1.0])

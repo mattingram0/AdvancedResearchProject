@@ -42,7 +42,6 @@ def plots_for_presentation(demand_df):
     for ax in axes:
         ax.set_xticks([])
     plt.show()
-    sys.exit(0)
 
     pre_end = 5 * 24
     inp_end = 14 * 24 + pre_end

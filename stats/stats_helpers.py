@@ -234,7 +234,7 @@ def identify_sarima(df):
             ).fit()
             end_1 = timer()
             print("Time to Fit one Model:", end_1 - start_1)
-            sys.exit(0)
+
             best = fitted_model.aic
             updated = True
 

@@ -168,7 +168,6 @@ def differenced_plots(data, train_hours, test_hours):
     plt.show()
 
 
-# TODO - finish this, doesn't work
 def power_spectrum_plot(data):
     f, pxx_spec = signal.periodogram(data['total load actual'], fs=len(
         data['total load actual']), scaling='density')
