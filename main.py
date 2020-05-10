@@ -49,8 +49,8 @@ def load_weather_data():
     weather_cols = ["dt_iso", "city_name", "temp", "humidity", "wind_speed",
                     "pressure"]
     weather_df = pd.read_csv(filename, parse_dates=["dt_iso"],
-                          infer_datetime_format=True,
-                          usecols=weather_cols)
+                             infer_datetime_format=True,
+                             usecols=weather_cols)
 
     # Remove duplicates in the weather data
     weather_df = weather_df.drop_duplicates(["dt_iso", "city_name"])
